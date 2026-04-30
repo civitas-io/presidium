@@ -164,6 +164,58 @@ Order: stdlib → third-party → local. Enforced by Ruff `I` rules.
 
 ---
 
+## Wiki Maintenance
+
+This project uses the [LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — `docs/` is a persistent, compounding knowledge base maintained by AI assistants. The wiki gets richer with every source ingested and every question asked. **You (the AI) own the wiki's maintenance. The human curates sources and asks questions.**
+
+### Key Files
+
+- **`docs/index.md`** — Content catalog. Read this FIRST on any query to find relevant pages. Updated on every ingest.
+- **`docs/log.md`** — Append-only chronological log. Every ingest, query-filing, and lint pass gets an entry.
+
+### Ingest Workflow
+
+When the human provides new information (article, competitor update, market data, design decision, Civitas API change):
+
+1. **Read the source** and discuss key takeaways with the human
+2. **Update existing wiki pages** that the new information affects — don't just create new pages, revise what's already there:
+   - Competitive data → update `docs/research/competitive-landscape.md`
+   - Market numbers → update `docs/research/market-analysis.md`
+   - Fiddler news → update `docs/research/fiddler-relationship.md`
+   - Architecture insight → update relevant `docs/architecture/` and `docs/design/` pages
+   - Scope change → update `docs/rfcs/001-presidium-scope.md`
+3. **Create new pages** only if the topic genuinely doesn't fit in existing pages
+4. **Update `docs/index.md`** — add/revise the entry for every page touched
+5. **Append to `docs/log.md`** — record what was ingested, what pages were updated, key decisions made
+6. **Update AGENTS.md** if conventions, structure, or glossary changed
+
+A single source may touch 5-15 wiki pages. That's expected.
+
+### Query Workflow
+
+When the human asks a question against the wiki:
+
+1. **Read `docs/index.md`** to find relevant pages
+2. **Read those pages** and synthesize an answer with citations
+3. **If the answer is valuable and reusable** (comparison, analysis, synthesis), offer to file it as a new wiki page
+4. Filed answers go in the appropriate `docs/` subdirectory
+5. Update `docs/index.md` and append to `docs/log.md`
+
+### Lint Workflow
+
+Periodically (or when the human asks), health-check the wiki:
+
+- **Stale data** — market numbers with dates that have passed, competitor stats that may have changed (star counts, funding, versions)
+- **Contradictions** — pages that disagree with each other due to sequential updates
+- **Orphan pages** — pages not linked from `docs/index.md` or from other pages
+- **Missing pages** — concepts mentioned frequently but lacking their own page
+- **Missing cross-references** — pages that should link to each other but don't
+- **Data gaps** — areas where a web search could fill in missing information
+
+Report findings to the human. Fix mechanical issues (broken links, index updates) directly. Flag substantive issues (contradictions, stale claims) for discussion.
+
+---
+
 ## PR Checklist
 
 Before merging:
