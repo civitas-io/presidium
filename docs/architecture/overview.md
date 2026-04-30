@@ -4,54 +4,44 @@
 
 ## System Architecture
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                    External Consumers                     │
-│         Fiddler  ·  Arize  ·  Langfuse  ·  Datadog       │
-│                   (Observability / Safety)                │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   ┌──────────────────┐    ┌──────────────────┐          │
-│   │  presidium-eval  │    │ presidium-policy │          │
-│   │                  │    │                  │          │
-│   │  Eval framework  │    │  Policy engine   │          │
-│   │  Scoring         │    │  YAML/OPA/Cedar  │          │
-│   │  Export backends  │    │  Enforcement     │          │
-│   └────────┬─────────┘    └────────┬─────────┘          │
-│            │                       │                     │
-│   ┌────────┴─────────┐    ┌───────┴──────────┐          │
-│   │    presidium-     │    │    presidium-     │          │
-│   │   llm-gateway     │    │   mcp-gateway     │          │
-│   │                   │    │                   │          │
-│   │  LLM routing      │    │  Tool access      │          │
-│   │  Rate limiting    │    │  Poisoning detect  │          │
-│   │  Cost tracking    │    │  Credential redact │          │
-│   └────────┬──────────┘    └───────┬───────────┘          │
-│            │                       │                     │
-│            └───────────┬───────────┘                     │
-│                        │                                 │
-│            ┌───────────┴───────────┐                     │
-│            │  presidium-registry   │                     │
-│            │                       │                     │
-│            │  Agent identity       │                     │
-│            │  Capabilities         │                     │
-│            │  Trust tracking       │                     │
-│            └───────────┬───────────┘                     │
-│                        │                                 │
-│  P R E S I D I U M     │    (governance layer)           │
-├────────────────────────┼─────────────────────────────────┤
-│  C I V I T A S         │    (runtime layer)              │
-│                        │                                 │
-│   ┌────────────────────┴─────────────────────┐           │
-│   │  Runtime · Supervisor · MessageBus       │           │
-│   │  AgentProcess · Registry · Transport     │           │
-│   │  StateStore · OTEL · Plugins             │           │
-│   └──────────────────────────────────────────┘           │
-│                                                          │
-├──────────────────────────────────────────────────────────┤
-│                    Agent Frameworks                       │
-│      LangGraph  ·  CrewAI  ·  OpenAI SDK  ·  Custom      │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph External["External Consumers"]
+        Fiddler["Fiddler"]
+        Arize["Arize"]
+        Langfuse["Langfuse"]
+        Datadog["Datadog"]
+    end
+
+    subgraph Presidium["PRESIDIUM — Governance Layer"]
+        Eval["presidium-eval<br/><i>Eval framework · Scoring · Export</i>"]
+        Policy["presidium-policy<br/><i>Policy engine · YAML/OPA/Cedar · Enforcement</i>"]
+        LLMGw["presidium-llm-gateway<br/><i>LLM routing · Rate limiting · Cost tracking</i>"]
+        MCPGw["presidium-mcp-gateway<br/><i>Tool access · Poisoning detection · Credential redaction</i>"]
+        Registry["presidium-registry<br/><i>Agent identity · Capabilities · Trust tracking</i>"]
+    end
+
+    subgraph Civitas["CIVITAS — Runtime Layer"]
+        Runtime["Runtime · Supervisor · MessageBus<br/>AgentProcess · Registry · Transport<br/>StateStore · OTEL · Plugins"]
+    end
+
+    subgraph Frameworks["Agent Frameworks"]
+        LG["LangGraph"]
+        Crew["CrewAI"]
+        OAISDK["OpenAI SDK"]
+        Custom["Custom"]
+    end
+
+    Eval --> LLMGw
+    Eval --> Registry
+    Policy --> Registry
+    LLMGw --> Registry
+    MCPGw --> Registry
+    LLMGw --> Runtime
+    MCPGw --> Runtime
+    Registry --> Runtime
+    Eval -->|OTEL + metrics| External
+    Runtime --> Frameworks
 ```
 
 ## Key Design Decisions
@@ -97,20 +87,21 @@ The eval framework doesn't just score — it feeds back into governance:
 
 ## Data Flow
 
-```
-Agent Request → Registry Lookup → Policy Check → Action
-                                       │
-                                       ├─ ALLOW → Execute via Civitas
-                                       │           │
-                                       │           ├─ LLM call → LLM Gateway → Provider
-                                       │           ├─ Tool call → MCP Gateway → Tool
-                                       │           └─ Message → MessageBus → Target Agent
-                                       │
-                                       ├─ DENY → Error to agent, logged
-                                       │
-                                       └─ REQUIRE_APPROVAL → Queue for human review
-                                                    │
-                                                    └─ All paths → OTEL spans → Eval → Export
+```mermaid
+flowchart LR
+    A[Agent Request] --> B[Registry Lookup]
+    B --> C{Policy Check}
+    C -->|ALLOW| D[Execute via Civitas]
+    D --> D1[LLM call → LLM Gateway → Provider]
+    D --> D2[Tool call → MCP Gateway → Tool]
+    D --> D3[Message → MessageBus → Target Agent]
+    C -->|DENY| E[Error to agent, logged]
+    C -->|REQUIRE_APPROVAL| F[Queue for human review]
+    D1 --> G[OTEL spans → Eval → Export]
+    D2 --> G
+    D3 --> G
+    E --> G
+    F --> G
 ```
 
 ## Startup Sequence

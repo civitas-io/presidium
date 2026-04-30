@@ -22,17 +22,18 @@ Fiddler AI ($100M total funding, Series C Jan 2026) positions itself as "The Con
 
 ## Where They Sit in the Stack
 
-```
-┌─────────────────────────────────────────────┐
-│  OBSERVE & PROTECT         ← Fiddler        │
-│  Trust Models, Guardrails, Dashboards        │
-├─────────────────────────────────────────────┤
-│  GOVERN & ROUTE            ← Presidium       │
-│  Policy Engine, Registry, Gateways           │
-├─────────────────────────────────────────────┤
-│  RUN & SURVIVE             ← Civitas         │
-│  Supervision, Messaging, Transport           │
-└─────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Fiddler["OBSERVE & PROTECT — Fiddler"]
+        F1["Trust Models · Guardrails · Dashboards"]
+    end
+    subgraph Presidium["GOVERN & ROUTE — Presidium"]
+        P1["Policy Engine · Registry · Gateways"]
+    end
+    subgraph Civitas["RUN & SURVIVE — Civitas"]
+        C1["Supervision · Messaging · Transport"]
+    end
+    Fiddler ~~~ Presidium ~~~ Civitas
 ```
 
 **Fiddler sits above Presidium.** It consumes telemetry from whatever runs below.
@@ -49,8 +50,9 @@ Fiddler AI ($100M total funding, Series C Jan 2026) positions itself as "The Con
 
 ### The Natural Pipeline
 
-```
-Presidium (runtime + governance) → generates OTEL + eval signals → Fiddler (analyzes, dashboards, alerts)
+```mermaid
+flowchart LR
+    P["Presidium<br/><i>runtime + governance</i>"] -->|"OTEL + eval signals"| F["Fiddler<br/><i>analyzes, dashboards, alerts</i>"]
 ```
 
 Presidium is a **data source** for Fiddler. The `presidium-eval` package includes a `FiddlerExporter` that sends governance metrics to Fiddler for visualization.

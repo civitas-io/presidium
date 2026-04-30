@@ -44,11 +44,17 @@ class AgentRecord:
 
 ### Agent States
 
-```
-REGISTERED → STARTING → RUNNING → STOPPING → STOPPED
-                │                      │
-                └──── SUSPENDED ◄──────┘
-                      (policy violation or trust below threshold)
+```mermaid
+stateDiagram-v2
+    [*] --> REGISTERED
+    REGISTERED --> STARTING
+    STARTING --> RUNNING
+    RUNNING --> STOPPING
+    STOPPING --> STOPPED
+    STOPPED --> [*]
+    STARTING --> SUSPENDED : policy violation
+    RUNNING --> SUSPENDED : trust below threshold
+    SUSPENDED --> STARTING : human review approved
 ```
 
 ### Trust Score
