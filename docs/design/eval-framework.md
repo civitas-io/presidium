@@ -67,19 +67,15 @@ class ConsoleExporter(GovernanceExporter): ...
 
 Eval results feed back into the registry:
 
-```
-Agent acts → Policy evaluates → OTEL span emitted
-                                      │
-                                      ▼
-                              Eval loop collects
-                                      │
-                                      ▼
-                              Governance metrics computed
-                                      │
-                            ┌─────────┼─────────┐
-                            ▼         ▼         ▼
-                       Trust score   Export    Alert
-                       adjustment   (Fiddler)  (if threshold)
+```mermaid
+flowchart TD
+    A[Agent acts] --> B[Policy evaluates]
+    B --> C[OTEL span emitted]
+    C --> D[Eval loop collects]
+    D --> E[Governance metrics computed]
+    E --> F[Trust score adjustment]
+    E --> G["Export (Fiddler)"]
+    E --> H["Alert (if threshold)"]
 ```
 
 ### Civitas Integration

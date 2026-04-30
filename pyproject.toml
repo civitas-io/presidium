@@ -6,7 +6,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
 authors = [
-    { name = "Jeryn Mathew", email = "jeryn@civitas.io" },
+    { name = "Jeryn Mathew", email = "jerynmathew@gmail.com" },
 ]
 keywords = ["agents", "governance", "runtime", "civitas", "presidium"]
 classifiers = [

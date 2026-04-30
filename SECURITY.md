@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in Presidium, please report it responsibly.
 
-**Email:** security@civitas.io
+**Email:** jerynmathew@gmail.com
 
 **Please include:**
 - Description of the vulnerability

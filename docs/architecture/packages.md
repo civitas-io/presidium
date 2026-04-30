@@ -6,13 +6,18 @@
 
 Presidium is a monorepo with independently installable packages. Each package owns a specific governance concern and integrates with Civitas at well-defined extension points.
 
-```
-presidium-sdk (unified API)
-├── presidium-eval
-├── presidium-llm-gateway
-├── presidium-mcp-gateway
-├── presidium-policy
-└── presidium-registry (shared dependency)
+```mermaid
+graph TD
+    SDK["presidium-sdk<br/><i>unified API</i>"]
+    SDK --> Eval["presidium-eval"]
+    SDK --> LLMGw["presidium-llm-gateway"]
+    SDK --> MCPGw["presidium-mcp-gateway"]
+    SDK --> Policy["presidium-policy"]
+    SDK --> Registry["presidium-registry<br/><i>shared dependency</i>"]
+    Eval --> Registry
+    LLMGw --> Registry
+    MCPGw --> Registry
+    Policy --> Registry
 ```
 
 ---
