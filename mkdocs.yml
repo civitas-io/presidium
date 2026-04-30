@@ -1,0 +1,50 @@
+site_name: Presidium
+site_description: The governed agent platform built on Civitas
+site_url: https://civitas-io.github.io/presidium
+repo_url: https://github.com/civitas-io/presidium
+repo_name: civitas-io/presidium
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Vision:
+      - Manifesto: vision/manifesto.md
+      - Positioning: vision/positioning.md
+      - Roadmap: vision/roadmap.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Package Map: architecture/packages.md
+      - Full Stack: architecture/stack.md
+  - Design:
+      - Agent Registry: design/agent-registry.md
+      - Policy Engine: design/policy-engine.md
+      - LLM Gateway: design/llm-gateway.md
+      - MCP Gateway: design/mcp-gateway.md
+      - Eval Framework: design/eval-framework.md
+      - HTTP Gateway: design/http-gateway.md
+  - Research:
+      - Competitive Landscape: research/competitive-landscape.md
+      - Market Analysis: research/market-analysis.md
+      - Monetization: research/monetization.md
+      - Fiddler Relationship: research/fiddler-relationship.md
+  - RFCs:
+      - "001: Presidium Scope": rfcs/001-presidium-scope.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - admonition
+  - tables
+  - toc:
+      permalink: true
