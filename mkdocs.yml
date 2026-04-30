@@ -39,10 +39,15 @@ nav:
       - Fiddler Relationship: research/fiddler-relationship.md
   - RFCs:
       - "001: Presidium Scope": rfcs/001-presidium-scope.md
+  - Wiki Log: log.md
 
 markdown_extensions:
   - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed
   - admonition
   - tables
