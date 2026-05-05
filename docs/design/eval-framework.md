@@ -118,17 +118,7 @@ class GovernanceEvalAttachment:
 
 ### Feedback Loop
 
-```mermaid
-flowchart TD
-    A[Agent acts] --> B[Policy evaluates]
-    B --> C[AuditSink emits event]
-    C --> D[GovernanceAuditSink enriches]
-    D --> E[Aggregator computes window metrics]
-    E --> F[Trust score adjustment]
-    E --> G[Export to Fiddler / Arize / Langfuse]
-    E --> H[Alert if threshold breached]
-    F --> I[AgentRegistry.update_trust]
-```
+![Audit Feedback Loop](../../assets/audit-feedback-loop.svg)
 
 ## Open Questions
 
