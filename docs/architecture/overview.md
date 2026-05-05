@@ -96,24 +96,7 @@ For the full AAA architecture including HITL approval auth and the canonical cre
 
 ## Data Flow
 
-```mermaid
-flowchart LR
-    A[Agent Request] --> B[Registry Lookup]
-    B --> C{Policy Check}
-    C -->|ALLOW| D[Execute via Civitas]
-    D --> D1[LLM call → LLM Gateway → Provider]
-    D --> D2[Tool call → MCP Gateway → MCP Server]
-    D --> D3[Message → MessageBus → Target Agent]
-    C -->|DENY| E[Error to agent, logged]
-    C -->|REQUIRE_APPROVAL| F[Queue for human review]
-    F --> F1[Approver authenticates via IdP]
-    F1 --> F2[Resume signal → Civitas durable suspension]
-    D1 --> G[AuditSink → presidium-audit → Export]
-    D2 --> G
-    D3 --> G
-    E --> G
-    F2 --> G
-```
+![Data Flow](../assets/data-flow.svg)
 
 ---
 

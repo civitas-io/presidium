@@ -31,24 +31,7 @@
 
 ## The 2x2
 
-```mermaid
-quadrantChart
-    title Agent Infrastructure Landscape
-    x-axis "Low Runtime Depth" --> "High Runtime Depth"
-    y-axis "Low Governance Depth" --> "High Governance Depth"
-    quadrant-1 "Presidium (target)"
-    quadrant-2 "Governance Sidecars"
-    quadrant-3 "Frameworks"
-    quadrant-4 "Runtimes"
-    "Microsoft AGT": [0.2, 0.85]
-    "Fiddler": [0.15, 0.65]
-    "NeMo Guardrails": [0.1, 0.4]
-    "Presidium": [0.8, 0.85]
-    "Temporal": [0.85, 0.15]
-    "Civitas": [0.7, 0.1]
-    "CrewAI": [0.3, 0.15]
-    "LangChain": [0.35, 0.2]
-```
+![Agent Infrastructure Landscape](../assets/positioning-quadrant.svg)
 
 **Presidium occupies the only empty quadrant: deep runtime + deep governance.**
 
