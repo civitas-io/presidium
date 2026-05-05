@@ -4,53 +4,7 @@
 
 ## System Architecture
 
-```mermaid
-graph TB
-    subgraph External["External Consumers"]
-        Fiddler["Fiddler"]
-        Arize["Arize"]
-        Langfuse["Langfuse"]
-        Datadog["Datadog"]
-    end
-
-    subgraph Presidium["PRESIDIUM — Governance Layer"]
-        Audit["presidium-audit<br/><i>Governance metrics · Compliance · Export</i>"]
-        Policy["presidium-policy<br/><i>Policy engine · YAML/Cedar/OPA · Enforcement</i>"]
-        LLMGw["presidium-llm-gateway<br/><i>Rate limits · Cost tracking · Grant-based routing</i>"]
-        MCPGw["presidium-mcp-gateway<br/><i>Tool ACLs · OAuth 2.1 · Poisoning detection</i>"]
-        Registry["presidium-registry<br/><i>Agent identity · Grants · Credential vault · Trust</i>"]
-    end
-
-    subgraph Civitas["CIVITAS — Runtime Layer"]
-        Runtime["Runtime · Supervisor · MessageBus<br/>AgentProcess · RegistryListener · Transport<br/>StateStore · OTEL · AuditSink · Plugins"]
-    end
-
-    subgraph IdPs["Enterprise Identity Providers"]
-        Entra["Microsoft Entra ID"]
-        Okta["Okta / XAA"]
-        GCP["Google IAM"]
-        AWS["AWS IAM"]
-    end
-
-    subgraph Frameworks["Agent Frameworks"]
-        LG["LangGraph"]
-        Crew["CrewAI"]
-        OAISDK["OpenAI Agents SDK"]
-        Custom["Custom"]
-    end
-
-    Audit --> LLMGw
-    Audit --> Registry
-    Policy --> Registry
-    LLMGw --> Registry
-    MCPGw --> Registry
-    LLMGw --> Runtime
-    MCPGw --> Runtime
-    Registry --> Runtime
-    Registry --> IdPs
-    Audit -->|OTEL + governance metrics| External
-    Runtime --> Frameworks
-```
+![Presidium Architecture Overview](../assets/architecture-overview.svg)
 
 ---
 
