@@ -34,26 +34,94 @@ Work-Bench (NYC, $160M enterprise VC fund) published "The Rise of the Agent Runt
 
 **Relevance to Presidium:** Same layer (runtime) but different model. Temporal = workflow replay. Civitas/Presidium = actor model + supervision. Not direct competitors — different architectural philosophy.
 
-### Microsoft Agent Governance Toolkit (1,289 stars, 70 contributors)
+### Microsoft Agent Governance Toolkit (AGT)
 
-**What it is:** Runtime governance for AI agents — 10/10 OWASP coverage.
+> **License:** MIT. Safe to study and draw inspiration from.
+> **Reviewed:** 2026-05-06 via codebase analysis of microsoft/agent-governance-toolkit
 
-- 9 packages, 540K LOC, 5 languages (Python, TS, C#, Rust, Go)
-- 13,000+ tests, v3.3.0
-- Created March 2026, 13 releases in 2 months
+**What it is:** Multi-language governance sidecar toolkit for AI agents. Python is the
+reference implementation. 11 Python packages, 19 framework integrations, 5 language SDKs.
 
-**Architecture:**
-- Agent OS: Stateless policy engine (YAML, OPA Rego, Cedar)
-- Agent Mesh: Zero-trust identity (DIDs, Ed25519, trust decay)
-- Agent Hypervisor: Privilege rings (Ring 0-3)
-- Agent SRE: SLOs, error budgets, circuit breakers, chaos engineering
-- Agent Compliance: EU AI Act, NIST AI RMF, HIPAA, SOC 2
-- 20+ framework integrations
+**Architecture (Python packages):**
 
-**Strengths:** Comprehensive. Enterprise-grade. Microsoft backing. Multi-language.
-**Gaps:** No runtime. Governance sidecar only. 540K LOC complexity. Azure gravity.
+| Package | What it does |
+|---|---|
+| `agent-os` | Policy engine (YAML, OPA Rego, Cedar), capability model, MCP gateway, intent declaration |
+| `agent-mesh` | Zero-trust identity (DIDs, Ed25519), trust scoring, inter-agent protocol |
+| `agent-runtime` | Privilege rings (Ring 0-3), saga orchestration — mostly stubs, empty src/ |
+| `agent-sre` | SLOs, error budgets, circuit breakers, chaos engineering |
+| `agent-compliance` | OWASP verification, red-team CLI, EU AI Act / NIST / HIPAA mapping |
+| `agent-hypervisor` | Reversibility checker — classifies action blast radius |
+| `agent-primitives` | Shared base types across all packages |
 
-**Relevance to Presidium:** Occupies the governance quadrant without runtime. Presidium's key differentiator is native integration — governance as supervisor constraints, not external interceptors.
+**Conceptual enforcement stack (innermost to outermost):**
+1. Intent check — declared plan vs. actual action
+2. Policy evaluation — YAML rules + OPA/Rego/Cedar (< 0.1 ms)
+3. Constraint graph — DAG of agent-to-resource edges
+4. MCP gateway — intercept, sanitize, rate-limit, HITL approval gate
+5. Egress policy — domain allowlist on outbound connections
+6. Execution ring enforcement — Ring 0 (orchestrator) to Ring 3 (sandboxed)
+7. Audit log — JSONL, hash-chain architecture (cryptographic verification deferred)
+8. Trust score update — 5-factor weighted model
+
+**What's standard (already planned in Presidium):**
+- YAML policy rules → ALLOW/DENY/AUDIT
+- OPA/Rego/Cedar backends
+- HITL escalation and approval workflows
+- Audit logging
+- Framework adapters
+- Circuit breakers and SLO enforcement
+
+**What's genuinely novel (see presidium/docs/design/agt-inspiration.md for detailed design notes):**
+
+1. **Three-tier trust decomposition** — Identity / Authority / Liveness decay independently.
+   Missed heartbeat = suspension (reversible), not revocation. Restoration via delegation chain hash.
+
+2. **Intent declaration + drift detection** — Agents declare a plan upfront (`planned_actions`).
+   Every actual tool call is checked against it. Unplanned actions trigger `DriftPolicy`
+   (warn / block / re-declare). Catches goal-hijacking that per-action policy misses entirely.
+
+3. **Context budget scheduler** — Token allocation modeled as OS CPU scheduling. Global pool,
+   per-agent `ContextWindow`, 90%/10% lookup/reasoning split, typed Unix signals (SIGSTOP/SIGWARN),
+   `BudgetExceeded` on overrun. The OTP analogue: `max_message_queue_len` for LLM context.
+
+4. **Asymmetric policy-change propagation** — Tightening propagates immediately (412 on stale
+   cache). Loosening respects TTL. Simple rule; prevents newly-revoked capabilities from being
+   exercised by agents with stale policy caches.
+
+5. **Named, configurable policy conflict resolution** — Four strategies: `DENY_OVERRIDES`,
+   `ALLOW_OVERRIDES`, `PRIORITY_FIRST_MATCH`, `MOST_SPECIFIC_WINS`. Scope hierarchy:
+   GLOBAL < TENANT < ORG < AGENT. Default: `DENY_OVERRIDES`.
+
+6. **Folder-scoped hierarchical policy discovery** — `governance.yaml` files cascade down a
+   directory tree. Parent `deny` rules cannot be overridden by children. Relevant for Presidium
+   governing coding agents or CI/CD agents operating within a repo structure.
+
+**What they reinvented that Civitas already has:**
+
+AGT's `SupervisorHierarchy` states "Level 0 MUST be a deterministic (non-LLM) trust root"
+and "escalation always terminates at the trust root." This is exactly what OTP supervision
+trees enforce — the root supervisor is pure code, never an LLM process. Civitas gets this
+for free and has had it since M1. They arrived here from the security direction; we arrived
+from the reliability direction.
+
+**AGT's acknowledged limitations (their own docs):**
+
+- Doesn't govern reasoning — cannot intercept what happens inside an LLM call
+- Cannot prevent knowledge leaks — a sequence of allowed actions can exfiltrate data one piece
+  at a time through individually compliant queries
+- `agent-runtime` privilege rings are partially aspirational — `src/` is empty in current repo
+- No runtime — governance sidecar only; agents must exist in another framework
+
+**Presidium's differentiators vs AGT:**
+
+| Presidium | AGT |
+|---|---|
+| Governance native to the runtime — supervisor constraints, not interceptors | External sidecar — wraps existing agents |
+| Transport-layer enforcement — every message, regardless of routing | Gateway-only — misses direct API calls and inter-agent messages that bypass gateway |
+| OTP supervision as the trust root architecture | Reinvented supervision hierarchy from security first principles |
+| EvalLoop + CorrectionSignal — mid-flight behavioral correction | Post-hoc evaluation only |
+| Single Python-native package | 540K LOC across 5 languages |
 
 ### Fiddler ($100M total funding, Series C Jan 2026)
 
