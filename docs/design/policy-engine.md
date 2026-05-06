@@ -99,8 +99,72 @@ class PolicyEngine(Protocol):
 
 1. Find all policies matching the agent name (glob matching)
 2. Within each policy, evaluate rules top-to-bottom (first match wins)
-3. If multiple policies match, most restrictive decision wins (DENY > REQUIRE_APPROVAL > ALLOW)
+3. If multiple policies match, apply the configured conflict resolution strategy (see below)
 4. If no rule matches, default to DENY (secure by default)
+
+### Conflict Resolution
+
+When multiple policies match a single action, a named strategy determines precedence. This is a
+deployment-level configuration parameter, not hardcoded logic:
+
+| Strategy | Semantics |
+|---|---|
+| `DENY_OVERRIDES` | Any policy that denies wins, regardless of other policies |
+| `ALLOW_OVERRIDES` | Any policy that allows wins |
+| `PRIORITY_FIRST_MATCH` | Policies evaluated in priority order; first match wins |
+| `MOST_SPECIFIC_WINS` | Narrowest scope wins: agent > org > tenant > global |
+
+**Default: `DENY_OVERRIDES`.** An explicit deny at any scope cannot be accidentally overridden by a
+broader allow. Scope hierarchy for `MOST_SPECIFIC_WINS`: global < tenant < organization < agent.
+
+The `PolicyEngine.evaluate()` interface is identical regardless of strategy — strategy is injected
+at construction time, keeping application code independent of deployment policy semantics.
+
+### Policy-Change Propagation
+
+Policy updates have asymmetric propagation semantics based on security direction:
+
+**Tightening (removes or restricts a capability):** Must propagate immediately. An agent holding a
+stale policy cache cannot exercise a newly-revoked capability. `GovernedToolProvider` and
+`GovernedModelProvider` receive a re-fetch directive and must re-validate before the next action.
+
+**Loosening (adds or expands a capability):** Can follow normal TTL expiry. No security risk in an
+agent not yet knowing about a capability it hasn't used.
+
+Implementation: `PolicyEngine.publish_update()` atomically sets `min_valid_policy_version` on
+tightening updates. Any policy check presenting a version below the minimum is rejected with a
+re-fetch directive before the action proceeds.
+
+### Intent Declaration
+
+Per-action policy governs each call in isolation. It cannot detect when a sequence of individually-
+compliant actions collectively drifts from an agent's declared goal.
+
+A session-level **intent declaration** complements per-action policy by giving the governance layer
+visibility into what the agent intends to do before it starts:
+
+```python
+@dataclass
+class IntentDeclaration:
+    task_id: str
+    agent_name: str
+    expected_tools: list[str]          # e.g. ["read_email", "summarize"]
+    parameter_constraints: dict[str, Any]  # e.g. {"send_email": {"allowed": False}}
+    valid_until: float                 # epoch — declaration expires
+
+class DriftPolicy(Enum):
+    WARN = "warn"
+    BLOCK = "block"
+    REQUIRE_REDECLARATION = "require_redeclaration"
+```
+
+The agent sends an `IntentDeclaration` message to the Presidium policy agent before task start.
+Subsequent tool calls are validated against the registered plan. An unplanned tool call triggers
+`DriftPolicy` — configurable per deployment.
+
+This catches goal-hijacking that per-action rules miss: an agent with ALLOW on both `read_email`
+and `send_email` that starts forwarding emails instead of summarizing them violates its declared
+intent without violating any individual rule.
 
 ### Supervisor Integration
 
