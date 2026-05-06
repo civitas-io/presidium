@@ -116,6 +116,43 @@ llm_gateway:
         model: claude-haiku
 ```
 
+### Context Budget
+
+Token consumption is a governance primitive, not just a cost concern. Runaway context growth is a
+failure mode: an agent accumulating unbounded context degrades output quality before it exceeds
+any dollar threshold.
+
+Model context windows as OS CPU scheduling — each agent gets a declared budget; the supervisor
+enforces it at the transport layer:
+
+```python
+@dataclass
+class ContextBudget:
+    agent_name: str
+    max_tokens_per_request: int       # hard cap on individual call
+    max_tokens_per_session: int       # cumulative cap across a task session
+    warn_threshold: float = 0.8       # emit SIGWARN at 80% consumed
+    action_on_exceed: Literal["deny", "truncate", "summarize"]
+
+class ContextWindow:
+    """Per-agent token accounting maintained by GovernedModelProvider."""
+    consumed: int = 0
+    budget: ContextBudget = ...
+
+    def check(self, estimated_tokens: int) -> None:
+        if self.consumed + estimated_tokens > self.budget.max_tokens_per_session:
+            raise ContextBudgetExceeded(agent=self.budget.agent_name, consumed=self.consumed)
+        if (self.consumed + estimated_tokens) / self.budget.max_tokens_per_session >= self.budget.warn_threshold:
+            self._emit_sigwarn()
+```
+
+`GovernedModelProvider.chat()` checks and records against `ContextWindow` before and after each
+call. Budget state persists to Civitas `StateStore` so it survives supervisor restarts.
+
+BudgetConfig (cost) and ContextBudget (tokens) are separate configurations — cost limits prevent
+runaway spend; context limits prevent quality degradation. Both are enforced at the same gateway
+layer.
+
 ## Open Questions
 
 - Should the gateway support failover (if Anthropic is down, fall back to OpenAI)?

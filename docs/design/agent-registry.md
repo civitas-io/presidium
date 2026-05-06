@@ -43,9 +43,25 @@ class AgentRecord:
     state: AgentState = AgentState.REGISTERED
     metadata: dict[str, Any] = field(default_factory=dict)
     registered_at: datetime = field(default_factory=datetime.utcnow)
+
+    # Three-tier attestation (see docs/design/trust-attestation.md)
+    identity_key: str | None = None            # Ed25519 public key — future: DID
+    authority_expires_at: float | None = None  # epoch; None = indefinite
+    liveness_last_seen: float = field(default_factory=time.time)
+    liveness_status: Literal["active", "suspended", "revoked"] = "active"
 ```
 
 **Note**: `grants` are Presidium authorization entitlements — what an agent is *permitted to access*. They are distinct from Civitas `AgentProcess.capabilities`, which are operational routing tags (what an agent *can handle technically*). Do not conflate these.
+
+**Three-tier attestation:** Trust is not a single bit. An agent may have valid identity but expired authority, or valid identity and authority but be unresponsive (liveness failure). Each decays independently:
+
+| Property | Decays when | Consequence of failure |
+|---|---|---|
+| `identity_key` | Key rotation / explicit revocation | Full revocation |
+| `authority_expires_at` | TTL reached | Re-attestation required before next action |
+| `liveness_last_seen` | Missed heartbeats (supervisor timeout) | Suspension — reversible |
+
+**Suspension ≠ revocation.** A liveness failure suspends the agent (grants intact, state preserved). Restoration is automatic once the supervisor re-establishes heartbeat. Revocation is an explicit administrative action on identity or authority.
 
 ### Agent States
 
@@ -132,7 +148,7 @@ The agent uses this context to authenticate to tools and LLMs. The gateways (`Go
 ## Alternatives Considered
 
 1. **Use Civitas's routing registry directly** — Too simple. Civitas's registry maps names to process references. We need persistent governance metadata, grants, trust scores, and credential vault.
-2. **External identity system (DIDs like AGT)** — Over-engineered for M2. Could add DID support later as an optional backend.
+2. **External identity system (DIDs)** — Over-engineered for M2. Could add DID support later as an optional backend.
 3. **No registry — just policies** — Policies need something to attach to. Agent identity and grants are foundational to every other Presidium concern.
 4. **Subclass `AgentProcess`** — Creates tight coupling between Civitas and Presidium. The `RegistryListener` hook achieves the same result without coupling.
 
