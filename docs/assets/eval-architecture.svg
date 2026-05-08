@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 680" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6B7280"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7C3AED"/>
+    </marker>
+    <marker id="arrow-dashed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="680" fill="#F9FAFB" rx="8"/>
+
+  <!-- Title -->
+  <text x="460" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">Evaluation Architecture — Two-Tier Design</text>
+
+  <!-- ═══ TIER 1: IN-FLIGHT ═══ -->
+  <rect x="16" y="50" width="888" height="340" rx="8" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="32" y="72" font-size="12" font-weight="600" fill="#6B7280" letter-spacing="1">IN-FLIGHT — RUNTIME</text>
+
+  <!-- Agent Action -->
+  <rect x="32" y="100" width="110" height="50" rx="6" fill="#374151"/>
+  <text x="87" y="130" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Agent Action</text>
+
+  <!-- Arrow: emit_eval() -->
+  <line x1="142" y1="125" x2="180" y2="125" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="161" y="118" text-anchor="middle" font-size="9" fill="#6B7280" font-style="italic">emit_eval()</text>
+
+  <!-- EvalEvent -->
+  <rect x="184" y="100" width="100" height="50" rx="6" fill="#3B82F6"/>
+  <text x="234" y="122" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">EvalEvent</text>
+  <text x="234" y="137" text-anchor="middle" font-size="9" fill="#DBEAFE">civitas core</text>
+
+  <!-- Arrow -->
+  <line x1="284" y1="125" x2="318" y2="125" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- EvalAgent (large box) -->
+  <rect x="322" y="84" width="260" height="170" rx="8" fill="#1D4ED8" opacity="0.1" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="452" y="104" text-anchor="middle" font-size="12" font-weight="700" fill="#1D4ED8">EvalAgent</text>
+  <text x="452" y="118" text-anchor="middle" font-size="9" fill="#3B82F6">civitas core</text>
+
+  <!-- on_eval_event() -->
+  <rect x="338" y="128" width="130" height="34" rx="4" fill="#3B82F6"/>
+  <text x="403" y="149" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">on_eval_event()</text>
+
+  <!-- EvalExporter[] -->
+  <rect x="338" y="170" width="130" height="34" rx="4" fill="#2563EB"/>
+  <text x="403" y="191" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">EvalExporter[]</text>
+
+  <!-- Exporter connections (dotted) -->
+  <line x1="468" y1="145" x2="490" y2="145" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="468" y1="170" x2="490" y2="170" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="468" y1="195" x2="490" y2="195" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Exporter instances -->
+  <rect x="494" y="132" width="132" height="26" rx="4" fill="#10B981"/>
+  <text x="560" y="149" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">DeepEvalExporter</text>
+
+  <rect x="494" y="162" width="132" height="26" rx="4" fill="#059669"/>
+  <text x="560" y="179" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">FiddlerExporter</text>
+
+  <rect x="494" y="192" width="132" height="26" rx="4" fill="#047857"/>
+  <text x="560" y="209" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">ArizeExporter</text>
+
+  <!-- CorrectionSignal (output from EvalAgent, going down) -->
+  <line x1="400" y1="254" x2="400" y2="290" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="310" y="294" width="192" height="52" rx="6" fill="#3B82F6"/>
+  <text x="406" y="314" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">CorrectionSignal</text>
+  <text x="406" y="334" text-anchor="middle" font-size="9" fill="#DBEAFE">nudge · redirect · halt</text>
+
+  <!-- Arrow from CorrectionSignal back to Agent -->
+  <path d="M310,320 L87,320 L87,150" fill="none" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="5,3"/>
+  <text x="180" y="338" text-anchor="middle" font-size="9" fill="#3B82F6" font-style="italic">sent back to agent</text>
+
+  <!-- GovernanceEvalLoop (right side) -->
+  <line x1="582" y1="145" x2="620" y2="145" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="620" y1="145" x2="660" y2="185" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <rect x="640" y="168" width="170" height="44" rx="6" fill="#7C3AED"/>
+  <text x="725" y="186" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">GovernanceEvalLoop</text>
+  <text x="725" y="202" text-anchor="middle" font-size="9" fill="#E9D5FF">presidium-eval</text>
+
+  <!-- GovernanceMetrics -->
+  <rect x="660" y="226" width="138" height="36" rx="4" fill="#5B21B6"/>
+  <text x="729" y="249" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">GovernanceMetrics</text>
+  <line x1="725" y1="212" x2="725" y2="226" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <!-- Trust Score Update -->
+  <rect x="660" y="278" width="138" height="32" rx="4" fill="#6D28D9"/>
+  <text x="729" y="299" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">Trust Score Update</text>
+  <line x1="725" y1="262" x2="725" y2="278" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <!-- Export arrow from GovernanceMetrics -->
+  <line x1="798" y1="244" x2="830" y2="244" stroke="#10B981" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="834" y="228" width="60" height="32" rx="4" fill="#10B981"/>
+  <text x="864" y="249" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">Export</text>
+
+  <!-- ═══ TIER 2: OFFLINE ═══ -->
+  <rect x="16" y="404" width="888" height="130" rx="8" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="32" y="426" font-size="12" font-weight="600" fill="#6B7280" letter-spacing="1">OFFLINE — CI / CD</text>
+
+  <!-- Golden Datasets -->
+  <rect x="32" y="444" width="130" height="50" rx="6" fill="#374151"/>
+  <text x="97" y="466" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Golden Datasets</text>
+  <text x="97" y="482" text-anchor="middle" font-size="9" fill="#D1D5DB">recorded traces</text>
+
+  <!-- Arrow -->
+  <line x1="162" y1="469" x2="196" y2="469" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Test Harness -->
+  <rect x="200" y="444" width="170" height="50" rx="6" fill="#3B82F6"/>
+  <text x="285" y="466" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">EvalTestRunner</text>
+  <text x="285" y="482" text-anchor="middle" font-size="9" fill="#DBEAFE">civitas core</text>
+
+  <!-- Arrow -->
+  <line x1="370" y1="469" x2="404" y2="469" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- DeepEval assert_test() -->
+  <rect x="408" y="444" width="180" height="50" rx="6" fill="#10B981"/>
+  <text x="498" y="466" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">DeepEval assert_test()</text>
+  <text x="498" y="482" text-anchor="middle" font-size="9" fill="#D1FAE5">same metrics as in-flight</text>
+
+  <!-- Arrow -->
+  <line x1="588" y1="469" x2="626" y2="469" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- pytest results -->
+  <rect x="630" y="444" width="140" height="50" rx="6" fill="#374151"/>
+  <text x="700" y="466" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">pytest results</text>
+  <text x="700" y="482" text-anchor="middle" font-size="9" fill="#FCA5A5">pass/fail → blocks PR</text>
+
+  <!-- ═══ CONNECTING ELEMENT ═══ -->
+  <line x1="498" y1="390" x2="498" y2="440" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-dashed)"/>
+  <line x1="498" y1="350" x2="498" y2="390" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <rect x="396" y="368" width="204" height="24" rx="4" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+  <text x="498" y="384" text-anchor="middle" font-size="10" font-weight="600" fill="#6B7280">Same metrics, shared thresholds</text>
+
+  <!-- ═══ LEGEND ═══ -->
+  <rect x="16" y="548" width="888" height="120" rx="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="32" y="570" font-size="11" font-weight="700" fill="#374151">Package Ownership</text>
+
+  <rect x="32" y="582" width="14" height="14" rx="3" fill="#3B82F6"/>
+  <text x="52" y="594" font-size="10" fill="#374151" font-weight="600">civitas core</text>
+  <text x="130" y="594" font-size="10" fill="#6B7280">EvalEvent · EvalAgent · EvalExporter protocol · CorrectionSignal · EvalTestRunner</text>
+
+  <rect x="32" y="604" width="14" height="14" rx="3" fill="#10B981"/>
+  <text x="52" y="616" font-size="10" fill="#374151" font-weight="600">civitas-contrib / external</text>
+  <text x="180" y="616" font-size="10" fill="#6B7280">DeepEvalExporter · FiddlerExporter · ArizeExporter · DeepEval metrics</text>
+
+  <rect x="32" y="626" width="14" height="14" rx="3" fill="#7C3AED"/>
+  <text x="52" y="638" font-size="10" fill="#374151" font-weight="600">presidium-eval</text>
+  <text x="140" y="638" font-size="10" fill="#6B7280">GovernanceEvalLoop · GovernanceMetrics · Trust score feedback</text>
+
+  <rect x="32" y="648" width="14" height="14" rx="3" fill="#374151"/>
+  <text x="52" y="660" font-size="10" fill="#374151" font-weight="600">application / framework</text>
+  <text x="175" y="660" font-size="10" fill="#6B7280">Agent actions · Golden datasets · pytest results</text>
+</svg>

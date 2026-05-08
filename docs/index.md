@@ -2,11 +2,9 @@
 
 > Content catalog for the Presidium knowledge base.
 > AI assistants: read this file first to find relevant pages before drilling in.
-> Last updated: 2026-05-05
+> Last updated: 2026-04-30
 
-**The governance layer for AI agent systems, built on [Civitas](https://github.com/civitas-io/civitas-forge).**
-
-> **Civitas:** Run agents reliably. **Presidium:** Run agents accountably.
+**The governed agent platform built on [Civitas](https://github.com/jerynmathew/python-civitas).**
 
 Runtime + governance as one architecture — not bolted on, not a sidecar, native.
 
@@ -22,7 +20,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|
 | [Manifesto](vision/manifesto.md) | Core thesis: governance should be architectural, not bolted on. 88% of agents fail in production due to infrastructure, not models. Principles: OSS-first, Python-native, developer-centric, vendor-neutral. |
 | [Market Positioning](vision/positioning.md) | Competitive 2x2 (governance depth × runtime depth). Presidium occupies the only empty quadrant. Detailed comparisons vs. AGT, Fiddler, Temporal. Target users: platform engineers, agent developers, enterprise compliance. |
-| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, current) → M2 (registry + policy) → M3 (gateways) → M4 (audit) → M5 (SDK) → M6 (cloud). |
+| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, current) → M2 (registry + policy) → M3 (gateways) → M4 (eval) → M5 (SDK) → M6 (cloud). |
 
 ## Architecture
 
@@ -30,9 +28,10 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 | Page | Summary |
 |---|---|
-| [System Overview](architecture/overview.md) | Full system architecture diagram (Mermaid) including IdP layer. Eight Civitas integration points table. AAA stack diagram. Data flow with HITL path. Startup sequence. |
-| [Package Map](architecture/packages.md) | Six planned packages with responsibilities, Civitas integration points, key types (Protocol sketches), and dependency rules. Packages: registry, policy, llm-gateway, mcp-gateway, audit, sdk. |
+| [System Overview](architecture/overview.md) | Full system architecture diagram (Mermaid). Four key design decisions: governance as supervisor constraints, registry as source of truth, gateways as Civitas plugins, eval as feedback loop. Data flow and startup sequence. |
+| [Package Map](architecture/packages.md) | Six planned packages with responsibilities, Civitas integration points, key types (Protocol sketches), and dependency rules. Packages: registry, policy, llm-gateway, mcp-gateway, eval, sdk. |
 | [Full Stack](architecture/stack.md) | Three-layer model: Run (Civitas) → Govern (Presidium) → Observe (Fiddler/Arize). Integration points between layers. Three deployment scenarios (laptop → staging → production). |
+| [Architecture Diagrams](assets/) | SVG assets: eval-architecture.svg, deepeval-integration.svg, test-harness-architecture.svg |
 
 ## Design
 
@@ -44,7 +43,8 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Policy Engine](design/policy-engine.md) | `presidium-policy` | M2 | Draft |
 | [LLM Gateway](design/llm-gateway.md) | `presidium-llm-gateway` | M3 | Draft |
 | [MCP Gateway](design/mcp-gateway.md) | `presidium-mcp-gateway` | M3 | Draft |
-| [Audit Framework](design/eval-framework.md) | `presidium-audit` | M4 | Draft |
+| [Eval Framework](design/eval-framework.md) | `presidium-eval` + `civitas[test]` | M4 | Draft (revised) |
+| [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
 | [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Draft (deferred) |
 
 ## Research
@@ -56,8 +56,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Competitive Landscape](research/competitive-landscape.md) | Detailed analysis of Temporal ($5B), Microsoft AGT (1,289 stars, 540K LOC), Fiddler ($100M), LangChain ($1.25B), CrewAI ($18M), Inngest, Restate. Nobody occupies the runtime + governance quadrant. | 7 competitors analyzed |
 | [Market Analysis](research/market-analysis.md) | Agent infrastructure market $7-11B in 2026, 27-47% CAGR. 88% of agents fail to reach production. 67% cite auditability as top adoption barrier. Tool call failure rates 3-15%. | 12 data sources cited |
 | [Monetization Strategy](research/monetization.md) | Open core + managed cloud playbook. Temporal/LangChain/CrewAI revenue comparisons. Four-tier pricing model. Revenue projections Y1-Y4. Defensible moats analysis. | 5 comparable companies |
-| [Fiddler Relationship](research/fiddler-relationship.md) | Complementary, not competitive. Fiddler observes agents (layer above), Presidium runs them (layer below). Natural pipeline: Presidium generates governance telemetry → Fiddler analyzes. | Stack position analysis |
-| [AAA Patterns](research/aaa-patterns.md) | Authentication, Authorization, and Access Control patterns across 8 major platforms. Four dominant patterns: OAuth 2.1 M2M, OBO/token exchange, per-agent workload identity, policy-as-code. MCP OAuth 2.1 spec breakdown. HITL approval patterns with LITL protection. | 8 platforms, 6 emerging standards |
+| [Fiddler Relationship](research/fiddler-relationship.md) | Complementary, not competitive. Fiddler observes agents (layer above), Presidium runs them (layer below). Natural pipeline: Presidium generates telemetry → Fiddler analyzes. Watch areas: "control plane" branding, policy enforcement direction. | Stack position analysis |
 
 ## RFCs
 
@@ -65,7 +64,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 | RFC | Title | Status |
 |---|---|---|
-| [RFC-001](rfcs/001-presidium-scope.md) | Presidium Scope and Boundaries — AAA architecture, eight integration points, grants/capability distinction, audit vs. eval distinction | Draft (revised 2026-05-05) |
+| [RFC-001](rfcs/001-presidium-scope.md) | Presidium Scope and Boundaries | Draft |
 
 ## Project Files
 
@@ -73,7 +72,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 | File | Purpose |
 |---|---|
-| [AGENTS.md](../AGENTS.md) | Machine-readable project reference for AI assistants. Conventions, glossary, integration points, anti-patterns, PR checklist. |
+| [AGENTS.md](../AGENTS.md) | Machine-readable project reference for AI assistants. Conventions, anti-patterns, PR checklist. |
 | [README.md](../README.md) | Public-facing project overview. |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | How to contribute (currently: feedback on design docs). |
 | [SECURITY.md](../SECURITY.md) | Vulnerability reporting policy. |
