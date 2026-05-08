@@ -31,6 +31,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [System Overview](architecture/overview.md) | Full system architecture diagram (Mermaid). Four key design decisions: governance as supervisor constraints, registry as source of truth, gateways as Civitas plugins, eval as feedback loop. Data flow and startup sequence. |
 | [Package Map](architecture/packages.md) | Six planned packages with responsibilities, Civitas integration points, key types (Protocol sketches), and dependency rules. Packages: registry, policy, llm-gateway, mcp-gateway, eval, sdk. |
 | [Full Stack](architecture/stack.md) | Three-layer model: Run (Civitas) → Govern (Presidium) → Observe (Fiddler/Arize). Integration points between layers. Three deployment scenarios (laptop → staging → production). |
+| [Architecture Diagrams](assets/) | SVG assets: eval-architecture.svg, deepeval-integration.svg, test-harness-architecture.svg |
 
 ## Design
 
@@ -42,7 +43,8 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Policy Engine](design/policy-engine.md) | `presidium-policy` | M2 | Draft |
 | [LLM Gateway](design/llm-gateway.md) | `presidium-llm-gateway` | M3 | Draft |
 | [MCP Gateway](design/mcp-gateway.md) | `presidium-mcp-gateway` | M3 | Draft |
-| [Eval Framework](design/eval-framework.md) | `presidium-eval` | M4 | Draft |
+| [Eval Framework](design/eval-framework.md) | `presidium-eval` + `civitas[test]` | M4 | Draft (revised) |
+| [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
 | [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Draft (deferred) |
 
 ## Research

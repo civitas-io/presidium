@@ -167,30 +167,68 @@ class PolicyEngine(Protocol):
 
 ## presidium-eval
 
-**Governance-aware evaluation and external platform integration.**
+**Governance-aware evaluation, trust feedback, and external platform integration.**
 
 ### Responsibility
 
-- Define governance-specific evaluation metrics:
-  - Policy compliance rate
-  - Trust score trends
-  - Action denial frequency
-  - Approval queue depth
-  - Cost efficiency
-- Score agent behavior against governance criteria
-- Export to external platforms (Fiddler, Arize, Langfuse, custom)
-- Feed evaluation results back into trust scores
+- Define governance-specific evaluation metrics (`GovernanceMetrics`):
+  - Policy compliance rate, denial count, approval queue depth
+  - Trust score trends, grant utilization, budget consumption
+  - Drift score (deviation from declared intent)
+  - Mean action latency, restart count
+- Provide `GovernanceEvalAgent` — extends Civitas `EvalAgent` with governance context
+- Close the feedback loop: composite quality + governance scores → trust score adjustments → autonomy changes
+- Define `MetricRegistry` — canonical metric + threshold config shared between in-flight and offline evaluation
+- Export governance metrics to external platforms via `GovernanceExporter` protocol
+- Export backends: Fiddler, Arize, Langfuse, Prometheus, Console
 
 ### Civitas Integration Point
 
-- Extends `civitas.EvalLoop` with governance-specific metrics
-- Implements `civitas.plugins.ExportBackend` for each external platform
+- Extends `civitas.EvalAgent` with `GovernanceEvalAgent` (integration point 6)
+- Consumes `EvalExporter` results (e.g., DeepEval scores) for composite scoring
+- Writes trust score updates to `presidium-registry`
+- Reads policy decisions from `presidium-policy` for compliance metrics
+
+### Relationship to civitas[test] and civitas-contrib[deepeval]
+
+`presidium-eval` owns governance metrics and trust feedback. It does NOT own:
+
+- **Test harness** (`EvalTestRunner`, `EvalDataset`) → `civitas[test]` extra (civitas core)
+- **DeepEval bridge** (`DeepEvalExporter`, custom `BaseMetric`) → `civitas-contrib[deepeval]`
+- **Quality metrics** (`TaskCompletionMetric`, `ToolCorrectnessMetric`) → DeepEval (external)
+
+The `GovernanceEvalAgent` consumes quality scores from exporters and governance scores from its own metrics, then produces a composite that drives trust feedback.
+
+See [Eval Framework design doc](../design/eval-framework.md) and [DeepEval Integration design doc](../design/deepeval-integration.md) for full details.
+
+### Key Types (Planned)
+
+```python
+@dataclass
+class GovernanceMetrics:
+    policy_compliance_rate: float
+    denial_count: int
+    trust_score_delta: float
+    tool_usage_authorized: float
+    llm_budget_utilization: float
+    drift_score: float
+    # ... see design doc for full list
+
+class GovernanceEvalAgent(EvalAgent):
+    async def on_eval_event(self, event: EvalEvent) -> CorrectionSignal | None: ...
+
+class GovernanceExporter(Protocol):
+    async def export(self, agent_name: str, metrics: GovernanceMetrics, window: TimeWindow) -> None: ...
+
+class MetricRegistry:
+    def get_metrics(self, agent_name: str, context: str = "in_flight") -> list[MetricConfig]: ...
+```
 
 ### Depends On
 
-- `civitas` (eval_loop, plugins)
-- `presidium-registry` (trust score updates)
-- `presidium-policy` (compliance metrics)
+- `civitas` (EvalAgent, EvalExporter, EvalEvent, CorrectionSignal)
+- `presidium-registry` (trust score updates via `AgentRegistry.update_trust()`)
+- `presidium-policy` (policy decisions for compliance metrics)
 
 ---
 
