@@ -92,3 +92,32 @@
 - Same metric instances run in-flight and offline — single source of truth, no threshold drift
 - Deterministic metrics always run in-flight; LLM-as-Judge metrics are sampled or async
 - Flight recorder (AuditSink) captures production traces as golden datasets
+
+## [2026-06-11] architecture | Interface-first redesign + CEL + library/service dual mode
+
+**Sources ingested:**
+- Analysis of Civitas codebase for coding agent and autonomous agent feasibility
+- CEL (Common Expression Language) specification and Kubernetes adoption patterns
+- Comparison of OPA/Rego vs CEL for embedded policy evaluation
+- Survey of existing products for governance components (OPA, Vault, LiteLLM Proxy, Slack, Temporal, PagerDuty)
+
+**Pages revised:**
+- `README.md` — Rewritten to reflect interface-first strategy, 2-package structure, CEL default, library-vs-service modes, build-vs-wrap table
+- `AGENTS.md` — Updated monorepo structure, package boundaries, dependency rules, glossary (CEL, Interface Library, Adapter, Reference Implementation, Library Mode, Service Mode), anti-patterns
+- `docs/architecture/packages.md` — Full rewrite. 6-package structure replaced with `presidium` (protocols + CEL) + `presidium-contrib` (adapters + reference impls). Component map table, Protocol definitions for all 8 components, Mermaid dependency graph.
+- `docs/architecture/overview.md` — Updated Mermaid diagrams for 2-package structure. Added 3 new design decisions: Interface-First Architecture, CEL as Default Policy Language, Library-First Service-Optional. Updated data flow for inline CEL evaluation.
+- `docs/architecture/stack.md` — Deployment scenarios rewritten with library/service distinction and YAML topology examples per scenario.
+- `docs/vision/roadmap.md` — Milestones revised: M1 complete; M2 renamed "Core Interfaces + CEL Policy" (all Protocols + library defaults); M3 renamed "Contrib Adapters + Reference Impls"; new M4 "Autonomy Progression" (decision journal, confidence routing, learned trust); M5/M6 updated.
+- `docs/index.md` — Summaries updated for all revised architecture pages. Design doc table updated with new package references.
+
+**Cross-repo changes (python-civitas):**
+- `docs/design/civitas-presidium-boundary.md` — Appended "Presidium Architecture: Interface-First with Dual Deployment Modes" section: 2-package structure, CEL rationale, library/service modes with YAML examples, product mapping table, autonomy progression (4 levels).
+- `docs/milestones.md` — Phase 5 intro rewritten to reference Presidium interface-first architecture. LLM Gateway entry updated from `presidium-llm-gateway` to `GovernedModelProvider` protocol + `presidium-contrib` adapters.
+- `README.md` — CONTROL LAYER box updated to name Presidium and CEL/OPA.
+
+**Key decisions:**
+- 6-package structure (`presidium-registry`, `presidium-policy`, etc.) replaced with 2-package structure (`presidium` + `presidium-contrib`), mirroring the `civitas` + `civitas-contrib` pattern
+- CEL (Common Expression Language) chosen as default policy engine over OPA/Rego: embeddable (in-process, microseconds), no sidecar, Kubernetes direction, simpler expressions, cel-python exists. OPA available as `presidium-contrib[opa]` adapter.
+- Every component has library mode (in-process, no infrastructure) and optional service mode (GenServer or HTTP, for distributed deployments). Library mode is the complete implementation, not a degraded subset.
+- Where mature products exist (OPA, Vault, LiteLLM, Slack, Temporal), Presidium wraps them as adapters. Where nothing exists (Agent Registry with grants+trust, MCP governance, Trust scoring), Presidium builds reference implementations.
+- Autonomy progression: HITL → heuristic recommendations → learned partial autonomy → full autonomy. Levels 1-2 work with current Civitas + Presidium interfaces. Levels 3-4 require decision journal and confidence routing (M4).

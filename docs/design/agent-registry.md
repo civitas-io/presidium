@@ -44,18 +44,7 @@ class AgentRecord:
 
 ### Agent States
 
-```mermaid
-stateDiagram-v2
-    [*] --> REGISTERED
-    REGISTERED --> STARTING
-    STARTING --> RUNNING
-    RUNNING --> STOPPING
-    STOPPING --> STOPPED
-    STOPPED --> [*]
-    STARTING --> SUSPENDED : policy violation
-    RUNNING --> SUSPENDED : trust below threshold
-    SUSPENDED --> STARTING : human review approved
-```
+![Agent State Machine](../assets/agent-state-machine.svg)
 
 ### Trust Score
 
