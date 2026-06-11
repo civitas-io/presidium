@@ -2,6 +2,8 @@
 
 > How Civitas, Presidium, and external platforms fit together.
 
+![Full Stack Layers](../assets/full-stack-layers.svg)
+
 ## Three Layers
 
 | Layer | Concern | Projects |
@@ -67,30 +69,102 @@ Presidium generates telemetry that external platforms consume:
 
 ## Deployment Scenarios
 
-### Scenario 1: Developer Laptop
+![Deployment Modes](../assets/deployment-modes.svg)
+
+Presidium components have two modes: library (in-process) and service (separate process, Civitas bus or HTTP). You can mix them. Start with everything in-process, then move individual components to service mode as your deployment grows. The application code doesn't change — only the topology config.
+
+### Scenario 1: Developer Laptop (Library Mode)
+
+Everything runs in-process. No infrastructure required beyond Python.
 
 ```
 Single process, InProcessTransport
-Civitas + Presidium as Python libraries
-Console output for observability
+CEL policies from YAML files
+InMemoryRegistry for agent records
+EnvCredentialProvider for secrets
+RuleBasedTrustScorer
+Console audit output
 ```
 
-### Scenario 2: Team Staging
+```yaml
+presidium:
+  policy:
+    type: cel
+    rules_path: ./policies/
+  registry:
+    type: memory
+  credentials:
+    type: env
+  trust:
+    type: rule_based
+  audit:
+    type: console
+```
+
+### Scenario 2: Team Staging (Mixed)
+
+Multi-process via ZMQ. Some components move to service mode; others stay in-process.
 
 ```
 Multi-process, ZMQTransport
-Civitas + Presidium with OTEL export
-Fiddler or Langfuse for dashboards
+CEL policies (still in-process, loaded from shared path)
+SQLite registry (file-based, shared across processes)
+HashiCorp Vault for credentials
+OTEL export to Langfuse or Datadog
 ```
 
-### Scenario 3: Production
+```yaml
+presidium:
+  policy:
+    type: cel
+    rules_path: ./policies/
+  registry:
+    type: sqlite
+    db_path: ./presidium.db
+  credentials:
+    type: vault
+    url: https://vault.staging:8200
+    token_env: VAULT_TOKEN
+  trust:
+    type: rule_based
+  audit:
+    type: otel
+    endpoint: http://otel-collector:4317
+```
+
+### Scenario 3: Production (Service Mode)
+
+Distributed via NATS. All components run as services. OPA or CEL depending on existing infrastructure.
 
 ```
 Distributed, NATSTransport
-Civitas + Presidium across containers
+OPA policy service (or CEL if no existing OPA)
+Postgres-backed RegistryService
+HashiCorp Vault
 Full OTEL pipeline → Fiddler + Datadog
-Policy engine with OPA/Cedar
+LearningTrustScorer service
 SOC 2 audit trail
+```
+
+```yaml
+presidium:
+  policy:
+    type: opa
+    url: http://policy-service:8181
+    # OR: type: cel with rules_path for teams without OPA
+  registry:
+    type: remote
+    url: http://registry-service:8080
+  credentials:
+    type: vault
+    url: https://vault.internal:8200
+    auth: kubernetes
+  trust:
+    type: remote
+    url: http://trust-service:8090
+  audit:
+    type: otel
+    endpoint: http://otel-collector:4317
 ```
 
 Same code, different topology config. That's the Civitas scaling ladder, extended with Presidium governance at every level.

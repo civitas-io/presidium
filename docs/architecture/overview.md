@@ -2,47 +2,11 @@
 
 > How Presidium's components fit together.
 
+![Full Stack Layers](../assets/full-stack-layers.svg)
+
 ## System Architecture
 
-```mermaid
-graph TB
-    subgraph External["External Consumers"]
-        Fiddler["Fiddler"]
-        Arize["Arize"]
-        Langfuse["Langfuse"]
-        Datadog["Datadog"]
-    end
-
-    subgraph Presidium["PRESIDIUM — Governance Layer"]
-        Eval["presidium-eval<br/><i>Eval framework · Scoring · Export</i>"]
-        Policy["presidium-policy<br/><i>Policy engine · YAML/OPA/Cedar · Enforcement</i>"]
-        LLMGw["presidium-llm-gateway<br/><i>LLM routing · Rate limiting · Cost tracking</i>"]
-        MCPGw["presidium-mcp-gateway<br/><i>Tool access · Poisoning detection · Credential redaction</i>"]
-        Registry["presidium-registry<br/><i>Agent identity · Capabilities · Trust tracking</i>"]
-    end
-
-    subgraph Civitas["CIVITAS — Runtime Layer"]
-        Runtime["Runtime · Supervisor · MessageBus<br/>AgentProcess · Registry · Transport<br/>StateStore · OTEL · Plugins"]
-    end
-
-    subgraph Frameworks["Agent Frameworks"]
-        LG["LangGraph"]
-        Crew["CrewAI"]
-        OAISDK["OpenAI SDK"]
-        Custom["Custom"]
-    end
-
-    Eval --> LLMGw
-    Eval --> Registry
-    Policy --> Registry
-    LLMGw --> Registry
-    MCPGw --> Registry
-    LLMGw --> Runtime
-    MCPGw --> Runtime
-    Registry --> Runtime
-    Eval -->|OTEL + metrics| External
-    Runtime --> Frameworks
-```
+![System Architecture](../assets/system-architecture.svg)
 
 ## Key Design Decisions
 
@@ -85,30 +49,47 @@ The eval framework doesn't just score — it feeds back into governance:
 - Repeated violations can trigger automatic policy tightening
 - Eval results are exported to external platforms (Fiddler, Arize) for dashboarding
 
+### 5. Interface-First Architecture
+
+`presidium` (core) contains only Protocol definitions and lightweight defaults. `presidium-contrib` contains adapters for existing products and reference implementations for novel components.
+
+This follows the Civitas pattern: `civitas` defines `ModelProvider`, `ToolProvider`, `StateStore` protocols. `civitas-contrib` has `AnthropicProvider`, `SQLiteStateStore`, and so on. Presidium does the same for governance.
+
+The benefit: you can swap any component without touching the rest of the system. OPA today, CEL tomorrow. Vault in production, env vars in development. Same interface throughout.
+
+### 6. CEL as Default Policy Language
+
+![Policy Evaluation Flow](../assets/policy-evaluation-flow.svg)
+
+CEL (Common Expression Language) is the default policy engine, not OPA.
+
+- **Embeddable**: `cel-python` runs in-process. No sidecar, no network call, no separate process to manage.
+- **Kubernetes direction**: Kubernetes is adopting CEL for admission policies (ValidatingAdmissionPolicy). The ecosystem is moving this way.
+- **Simpler syntax**: CEL expressions are closer to Python than Rego. Lower learning curve for teams already writing Python.
+- **Fast**: In-process evaluation adds microseconds, not milliseconds.
+
+OPA remains available as an adapter in `presidium-contrib` for teams that already run OPA and want to reuse their Rego policies.
+
+### 7. Library-First, Service-Optional
+
+Every component starts as an in-process library. Service mode is an upgrade path, not a requirement.
+
+- **Library mode**: `CelPolicyEngine` evaluates policies in-process. `InMemoryRegistry` stores agent records in memory. `EnvCredentialProvider` reads from environment variables. Zero infrastructure.
+- **Service mode**: `PolicyService` GenServer on the Civitas bus. `RegistryService` backed by Postgres. `Vault` for credentials. Same interfaces, different implementations.
+
+A team can start with `pip install presidium` and a YAML policy file, then migrate individual components to service mode as their deployment grows. The application code doesn't change.
+
 ## Data Flow
 
-```mermaid
-flowchart LR
-    A[Agent Request] --> B[Registry Lookup]
-    B --> C{Policy Check}
-    C -->|ALLOW| D[Execute via Civitas]
-    D --> D1[LLM call → LLM Gateway → Provider]
-    D --> D2[Tool call → MCP Gateway → Tool]
-    D --> D3[Message → MessageBus → Target Agent]
-    C -->|DENY| E[Error to agent, logged]
-    C -->|REQUIRE_APPROVAL| F[Queue for human review]
-    D1 --> G[OTEL spans → Eval → Export]
-    D2 --> G
-    D3 --> G
-    E --> G
-    F --> G
-```
+![Data Flow](../assets/data-flow.svg)
+
+CEL evaluation happens inline — no external call, no network hop. The policy check is part of the request path, not a separate service call.
 
 ## Startup Sequence
 
 1. **Registry loads** — agent definitions from YAML topology or programmatic config
-2. **Policies load** — policy definitions compiled and attached to registry entries
-3. **Gateways initialize** — LLM and MCP gateways register as Civitas plugins
+2. **Policies load** — CEL expressions compiled and attached to registry entries
+3. **Gateways initialize** — `GovernedModelProvider` and `GovernedToolProvider` register as Civitas plugins
 4. **Civitas Runtime starts** — supervision trees built from registry + policy config
 5. **Agents start** — each agent gets its registered identity, policies, and capabilities
 6. **Eval loop starts** — begins collecting governance metrics
