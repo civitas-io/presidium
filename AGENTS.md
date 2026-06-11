@@ -1,7 +1,7 @@
 # AGENTS.md — Presidium
 
 > Machine-readable project reference for AI coding assistants.
-> Last updated: 2026-04-30
+> Last updated: 2026-06-11
 
 ## Project Identity
 
@@ -35,23 +35,31 @@ natively integrated into the Civitas agent runtime.
 
 ```
 presidium/
-├── packages/                   # Code packages (uv workspace members)
-│   ├── presidium-registry/     # Agent identity, capabilities, trust
-│   ├── presidium-policy/       # Policy engine (YAML, OPA, Cedar)
-│   ├── presidium-llm-gateway/  # LLM routing, rate limiting, cost
-│   ├── presidium-mcp-gateway/  # Tool access governance
-│   ├── presidium-eval/         # Governance-aware evaluation
-│   └── presidium-sdk/          # Unified API (pip install presidium)
-├── docs/                       # All documentation
-│   ├── vision/                 # Why — manifesto, positioning, roadmap
-│   ├── architecture/           # How — system design, package map
-│   ├── design/                 # What — per-component design docs
-│   ├── research/               # Context — competitive analysis, market
-│   ├── rfcs/                   # RFCs for significant decisions
-│   └── guides/                 # Getting started, contributing
-├── AGENTS.md                   # This file
-├── pyproject.toml              # Root workspace config
-└── mkdocs.yml                  # Documentation site
+├── packages/                        # Code packages (uv workspace members)
+│   ├── presidium/                   # Interface library (protocols, dataclasses, CEL engine)
+│   │   └── src/presidium/
+│   │       ├── protocols/           # Python Protocols for every component
+│   │       ├── models/              # Shared dataclasses (AgentRecord, Policy, etc.)
+│   │       └── policy/             # CEL policy engine (default implementation)
+│   └── presidium-contrib/           # Adapters + reference implementations
+│       └── src/presidium_contrib/
+│           ├── opa/                 # OPA adapter (presidium-contrib[opa])
+│           ├── vault/               # Vault credential backend (presidium-contrib[vault])
+│           ├── litellm/             # LiteLLM Proxy adapter (presidium-contrib[litellm])
+│           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
+│           ├── registry/            # Reference impl: Agent Registry with grants + trust
+│           ├── mcp_gateway/         # Reference impl: MCP governance gateway
+│           └── trust/               # Reference impl: Trust scoring engine
+├── docs/                            # All documentation
+│   ├── vision/                      # Why — manifesto, positioning, roadmap
+│   ├── architecture/                # How — system design, package map
+│   ├── design/                      # What — per-component design docs
+│   ├── research/                    # Context — competitive analysis, market
+│   ├── rfcs/                        # RFCs for significant decisions
+│   └── guides/                      # Getting started, contributing
+├── AGENTS.md                        # This file
+├── pyproject.toml                   # Root workspace config
+└── mkdocs.yml                       # Documentation site
 ```
 
 ---
@@ -79,7 +87,7 @@ This repo follows the conventions established in `civitas-io/civitas-forge`:
 
 ### Naming
 
-- **Package names:** `presidium-<component>` (hyphenated in pyproject, underscore in Python imports)
+- **Package names:** `presidium` and `presidium-contrib` (hyphenated in pyproject, underscore in Python imports: `presidium_contrib`)
 - **Module names:** lowercase, single word where possible
 - **Classes:** PascalCase
 - **Functions/methods:** snake_case
@@ -97,8 +105,12 @@ from typing import Protocol
 # Third-party
 from civitas import AgentProcess, Runtime
 
-# Local package
-from presidium_registry import AgentRecord
+# Core interfaces and models
+from presidium.protocols import RegistryProtocol
+from presidium.models import AgentRecord
+
+# Contrib adapter (optional extra)
+from presidium_contrib.registry import InMemoryRegistry
 ```
 
 Order: stdlib → third-party → local. Enforced by Ruff `I` rules.
@@ -130,22 +142,49 @@ Order: stdlib → third-party → local. Enforced by Ruff `I` rules.
 
 ## Package Boundaries
 
-| Package | Owns | Depends On |
+### `presidium` — Interface Library
+
+The core package. Contains only protocols, dataclasses, and the CEL policy engine (the one default implementation). Nothing else.
+
+| Module | Owns |
+|---|---|
+| `presidium.protocols` | Python `Protocol` classes for every component (Registry, PolicyEngine, LLMGateway, MCPGateway, Evaluator, CredentialStore) |
+| `presidium.models` | Shared dataclasses: `AgentRecord`, `Policy`, `Grant`, `TrustScore`, `LLMRequest`, `ToolCall`, etc. |
+| `presidium.policy` | CEL policy engine — the default `PolicyEngine` implementation. No other implementations live here. |
+
+Install: `pip install presidium`
+
+### `presidium-contrib` — Adapters and Reference Implementations
+
+All concrete implementations. Organized into two categories:
+
+**Adapters** (wrapping existing products):
+
+| Extra | Module | Wraps |
 |---|---|---|
-| `presidium-registry` | Agent identity, capability registration, trust scores, lifecycle tracking | civitas (registry, process) |
-| `presidium-policy` | Policy definitions, evaluation engine, enforcement hooks | civitas (supervisor, bus) |
-| `presidium-llm-gateway` | LLM provider routing, rate limiting, cost tracking, content filtering | civitas (plugins) |
-| `presidium-mcp-gateway` | Tool access control, tool poisoning detection, credential redaction | civitas (mcp) |
-| `presidium-eval` | Governance-aware evaluation, scoring, external exporter integration | civitas (eval_loop, plugins) |
-| `presidium-sdk` | Unified public API, convenience imports, CLI | All packages above |
+| `[opa]` | `presidium_contrib.opa` | Open Policy Agent — for teams already running OPA |
+| `[vault]` | `presidium_contrib.vault` | HashiCorp Vault — credential management |
+| `[litellm]` | `presidium_contrib.litellm` | LiteLLM Proxy — LLM routing and cost tracking |
+| `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
+
+**Reference Implementations** (novel components, no prior art to wrap):
+
+| Module | Implements | Why here |
+|---|---|---|
+| `presidium_contrib.registry` | `RegistryProtocol` | Agent Registry with grants + trust scores — no existing product models this |
+| `presidium_contrib.mcp_gateway` | `MCPGatewayProtocol` | MCP governance — MCP is new, no tooling exists |
+| `presidium_contrib.trust` | `TrustScoringProtocol` | Trust scoring engine — novel concept |
+
+Install: `pip install presidium-contrib[opa,vault]` (mix and match extras)
 
 ### Dependency Rules
 
-1. Packages may depend on `civitas` (external)
-2. Packages may depend on `presidium-registry` (shared identity)
-3. `presidium-sdk` depends on all packages
-4. No circular dependencies between packages
-5. No package should import from another package's internal modules
+1. `presidium` may depend on `civitas` and `cel-python` only
+2. `presidium` must not depend on `presidium-contrib` or any adapter library
+3. `presidium-contrib` depends on `presidium` (for protocols and models)
+4. `presidium-contrib` adapter extras depend on their respective backends (opa, hvac, litellm, slack-sdk) as optional dependencies
+5. No circular dependencies
+6. No package should import from another package's `_internal` modules
 
 ---
 
@@ -161,6 +200,7 @@ Order: stdlib → third-party → local. Enforced by Ruff `I` rules.
 6. **Break package boundaries** — Don't import from `_internal` modules across packages
 7. **Skip design docs** — No package implementation without an approved design doc in `docs/design/`
 8. **Monolith creep** — Each package should be independently installable
+9. **Implement governance logic in `presidium` core** — The core package is interface-only. Protocols and dataclasses only. The CEL engine is the single permitted exception (it's the default implementation). Everything else goes in `presidium-contrib`.
 
 ---
 
@@ -244,3 +284,9 @@ Before merging:
 | **Transport** | Civitas abstraction for message delivery (InProcess, ZMQ, NATS) |
 | **Control Plane** | Industry term for governance infrastructure (Fiddler's positioning) |
 | **Presidium** | Latin: "garrison, guard, protection" — governance for agent systems |
+| **CEL** | Common Expression Language. Embeddable policy language used by Kubernetes and Google Cloud IAM. Evaluates in microseconds in-process. The default policy engine in `presidium`. |
+| **Interface Library** | A package whose primary value is the contracts it defines (Python `Protocol` classes, dataclasses), not the implementations. `presidium` is an interface library. |
+| **Adapter** | A concrete implementation of a `presidium` protocol that wraps an existing product (OPA, Vault, LiteLLM). Lives in `presidium-contrib`. |
+| **Reference Implementation** | A concrete implementation of a `presidium` protocol for a component where no mature product exists to wrap. Lives in `presidium-contrib`. |
+| **Library Mode** | Running a component in-process as a Python import. No network calls, no sidecar, microsecond latency. The default for all Presidium components. |
+| **Service Mode** | Running a component as a standalone HTTP service or GenServer for distributed deployments. Optional. The interface is identical to library mode. |
