@@ -1,0 +1,81 @@
+<svg viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="460" fill="#111827" rx="8"/>
+
+  <!-- Plot area: x=60..660, y=30..430 (600x400) -->
+  <!-- Grid lines -->
+  <line x1="60" y1="230" x2="660" y2="230" stroke="#374151" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="360" y1="30" x2="360" y2="430" stroke="#374151" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Axes -->
+  <line x1="60" y1="430" x2="660" y2="430" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="60" y1="30" x2="60" y2="430" stroke="#6B7280" stroke-width="1.5"/>
+
+  <!-- Axis labels -->
+  <text x="60" y="450" text-anchor="start" fill="#9CA3AF" font-size="11">Low Runtime Depth</text>
+  <text x="660" y="450" text-anchor="end" fill="#9CA3AF" font-size="11">High Runtime Depth</text>
+
+  <!-- Y-axis label (rotated) -->
+  <text x="16" y="430" fill="#9CA3AF" font-size="11" transform="rotate(-90, 16, 430)" text-anchor="end">Low Governance Depth</text>
+  <text x="16" y="30" fill="#9CA3AF" font-size="11" transform="rotate(-90, 16, 30)" text-anchor="start">High Governance Depth</text>
+
+  <!-- Quadrant labels -->
+  <!-- Q1: top-right — Presidium target -->
+  <rect x="370" y="38" width="140" height="22" rx="4" fill="#1E3A5F" opacity="0.6"/>
+  <text x="440" y="53" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="700">Presidium (target)</text>
+
+  <!-- Q2: top-left — Governance Sidecars -->
+  <text x="210" y="53" text-anchor="middle" fill="#6B7280" font-size="11" font-weight="600">Governance Sidecars</text>
+
+  <!-- Q3: bottom-left — Frameworks -->
+  <text x="210" y="418" text-anchor="middle" fill="#6B7280" font-size="11" font-weight="600">Frameworks</text>
+
+  <!-- Q4: bottom-right — Runtimes -->
+  <text x="510" y="418" text-anchor="middle" fill="#6B7280" font-size="11" font-weight="600">Runtimes</text>
+
+  <!--
+    Coordinate mapping:
+    x_px = 60 + fraction * 600
+    y_px = 430 - fraction * 400   (y is inverted: 0=bottom, 1=top)
+  -->
+
+  <!-- Microsoft AGT: x=0.2, y=0.85 => x_px=180, y_px=90 -->
+  <circle cx="180" cy="90" r="7" fill="#7C3AED"/>
+  <text x="192" y="87" fill="#C4B5FD" font-size="10" font-weight="500">Microsoft AGT</text>
+
+  <!-- Fiddler: x=0.15, y=0.65 => x_px=150, y_px=170 -->
+  <circle cx="150" cy="170" r="7" fill="#7C3AED"/>
+  <text x="162" y="167" fill="#C4B5FD" font-size="10" font-weight="500">Fiddler</text>
+
+  <!-- NeMo Guardrails: x=0.1, y=0.4 => x_px=120, y_px=270 -->
+  <circle cx="120" cy="270" r="7" fill="#7C3AED"/>
+  <text x="132" y="267" fill="#C4B5FD" font-size="10" font-weight="500">NeMo Guardrails</text>
+
+  <!-- Presidium: x=0.8, y=0.85 => x_px=540, y_px=90 — large green with glow -->
+  <circle cx="540" cy="90" r="10" fill="#2D6A4F" filter="url(#glow)"/>
+  <circle cx="540" cy="90" r="10" fill="#2D6A4F"/>
+  <text x="554" y="87" fill="#6EE7B7" font-size="11" font-weight="700">Presidium</text>
+
+  <!-- Temporal: x=0.85, y=0.15 => x_px=570, y_px=370 -->
+  <circle cx="570" cy="370" r="7" fill="#3B82F6"/>
+  <text x="582" y="367" fill="#93C5FD" font-size="10" font-weight="500">Temporal</text>
+
+  <!-- Civitas: x=0.7, y=0.1 => x_px=480, y_px=390 -->
+  <circle cx="480" cy="390" r="7" fill="#3B82F6"/>
+  <text x="492" y="387" fill="#93C5FD" font-size="10" font-weight="500">Civitas</text>
+
+  <!-- CrewAI: x=0.3, y=0.15 => x_px=240, y_px=370 -->
+  <circle cx="240" cy="370" r="7" fill="#6B7280"/>
+  <text x="252" y="367" fill="#D1D5DB" font-size="10" font-weight="500">CrewAI</text>
+
+  <!-- LangChain: x=0.35, y=0.2 => x_px=270, y_px=350 -->
+  <circle cx="270" cy="350" r="7" fill="#6B7280"/>
+  <text x="282" y="347" fill="#D1D5DB" font-size="10" font-weight="500">LangChain</text>
+</svg>
