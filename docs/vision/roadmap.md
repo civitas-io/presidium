@@ -41,7 +41,7 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 **Goal:** All Protocol definitions in `presidium` core, plus working library-mode defaults. A developer can `pip install presidium` and have complete in-process governance.
 
-**Status:** Implementation complete (Phases 1-6). 234 tests, 95% coverage, mypy strict, ruff clean.
+**Status:** Complete. 245 tests, 95% coverage, mypy strict, ruff clean. Integration tests passing.
 
 - [x] Requirements and design for all 9 components (35 design decisions, 12 review issues resolved)
 - [x] `presidium` package — Protocol definitions + default implementations:
@@ -53,11 +53,10 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
   - `AuditEnricher` + `InProcessAuditEnricher` — middleware sink, re-enrichment guard, fail-open enrichment
   - `GovernedModelProvider` — wraps ModelProvider, evaluates pre_llm policies
   - `GovernedToolProvider` — wraps ToolProvider, evaluates pre_tool policies
-- [x] `GovernedRuntime` — programmatic constructor wiring all governance components
-- [ ] `GovernedRuntime.from_config()` — YAML-based config (blocked on Civitas `from_config_dict()`)
-- [ ] 2 Civitas changes: add `"presidium"` to known keys + add `from_config_dict()` classmethod
-- [ ] Integration tests with Civitas runtime (blocked on Civitas changes)
-- [ ] Getting started guide
+- [x] `GovernedRuntime` — programmatic constructor + `from_config()` YAML-based construction
+- [x] 2 Civitas changes: add `"presidium"` to known keys + add `from_config_dict()` classmethod
+- [x] Integration tests (compliant agent, denied agent, approval-gated, from_config YAML loading)
+- [x] Getting started guide
 
 **Deliverable:** `pip install presidium` — complete library-mode governance. No sidecars, no infrastructure, no Rego.
 
@@ -153,7 +152,7 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 | Milestone | Target | Status |
 |---|---|---|
 | M1: Foundation | Q2 2026 | Complete |
-| M2: Core Interfaces + CEL Policy | Q3 2026 | Implementation complete (Civitas integration remaining) |
+| M2: Core Interfaces + CEL Policy | Q3 2026 | Complete |
 | M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Planning |
 | M4: Autonomy Progression | Q4 2026 | Planning |
 | M5: SDK + CLI | Q1 2027 | Planning |

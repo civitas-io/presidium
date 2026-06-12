@@ -79,6 +79,12 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [RFC-001](rfcs/001-presidium-scope.md) | Presidium Scope and Boundaries | Draft |
 | [RFC-002](rfcs/002-multi-dimensional-evaluation.md) | Multi-Dimensional Evaluation for Non-Deterministic Systems | Seed |
 
+## Guides
+
+| Page | Summary |
+|---|---|
+| [Getting Started](guides/getting-started.md) | Add governance to a Civitas agent system in under 5 minutes. Programmatic and YAML examples. |
+
 ## Project Files
 
 *Root-level documents outside docs/.*
