@@ -68,9 +68,16 @@ presidium-contrib[slack]    # Slack-based human-in-the-loop
 
 Every component starts as a library. You import it, it runs in-process, evaluation takes microseconds. When you outgrow in-process (distributed deployments, multi-tenant isolation), some components can optionally deploy as a service. The interface stays the same either way.
 
+### CNCF-Aligned Standards
+
+Presidium prefers CNCF standards where applicable to enable enterprise adoption and interoperability:
+- **Identity**: [SPIFFE](https://spiffe.io/)-compatible agent identity URIs with Ed25519 cryptographic binding
+- **Observability**: [OpenTelemetry](https://opentelemetry.io/) for all telemetry (via Civitas)
+- **Policy**: [CEL](https://cel.dev) (Common Expression Language) — the Kubernetes admission policy language
+
 ### Policy Engine: CEL by Default
 
-The default policy engine is [CEL (Common Expression Language)](https://cel.dev). CEL is embeddable as a library, evaluates in microseconds with no sidecar, and is already the policy language for Kubernetes admission webhooks and Google Cloud IAM. If you already run OPA infrastructure, `presidium-contrib[opa]` wraps it as an adapter.
+The default policy engine is CEL. CEL is embeddable as a library, evaluates in microseconds with no sidecar, and is already the policy language for Kubernetes admission webhooks and Google Cloud IAM. If you already run OPA infrastructure, `presidium-contrib[opa]` wraps it as an adapter.
 
 ### Where Presidium Builds vs. Wraps
 

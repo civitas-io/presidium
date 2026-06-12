@@ -40,7 +40,18 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | Page | Package | Milestone | Status |
 |---|---|---|---|
 | [Agent Registry](design/agent-registry.md) | `presidium` (protocol) + `presidium-contrib` (Postgres ref impl) | M2 | Draft |
+| [Agent Registry Requirements](design/agent-registry-requirements.md) | `presidium` (protocol) | M2 | Draft |
 | [Policy Engine](design/policy-engine.md) | `presidium` (protocol + CEL default) + `presidium-contrib[opa]` | M2 | Draft |
+| [Policy Engine Requirements](design/policy-engine-requirements.md) | `presidium` (protocol + CEL default) | M2 | Draft |
+| [Credential Provider Requirements](design/credential-provider-requirements.md) | `presidium` (protocol) | M2 | Draft |
+| [Credential Provider](design/credential-provider.md) | `presidium` (protocol + env/file) / `presidium-contrib` (Vault, AWS) | M2 | Draft |
+| [Approval Service Requirements](design/approval-service-requirements.md) | `presidium` (protocol) | M2 | Draft |
+| [Approval Service](design/approval-service.md) | `presidium` (protocol + callback) / `presidium-contrib` (Slack, Temporal, webhook) | M2 | Draft |
+| [Audit Enricher Requirements](design/audit-enricher-requirements.md) | `presidium` (protocol) | M2 | Draft |
+| [Audit Enricher](design/audit-enricher.md) | `presidium` (protocol + InProcessAuditEnricher) | M2 | Draft |
+| [Topology Integration Requirements](design/topology-integration-requirements.md) | `presidium` + `civitas` (2 minimal changes) | M2 | Draft |
+| [Topology Integration](design/topology-integration.md) | `presidium` (GovernedRuntime) | M2 | Draft |
+| [Implementation Plan](design/implementation-plan.md) | All M2 components | M2 | Ready |
 | [LLM Gateway](design/llm-gateway.md) | `presidium` (protocol) + `presidium-contrib[litellm]` | M3 | Draft |
 | [MCP Gateway](design/mcp-gateway.md) | `presidium` (protocol) + `presidium-contrib` (ref impl) | M3 | Draft |
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |
@@ -57,6 +68,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Market Analysis](research/market-analysis.md) | Agent infrastructure market $7-11B in 2026, 27-47% CAGR. 88% of agents fail to reach production. 67% cite auditability as top adoption barrier. Tool call failure rates 3-15%. | 12 data sources cited |
 | [Monetization Strategy](research/monetization.md) | Open core + managed cloud playbook. Temporal/LangChain/CrewAI revenue comparisons. Four-tier pricing model. Revenue projections Y1-Y4. Defensible moats analysis. | 5 comparable companies |
 | [Fiddler Relationship](research/fiddler-relationship.md) | Complementary, not competitive. Fiddler observes agents (layer above), Presidium runs them (layer below). Natural pipeline: Presidium generates telemetry → Fiddler analyzes. Watch areas: "control plane" branding, policy enforcement direction. | Stack position analysis |
+| [Agent Registry Research](research/agent-registry-research.md) | Industry research on agent identity, registration, authorization, and trust across AWS Bedrock, Google Gemini, Microsoft AGT, IBM watsonx, SPIFFE/SPIRE, K8s RBAC, OAuth 2.0, and 4 academic papers. Comparative analysis and 8 key patterns. | 4 providers + 3 infra systems + 4 papers |
 
 ## RFCs
 
@@ -65,6 +77,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | RFC | Title | Status |
 |---|---|---|
 | [RFC-001](rfcs/001-presidium-scope.md) | Presidium Scope and Boundaries | Draft |
+| [RFC-002](rfcs/002-multi-dimensional-evaluation.md) | Multi-Dimensional Evaluation for Non-Deterministic Systems | Seed |
 
 ## Project Files
 

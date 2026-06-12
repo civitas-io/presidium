@@ -28,6 +28,7 @@ Presidium is a **governance layer for AI agent systems**, built on Civitas. It p
 - Python-first (no multi-language until Python is excellent)
 - Developer-centric (simple things simple, complex things possible)
 - Vendor-neutral (no cloud lock-in, OTEL for telemetry)
+- CNCF-aligned (prefer CNCF standards where applicable — SPIFFE for identity, OTEL for observability, CEL for policy — to enable enterprise adoption and interoperability with existing infrastructure)
 - Open source (Apache 2.0, free forever for core)
 
 ## Out of Scope: What Presidium is NOT

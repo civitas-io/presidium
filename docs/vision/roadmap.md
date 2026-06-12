@@ -20,9 +20,17 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 - [x] Architecture overview and package map
 - [x] Interface-first architecture decisions (2-package structure, CEL default, library-first)
 - [x] Competitive research archive
-- [ ] RFC-001: Presidium scope and boundaries
-- [ ] Design doc: Agent Registry
-- [ ] Design doc: Policy Engine
+- [x] CNCF standards alignment principle (SPIFFE, OTEL, CEL)
+- [ ] RFC-001: Presidium scope and boundaries (draft exists, needs finalization)
+- [x] Design doc: Agent Registry (requirements + design + research, reviewed)
+- [x] Design doc: Policy Engine (requirements + design, reviewed)
+- [x] Design doc: Credential Provider (requirements + design)
+- [x] Design doc: Approval Service (requirements + design)
+- [x] Design doc: Audit Enricher (requirements + design)
+- [x] Design doc: Topology Integration (requirements + design)
+- [x] Agent registry industry research (AWS, Google, Microsoft, IBM, SPIFFE, K8s RBAC)
+- [x] Full M2 design review (Oracle + consistency check, 12/12 issues resolved)
+- [x] RFC-002: Multi-dimensional evaluation (seed for post-M4 investigation)
 - [ ] Community feedback on architecture
 
 **Deliverable:** Complete documentation. No code.
@@ -33,16 +41,20 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 **Goal:** All Protocol definitions in `presidium` core, plus working library-mode defaults. A developer can `pip install presidium` and have complete in-process governance.
 
-- [ ] `presidium` package — all Protocol definitions:
-  - `PolicyEngine` + `CelPolicyEngine` (in-process CEL evaluation via `cel-python`)
-  - `AgentRegistry` + `InMemoryRegistry` / `SqliteRegistry`
-  - `CredentialProvider` + `EnvCredentialProvider` / `FileCredentialProvider`
-  - `TrustScorer` + `RuleBasedTrustScorer`
-  - `ApprovalService` + `CallbackApprovalProvider` (stdin/callback for dev and test)
-  - `AuditEnricher` + `InProcessAuditEnricher` (forwards to Civitas AuditSink)
-  - `GovernedModelProvider` (in-process grant checks + rate limits)
-  - `GovernedToolProvider` (in-process ACL checks)
-- [ ] YAML topology integration — governance config extends Civitas topology files
+**Design:** Complete (reviewed, all issues resolved). **Implementation:** Next.
+
+- [x] Requirements and design for all 9 components (35 design decisions, 12 review issues resolved)
+- [ ] `presidium` package — Protocol definitions + default implementations:
+  - `AgentRegistry` + `InMemoryRegistry` / `SqliteRegistry` — SPIFFE-compatible `presidium://` identity, Ed25519 binding, K8s-style grants with CEL conditions, `trust_events` history table
+  - `PolicyEngine` + `CelPolicyEngine` — 3 evaluation stages (pre_tool, pre_llm, registration), fail-closed, advisory/soft/hard enforcement modes, multi-stage rules
+  - `CredentialProvider` + `EnvCredentialProvider` / `FileCredentialProvider` — grant-based credential access (`credential:{name}`), governance-enriched audit
+  - `TrustScorer` + `LinearTrustScore` — 0.0-1.0, 3 tiers, lazy-on-read decay, materialize-on-write
+  - `ApprovalService` + `CallbackApprovalProvider` — async HITL with 5-min default timeout, fail-closed
+  - `AuditEnricher` + `InProcessAuditEnricher` — middleware sink, re-enrichment guard, 15 event types (5 Civitas + 10 Presidium)
+  - `GovernedModelProvider` — wraps ModelProvider, evaluates pre_llm policies
+  - `GovernedToolProvider` — wraps ToolProvider, evaluates pre_tool policies
+- [ ] `GovernedRuntime.from_config()` — single YAML file, wraps Civitas Runtime
+- [ ] 2 Civitas changes: add `"presidium"` to known keys + add `from_config_dict()` classmethod
 - [ ] Integration tests with Civitas runtime
 - [ ] Getting started guide
 
@@ -62,11 +74,15 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
   - `LiteLLMModelProvider` — routes through LiteLLM Proxy (100+ model support)
   - `SlackApprovalService` — approval requests via Slack with approve/deny buttons
   - `TemporalApprovalService` — human task workflows via Temporal
+  - `WebhookApprovalProvider` — POST approval requests to webhook URL, listen for callbacks
 - [ ] Reference implementations (novel):
   - `PostgresAgentRegistry` — agent records, grant sets, trust score history in Postgres
   - `MCPGovernedToolProvider` — full MCP governance: ACL, tool poisoning detection, credential redaction
   - `LearningTrustScorer` — starts rule-based, learns from decision journal over time
+- [ ] `pre_message` evaluation stage — requires Civitas MessageBus hook (3rd Civitas change, deferred from M2)
 - [ ] Service mode GenServer wrappers for registry, policy, and trust scoring
+- [ ] Policy hot-reload without restart
+- [ ] Concurrent grant modification (optimistic concurrency for service mode)
 - [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[vault]`, `presidium-contrib[slack]` extras
 
 **Deliverable:** `pip install presidium-contrib[opa,vault,slack]`
@@ -119,6 +135,16 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ---
 
+## Future Investigation: Multi-Dimensional Evaluation
+
+> See [RFC-002](../rfcs/002-multi-dimensional-evaluation.md)
+
+Current LLM evaluation collapses high-dimensional, non-deterministic outputs to scalar scores. This is a category error — the evaluation output should be distributional and multi-dimensional (per-dimension means with confidence intervals, context, and caveats), not a single number.
+
+The M2 `TrustScorer` ships as a simple 0.0-1.0 scalar. Post-M4, investigate replacing scalar trust with distributional trust profiles: per-dimension scores with uncertainty bounds, context-dependent trust, and explicit caveats. This is a research-first effort — the questions in RFC-002 need answers before any design work.
+
+---
+
 ## Timeline
 
 These are aspirational, not commitments. Adjusted based on community feedback and contributor availability.
@@ -126,7 +152,7 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 | Milestone | Target | Status |
 |---|---|---|
 | M1: Foundation | Q2 2026 | Complete |
-| M2: Core Interfaces + CEL Policy | Q3 2026 | Planning |
+| M2: Core Interfaces + CEL Policy | Q3 2026 | Design complete, implementation next |
 | M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Planning |
 | M4: Autonomy Progression | Q4 2026 | Planning |
 | M5: SDK + CLI | Q1 2027 | Planning |

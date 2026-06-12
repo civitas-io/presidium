@@ -12,7 +12,7 @@ This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the co
 
 ```
 presidium/                          # Interface library (pip install presidium)
-  registry.py                       # AgentRecord, GrantSet, TrustScore protocols
+  registry.py                       # AgentRecord, Grant, TrustScorer protocols
   policy.py                         # PolicyEngine protocol + CelPolicyEngine default
   credentials.py                    # CredentialProvider protocol
   llm_gateway.py                    # GovernedModelProvider protocol
@@ -70,26 +70,43 @@ class PolicyDecision(Enum):
     DENY = "deny"
     REQUIRE_APPROVAL = "require_approval"
 
+class EvaluationStage(Enum):
+    PRE_TOOL = "pre_tool"
+    PRE_LLM = "pre_llm"
+    PRE_MESSAGE = "pre_message"
+    REGISTRATION = "registration"
+
+@dataclass
+class PolicyResult:
+    decision: PolicyDecision
+    policy_name: str
+    reason: str | None = None
+    approvers: list[str] | None = None
+    enforcement: EnforcementMode = EnforcementMode.HARD
+
+@dataclass
+class EvaluationContext:
+    agent: AgentRecord       # identity, grants, trust, status, owner
+    request: ActionRequest   # resource + action + parameters
+    time: datetime
+
 class PolicyEngine(Protocol):
+    def load_policies(self, rules: list[PolicyRule]) -> None: ...
     async def evaluate(
-        self,
-        agent: str,
-        action: str,
-        context: dict[str, Any],
-    ) -> PolicyDecision: ...
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -> PolicyResult: ...
 
 class CelPolicyEngine:
-    """Default: evaluates CEL expressions in-process. No sidecar required."""
+    """Default: compiles CEL expressions at load time, evaluates in-process (1-3ms).
+    Fail-closed: evaluation errors return DENY. No sidecar required."""
 
-    def __init__(self, rules_path: Path) -> None: ...
-
+    def load_policies(self, rules: list[PolicyRule]) -> None: ...
     async def evaluate(
-        self,
-        agent: str,
-        action: str,
-        context: dict[str, Any],
-    ) -> PolicyDecision: ...
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -> PolicyResult: ...
 ```
+
+> See [policy-engine design doc](../design/policy-engine.md) for full data model, enforcement modes, CEL expression format, and design decisions.
 
 CEL (Common Expression Language) is the default because it's embeddable, has a Python implementation (`cel-python`), and is the direction Kubernetes is moving for admission policies. No sidecar, no network call, no Rego to learn.
 
@@ -97,27 +114,40 @@ CEL (Common Expression Language) is the default because it's embeddable, has a P
 
 ```python
 @dataclass
-class GrantSet:
-    capabilities: list[str]
-    llm_providers: list[str]
-    tools: list[str]
-    budget_usd_per_hour: float | None
+class Grant:
+    resources: list[str]              # ["tool:database", "llm:claude-sonnet"]
+    actions: list[str]                # ["read", "write", "invoke"]
+    scope: dict[str, str] = field(default_factory=dict)
+    condition: str | None = None      # CEL expression evaluated at policy time
+    expires_at: datetime | None = None
 
 @dataclass
 class AgentRecord:
+    # Identity
+    agent_id: str                     # SPIFFE-compatible URI: presidium://{trust_domain}/{path}
     name: str
-    version: str
-    owner: str
-    grants: GrantSet
-    trust_score: float
-    state: AgentState
+    public_key: str                   # Ed25519 public key (base64)
+    # Governance
+    grants: list[Grant] = field(default_factory=list)
+    trust_value: float = 0.5
+    trust_tier: TrustTier = TrustTier.STANDARD
+    status: AgentStatus = AgentStatus.REGISTERED
+    # Accountability
+    owner: str | None = None
+    parent_agent_id: str | None = None
+    revision: int = 0
 
 class AgentRegistry(Protocol):
-    async def register(self, record: AgentRecord) -> None: ...
+    async def register(self, record: AgentRecord) -> AgentRecord: ...
     async def lookup(self, name: str) -> AgentRecord | None: ...
-    async def update_trust(self, name: str, delta: float) -> None: ...
-    async def get_grants(self, name: str) -> GrantSet | None: ...
+    async def lookup_by_id(self, agent_id: str) -> AgentRecord | None: ...
+    async def add_grant(self, name: str, grant: Grant) -> AgentRecord: ...
+    async def has_grant(self, name: str, resource: str, action: str) -> bool: ...
+    async def record_trust_event(self, name: str, event: TrustEvent) -> AgentRecord: ...
+    async def update_status(self, name: str, status: AgentStatus) -> AgentRecord: ...
 ```
+
+> See [agent-registry design doc](../design/agent-registry.md) for full data model, SPIFFE identity format, dynamic spawning rules, and design decisions.
 
 No existing product tracks agent grants and trust scores together. This is novel territory.
 
@@ -125,37 +155,51 @@ No existing product tracks agent grants and trust scores together. This is novel
 
 ```python
 class CredentialProvider(Protocol):
-    async def get(self, key: str) -> str | None: ...
-    async def rotate(self, key: str) -> str: ...
+    async def get(
+        self,
+        agent_id: str,
+        credential_name: str,
+        grants: list[Grant],
+    ) -> str | None: ...
+    async def close(self) -> None: ...
 
 class EnvCredentialProvider:
-    """Default: reads from environment variables."""
-    async def get(self, key: str) -> str | None: ...
+    """Default: reads from os.environ. Checks grants before resolving.
+    Credential resource format: credential:{name}"""
+    async def get(self, agent_id: str, credential_name: str, grants: list[Grant]) -> str | None: ...
 
 class FileCredentialProvider:
-    """Default: reads from a local secrets file (dev only)."""
+    """Default: reads from a key=value file (dev only). Same grant checking."""
     def __init__(self, path: Path) -> None: ...
-    async def get(self, key: str) -> str | None: ...
+    async def get(self, agent_id: str, credential_name: str, grants: list[Grant]) -> str | None: ...
 ```
+
+> See [credential-provider design doc](../design/credential-provider.md) for grant integration, topology YAML wiring, audit event format, and design decisions.
 
 ### Trust Scorer
 
 ```python
-@dataclass
-class TrustSignal:
-    source: str          # "policy_violation", "eval_score", "human_approval"
-    value: float         # normalized 0.0–1.0
-    weight: float
-    timestamp: datetime
+class TrustEvent(Enum):
+    SUCCESS = "success"
+    FAILURE = "failure"
+    POLICY_VIOLATION = "policy_violation"
+    HUMAN_OVERRIDE = "human_override"
 
 class TrustScorer(Protocol):
-    async def score(self, agent: str, signals: list[TrustSignal]) -> float: ...
-    async def current(self, agent: str) -> float: ...
+    @property
+    def value(self) -> float: ...       # 0.0 - 1.0
+    @property
+    def tier(self) -> TrustTier: ...
+    @property
+    def last_updated(self) -> datetime: ...
+    def record_event(self, event: TrustEvent) -> None: ...
 
-class RuleBasedTrustScorer:
-    """Default: weighted average of signals with configurable decay."""
-    async def score(self, agent: str, signals: list[TrustSignal]) -> float: ...
+class LinearTrustScore:
+    """Default: linear decay, 3 tiers (TRUSTED >= 0.7, STANDARD 0.3-0.7, RESTRICTED < 0.3).
+    SUCCESS +0.02, FAILURE -0.05, POLICY_VIOLATION -0.10, decay -0.01/hr."""
 ```
+
+> See [agent-registry design doc](../design/agent-registry.md) for trust tier thresholds, decay model, and the AGT-style learning scorer in presidium-contrib.
 
 No existing product does trust scoring for AI agents. The reference implementation in `presidium-contrib` adds learning from historical patterns.
 
@@ -164,47 +208,73 @@ No existing product does trust scoring for AI agents. The reference implementati
 ```python
 @dataclass
 class ApprovalRequest:
-    agent: str
-    action: str
+    request_id: str                       # UUID
+    agent_id: str                         # presidium:// URI
+    resource: str                         # e.g. "tool:database"
+    action: str                           # e.g. "write"
+    reason: str                           # from PolicyResult.reason
+    approvers: list[str]                  # from PolicyRule.approvers
     context: dict[str, Any]
-    timeout_seconds: int = 300
+    policy_name: str
+    status: ApprovalStatus = ApprovalStatus.PENDING
+    timeout_seconds: float = 1800.0
 
 @dataclass
-class ApprovalResponse:
+class ApprovalDecision:
+    request_id: str
     approved: bool
-    reviewer: str | None
-    reason: str | None
+    decided_by: str
+    reason: str | None = None
 
 class ApprovalService(Protocol):
-    async def request(self, req: ApprovalRequest) -> ApprovalResponse: ...
+    async def request_approval(self, request: ApprovalRequest) -> ApprovalDecision: ...
+    async def list_pending(self) -> list[ApprovalRequest]: ...
+    async def decide(self, request_id: str, decision: ApprovalDecision) -> None: ...
 
 class CallbackApprovalProvider:
-    """Default: calls a Python callback. Useful for tests and CLI tools."""
-    def __init__(self, callback: Callable[[ApprovalRequest], Awaitable[ApprovalResponse]]) -> None: ...
+    """Default: programmatic callback or auto-approve/deny flags. No infrastructure required."""
+    auto_approve: bool
+    auto_deny: bool
+    callback: Callable | None
+    async def request_approval(self, request: ApprovalRequest) -> ApprovalDecision: ...
 ```
+
+> See [approval-service design doc](../design/approval-service.md) for PEP integration, Slack/Temporal contrib adapters, and the connection to M4 autonomy progression.
 
 ### Audit Enricher
 
 ```python
-@dataclass
-class AuditEvent:
-    agent: str
-    action: str
-    decision: PolicyDecision
-    trust_score: float
-    context: dict[str, Any]
-    timestamp: datetime
+# AuditEvent is Civitas's TypedDict — Presidium does not define its own
+from civitas.audit.types import AuditEvent, AuditSink
 
 class AuditEnricher(Protocol):
+    """Structural subtype of AuditSink. Drop-in replacement that adds governance context."""
     async def emit(self, event: AuditEvent) -> None: ...
+    async def flush(self) -> None: ...
+    async def close(self) -> None: ...
 
 class InProcessAuditEnricher:
-    """Default: enriches events and forwards to Civitas AuditSink."""
-    def __init__(self, sink: AuditSink) -> None: ...
+    """Default: looks up agent in registry, adds details['governance'] dict, forwards to sink.
+    Fail-open: enrichment errors forward the original event rather than dropping it."""
+    def __init__(self, downstream: AuditSink, registry: AgentRegistry, cache_ttl: float = 5.0) -> None: ...
     async def emit(self, event: AuditEvent) -> None: ...
 ```
 
-Presidium doesn't own the audit destination. It enriches events with governance context (policy decision, trust score, grant set) and forwards to Civitas's `AuditSink`, which already has adapters for Datadog, Splunk, and ELK.
+Enrichment adds a `governance` key to `event["details"]`:
+
+```python
+# Before enrichment (Civitas event)
+{"sender": "researcher", "recipient": "database_tool", "type": "tool_call"}
+
+# After enrichment (Presidium adds governance key)
+{"sender": "researcher", "recipient": "database_tool", "type": "tool_call",
+ "governance": {"agent_id": "presidium://acme.com/prod/researcher",
+                "trust_value": 0.72, "trust_tier": "trusted", "owner": "alice@acme.com"}}
+```
+
+> See [audit-enricher design doc](../design/audit-enricher.md) for the full event type catalog, topology YAML wiring, and design decisions.
+
+Presidium doesn't own the audit destination. It enriches events with governance context and forwards to Civitas's `AuditSink`, which already has adapters for Datadog, Splunk, and ELK.
 
 ### LLM Gateway
 

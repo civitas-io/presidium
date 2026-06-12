@@ -21,6 +21,7 @@ natively integrated into the Civitas agent runtime.
 - Built natively on Civitas (supervision trees, message passing, transports)
 - Policies as supervisor constraints, not external interceptors
 - Python-first, developer-centric, vendor-neutral
+- CNCF-aligned where applicable (SPIFFE for identity, OTEL for telemetry, CEL for policy)
 
 ### What Presidium Is NOT
 
