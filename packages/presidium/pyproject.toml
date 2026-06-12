@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "presidium"
+version = "0.1.0"
+description = "Governance interfaces and default implementations for AI agent systems built on Civitas"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+keywords = ["agents", "governance", "policy", "trust", "civitas"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Framework :: AsyncIO",
+    "Typing :: Typed",
+]
+dependencies = [
+    "civitas>=0.3",
+    "cel-python>=0.1",
+]
+
+[project.optional-dependencies]
+sqlite = ["aiosqlite>=0.20"]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/presidium"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=presidium --cov-report=term-missing --cov-fail-under=85"
+
+[tool.coverage.run]
+branch = true
+source = ["presidium"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "^\\s+\\.\\.\\.$",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["presidium"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = false
+disallow_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["celpy", "celpy.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["civitas", "civitas.*"]
+ignore_missing_imports = true
