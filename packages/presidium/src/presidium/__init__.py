@@ -43,6 +43,8 @@ from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry._base import AgentRegistry
 from presidium.registry.memory import InMemoryRegistry
+from presidium.registry.sqlite import SqliteRegistry
+from presidium.runtime import GovernedRuntime
 from presidium.trust import LinearTrustScore, TrustScorer
 
 __all__ = [
@@ -77,9 +79,11 @@ __all__ = [
     "EnvCredentialProvider",
     "FileCredentialProvider",
     "GovernedModelProvider",
+    "GovernedRuntime",
     "GovernedToolProvider",
     "InMemoryRegistry",
     "LinearTrustScore",
+    "SqliteRegistry",
     # Errors
     "AgentNotFoundError",
     "ApprovalTimeoutError",
