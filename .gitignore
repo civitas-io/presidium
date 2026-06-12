@@ -40,3 +40,6 @@ site/
 # Environment
 .env
 .env.local
+
+# Session handoff
+HANDOFF.md
