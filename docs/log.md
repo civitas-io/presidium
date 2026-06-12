@@ -10,7 +10,7 @@
 
 **Sources ingested:**
 - python-civitas repository (GitHub: jerynmathew/python-civitas) — evaluated architecture, code quality, documentation, testing, security
-- Microsoft Agent Governance Toolkit (GitHub: microsoft/agent-governance-toolkit) — evaluated as competitor, 540K LOC, 9 packages, 10/10 OWASP
+- Microsoft Agent Governance Toolkit — evaluated as competitor, 540K LOC, 9 packages, 10/10 OWASP
 - Fiddler AI product pages and Series C announcement — evaluated as complement, $100M funding
 - LangChain Series B announcement ($125M, $1.25B valuation)
 - CrewAI funding and product data ($18M Series A, $3.2M ARR)

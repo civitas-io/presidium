@@ -1,6 +1,7 @@
 # Package Map
 
 > What each package does, its boundaries, and dependencies.
+> Last updated: 2026-05-05
 
 ![Interface-First Architecture](../assets/interface-first-architecture.svg)
 

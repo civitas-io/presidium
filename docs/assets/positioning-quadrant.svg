@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 500" width="660" height="500"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+  <!-- Quadrant backgrounds -->
+  <!-- Q3 bottom-left: Frameworks -->
+  <rect x="80" y="230" width="250" height="200" rx="0" fill="#F9FAFB"/>
+  <!-- Q4 bottom-right: Runtimes -->
+  <rect x="330" y="230" width="250" height="200" rx="0" fill="#F0FDF4"/>
+  <!-- Q2 top-left: Governance Sidecars -->
+  <rect x="80" y="30" width="250" height="200" rx="0" fill="#EFF6FF"/>
+  <!-- Q1 top-right: Presidium target -->
+  <rect x="330" y="30" width="250" height="200" rx="0" fill="#FFFBEB"/>
+
+  <!-- Quadrant label text -->
+  <text x="205" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#93C5FD">Governance Sidecars</text>
+  <text x="455" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#F59E0B">Presidium (target)</text>
+  <text x="205" y="416" text-anchor="middle" font-size="11" font-weight="600" fill="#9CA3AF">Frameworks</text>
+  <text x="455" y="416" text-anchor="middle" font-size="11" font-weight="600" fill="#86EFAC">Runtimes</text>
+
+  <!-- Axis lines -->
+  <!-- Horizontal axis (middle) -->
+  <line x1="70" y1="230" x2="590" y2="230" stroke="#D1D5DB" stroke-width="1.5"/>
+  <!-- Vertical axis (middle) -->
+  <line x1="330" y1="20" x2="330" y2="440" stroke="#D1D5DB" stroke-width="1.5"/>
+
+  <!-- Chart border -->
+  <rect x="80" y="30" width="500" height="400" fill="none" stroke="#D1D5DB" stroke-width="1"/>
+
+  <!-- Axis arrows -->
+  <line x1="80" y1="430" x2="580" y2="430" stroke="#6B7280" stroke-width="1.5"/>
+  <polygon points="580,426 590,430 580,434" fill="#6B7280"/>
+  <line x1="70" y1="430" x2="70" y2="30" stroke="#6B7280" stroke-width="1.5"/>
+  <polygon points="66,30 70,20 74,30" fill="#6B7280"/>
+
+  <!-- Axis labels -->
+  <text x="80" y="450" font-size="10" fill="#6B7280">Low Runtime Depth</text>
+  <text x="580" y="450" text-anchor="end" font-size="10" fill="#6B7280">High Runtime Depth</text>
+  <text x="15" y="430" font-size="10" fill="#6B7280" transform="rotate(-90 15 430)">Low Governance</text>
+  <text x="15" y="270" font-size="10" fill="#6B7280" transform="rotate(-90 15 270)">High Governance</text>
+
+  <!-- Title -->
+  <text x="330" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#1F2937">Agent Infrastructure Landscape</text>
+
+  <!-- Chart area: x: 80→580 (500px), y: 30→430 (400px) -->
+  <!-- svg_x = 80 + px*500, svg_y = 430 - py*400 -->
+
+  <!-- Data points -->
+
+  <!-- Microsoft AGT [0.2, 0.85] → x=180, y=90 -->
+  <circle cx="180" cy="90" r="6" fill="#3B82F6"/>
+  <text x="190" y="86" font-size="10" fill="#1D4ED8" font-weight="600">Microsoft AGT</text>
+
+  <!-- Fiddler [0.15, 0.65] → x=155, y=170 -->
+  <circle cx="155" cy="170" r="6" fill="#6366F1"/>
+  <text x="165" y="166" font-size="10" fill="#4338CA" font-weight="600">Fiddler</text>
+
+  <!-- NeMo Guardrails [0.1, 0.4] → x=130, y=270 -->
+  <circle cx="130" cy="270" r="6" fill="#8B5CF6"/>
+  <text x="140" y="266" font-size="10" fill="#6D28D9" font-weight="600">NeMo Guardrails</text>
+
+  <!-- Presidium [0.8, 0.85] → x=480, y=90 -->
+  <circle cx="480" cy="90" r="9" fill="#F59E0B"/>
+  <text x="492" y="86" font-size="11" fill="#78350F" font-weight="700">Presidium ★</text>
+
+  <!-- Temporal [0.85, 0.15] → x=505, y=370 -->
+  <circle cx="505" cy="370" r="6" fill="#22C55E"/>
+  <text x="515" y="366" font-size="10" fill="#15803D" font-weight="600">Temporal</text>
+
+  <!-- Civitas [0.7, 0.1] → x=430, y=390 -->
+  <circle cx="430" cy="390" r="6" fill="#22C55E"/>
+  <text x="400" y="386" font-size="10" fill="#15803D" font-weight="600" text-anchor="end">Civitas</text>
+
+  <!-- CrewAI [0.3, 0.15] → x=230, y=370 -->
+  <circle cx="230" cy="370" r="6" fill="#9CA3AF"/>
+  <text x="240" y="366" font-size="10" fill="#374151" font-weight="600">CrewAI</text>
+
+  <!-- LangChain [0.35, 0.2] → x=255, y=350 -->
+  <circle cx="255" cy="350" r="6" fill="#9CA3AF"/>
+  <text x="265" y="346" font-size="10" fill="#374151" font-weight="600">LangChain</text>
+
+  <!-- Legend note -->
+  <text x="330" y="480" text-anchor="middle" font-size="9" fill="#9CA3AF" font-style="italic">Presidium occupies the only empty quadrant: deep runtime + deep governance.</text>
+
+</svg>

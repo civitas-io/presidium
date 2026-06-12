@@ -34,26 +34,30 @@ Work-Bench (NYC, $160M enterprise VC fund) published "The Rise of the Agent Runt
 
 **Relevance to Presidium:** Same layer (runtime) but different model. Temporal = workflow replay. Civitas/Presidium = actor model + supervision. Not direct competitors — different architectural philosophy.
 
-### Microsoft Agent Governance Toolkit (1,289 stars, 70 contributors)
+### Microsoft Agent Governance Toolkit
 
-**What it is:** Runtime governance for AI agents — 10/10 OWASP coverage.
+**What it is:** Multi-language governance sidecar toolkit for AI agents. 9+ packages across
+Python, TypeScript, .NET, Rust, and Go. Covers policy enforcement, zero-trust identity,
+privilege rings, SLOs, compliance mapping (EU AI Act, NIST, HIPAA), and framework adapters.
 
-- 9 packages, 540K LOC, 5 languages (Python, TS, C#, Rust, Go)
-- 13,000+ tests, v3.3.0
-- Created March 2026, 13 releases in 2 months
+**Strengths:** Comprehensive scope. Microsoft backing and enterprise credibility. Multi-language
+SDKs. Framework-agnostic (LangChain, CrewAI, AutoGen, and others).
 
-**Architecture:**
-- Agent OS: Stateless policy engine (YAML, OPA Rego, Cedar)
-- Agent Mesh: Zero-trust identity (DIDs, Ed25519, trust decay)
-- Agent Hypervisor: Privilege rings (Ring 0-3)
-- Agent SRE: SLOs, error budgets, circuit breakers, chaos engineering
-- Agent Compliance: EU AI Act, NIST AI RMF, HIPAA, SOC 2
-- 20+ framework integrations
+**Gaps:**
+- No runtime — governance sidecar only. Enforcement depends on agents passing through the
+  gateway; direct API calls and inter-agent messages that bypass the gateway are not covered.
+- Significant complexity — 9+ packages, multi-language monorepo.
+- Privilege rings (`agent-runtime`) are partially unimplemented in the current release.
 
-**Strengths:** Comprehensive. Enterprise-grade. Microsoft backing. Multi-language.
-**Gaps:** No runtime. Governance sidecar only. 540K LOC complexity. Azure gravity.
+**Presidium's differentiators:**
 
-**Relevance to Presidium:** Occupies the governance quadrant without runtime. Presidium's key differentiator is native integration — governance as supervisor constraints, not external interceptors.
+| Presidium | Microsoft AGT |
+|---|---|
+| Governance native to the runtime — supervisor constraints, not interceptors | External sidecar — wraps existing agents |
+| Transport-layer enforcement — every message, regardless of routing path | Gateway-only coverage |
+| OTP supervision as structural trust root | Policy-defined trust hierarchy |
+| Mid-flight behavioral correction via EvalLoop + CorrectionSignal | Post-hoc evaluation |
+| Single Python-native package | Multi-language, multi-package complexity |
 
 ### Fiddler ($100M total funding, Series C Jan 2026)
 
