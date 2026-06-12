@@ -41,21 +41,22 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 **Goal:** All Protocol definitions in `presidium` core, plus working library-mode defaults. A developer can `pip install presidium` and have complete in-process governance.
 
-**Design:** Complete (reviewed, all issues resolved). **Implementation:** Next.
+**Status:** Implementation complete (Phases 1-6). 234 tests, 95% coverage, mypy strict, ruff clean.
 
 - [x] Requirements and design for all 9 components (35 design decisions, 12 review issues resolved)
-- [ ] `presidium` package — Protocol definitions + default implementations:
+- [x] `presidium` package — Protocol definitions + default implementations:
   - `AgentRegistry` + `InMemoryRegistry` / `SqliteRegistry` — SPIFFE-compatible `presidium://` identity, Ed25519 binding, K8s-style grants with CEL conditions, `trust_events` history table
   - `PolicyEngine` + `CelPolicyEngine` — 3 evaluation stages (pre_tool, pre_llm, registration), fail-closed, advisory/soft/hard enforcement modes, multi-stage rules
-  - `CredentialProvider` + `EnvCredentialProvider` / `FileCredentialProvider` — grant-based credential access (`credential:{name}`), governance-enriched audit
+  - `CredentialProvider` + `EnvCredentialProvider` / `FileCredentialProvider` — grant-based credential access (`credential:{name}`), structured logging
   - `TrustScorer` + `LinearTrustScore` — 0.0-1.0, 3 tiers, lazy-on-read decay, materialize-on-write
   - `ApprovalService` + `CallbackApprovalProvider` — async HITL with 5-min default timeout, fail-closed
-  - `AuditEnricher` + `InProcessAuditEnricher` — middleware sink, re-enrichment guard, 15 event types (5 Civitas + 10 Presidium)
+  - `AuditEnricher` + `InProcessAuditEnricher` — middleware sink, re-enrichment guard, fail-open enrichment
   - `GovernedModelProvider` — wraps ModelProvider, evaluates pre_llm policies
   - `GovernedToolProvider` — wraps ToolProvider, evaluates pre_tool policies
-- [ ] `GovernedRuntime.from_config()` — single YAML file, wraps Civitas Runtime
+- [x] `GovernedRuntime` — programmatic constructor wiring all governance components
+- [ ] `GovernedRuntime.from_config()` — YAML-based config (blocked on Civitas `from_config_dict()`)
 - [ ] 2 Civitas changes: add `"presidium"` to known keys + add `from_config_dict()` classmethod
-- [ ] Integration tests with Civitas runtime
+- [ ] Integration tests with Civitas runtime (blocked on Civitas changes)
 - [ ] Getting started guide
 
 **Deliverable:** `pip install presidium` — complete library-mode governance. No sidecars, no infrastructure, no Rego.
@@ -152,7 +153,7 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 | Milestone | Target | Status |
 |---|---|---|
 | M1: Foundation | Q2 2026 | Complete |
-| M2: Core Interfaces + CEL Policy | Q3 2026 | Design complete, implementation next |
+| M2: Core Interfaces + CEL Policy | Q3 2026 | Implementation complete (Civitas integration remaining) |
 | M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Planning |
 | M4: Autonomy Progression | Q4 2026 | Planning |
 | M5: SDK + CLI | Q1 2027 | Planning |

@@ -2,13 +2,13 @@
 
 > Content catalog for the Presidium knowledge base.
 > AI assistants: read this file first to find relevant pages before drilling in.
-> Last updated: 2026-04-30
+> Last updated: 2026-06-12
 
 **The governed agent platform built on [Civitas](https://github.com/jerynmathew/python-civitas).**
 
 Runtime + governance as one architecture — not bolted on, not a sidecar, native.
 
-**Status:** Pre-alpha. Documentation-first phase.
+**Status:** Pre-alpha. M2 implementation complete (Phases 1-6). Civitas integration remaining.
 
 ---
 
@@ -51,7 +51,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Audit Enricher](design/audit-enricher.md) | `presidium` (protocol + InProcessAuditEnricher) | M2 | Draft |
 | [Topology Integration Requirements](design/topology-integration-requirements.md) | `presidium` + `civitas` (2 minimal changes) | M2 | Draft |
 | [Topology Integration](design/topology-integration.md) | `presidium` (GovernedRuntime) | M2 | Draft |
-| [Implementation Plan](design/implementation-plan.md) | All M2 components | M2 | Ready |
+| [Implementation Plan](design/implementation-plan.md) | All M2 components | M2 | Phases 1-6 complete |
 | [LLM Gateway](design/llm-gateway.md) | `presidium` (protocol) + `presidium-contrib[litellm]` | M3 | Draft |
 | [MCP Gateway](design/mcp-gateway.md) | `presidium` (protocol) + `presidium-contrib` (ref impl) | M3 | Draft |
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |

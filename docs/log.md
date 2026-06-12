@@ -386,3 +386,43 @@
 - CelPolicyEngine is highest risk — de-risked with Phase 1 spike before Protocol shapes are finalized
 - SqliteRegistry built LAST — InMemoryRegistry proves the Protocol, SQLite gets parity testing for free via parametrized test suite
 - Phase gates enforce Protocol review before consumers are built (Phase 2→3 gate)
+
+---
+
+## [2026-06-12] impl | M2 Phases 1-6 implementation complete
+
+**Implementation delivered:**
+All 6 phases of the M2 implementation plan completed. 18 source modules, 234 tests, 95% coverage. mypy strict clean, ruff clean.
+
+**Modules created (packages/presidium/src/presidium/):**
+- `model.py` — 8 enums, 8 dataclasses (Phase 1)
+- `errors.py` — PresidiumError hierarchy, 9 exception classes (Phase 1)
+- `trust.py` — TrustScorer Protocol + LinearTrustScore (Phase 2)
+- `policy/_base.py` — PolicyEngine Protocol (Phase 2)
+- `credentials.py` — CredentialProvider Protocol + EnvCredentialProvider + FileCredentialProvider (Phase 2)
+- `registry/_base.py` — AgentRegistry Protocol (Phase 3)
+- `registry/memory.py` — InMemoryRegistry (Phase 3)
+- `policy/cel.py` — CelPolicyEngine with cel-python (Phase 3)
+- `approval.py` — ApprovalService Protocol + CallbackApprovalProvider (Phase 3)
+- `audit.py` — AuditEnricher Protocol + InProcessAuditEnricher (Phase 4)
+- `providers/model.py` — GovernedModelProvider (Phase 5)
+- `providers/tool.py` — GovernedToolProvider (Phase 5)
+- `registry/sqlite.py` — SqliteRegistry with aiosqlite (Phase 6)
+- `runtime.py` — GovernedRuntime programmatic constructor (Phase 6)
+
+**Test coverage highlights:**
+- Registry tests parametrized across InMemoryRegistry and SqliteRegistry (one suite, two backends)
+- CEL spike validated cel-python: json_to_cel, .exists() macros, CELParseError, CELEvalError
+- 100 concurrent writer stress test for both registry backends
+- Trust decay math validated with table-driven golden tests
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — M2 status updated to implementation complete, remaining items listed
+- `docs/design/implementation-plan.md` — status updated
+- `docs/index.md` — status and last-updated refreshed
+
+**Remaining for M2 completion:**
+- `GovernedRuntime.from_config()` — blocked on Civitas `Runtime.from_config_dict()` extraction
+- 2 Civitas changes: add `"presidium"` to `_KNOWN_CONFIG_KEYS`, extract `from_config_dict()` classmethod
+- Integration tests with real Civitas Runtime
+- Getting started guide
