@@ -7,7 +7,7 @@
 
 ## Overview
 
-Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, Vault, AgentGateway, Slack, and the novel components that have no existing product equivalent.
+Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, OpenBao, AgentGateway, Slack, and the novel components that have no existing product equivalent.
 
 This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the core package defines the contracts, contrib provides the implementations.
 
@@ -26,7 +26,7 @@ presidium-contrib/                   # Adapters + reference impls
   adapters/
     opa.py                           # OPA PolicyEngine adapter
     cedar.py                         # Cedar PolicyEngine adapter
-    vault.py                         # HashiCorp Vault CredentialProvider
+    openbao.py                       # OpenBao/Vault CredentialProvider (MPL 2.0)
     agentgateway.py              # AgentGateway adapter (LLM + MCP routing)
     slack_approval.py                # Slack-based HITL adapter
     temporal_approval.py             # Temporal human task adapter
@@ -48,7 +48,7 @@ presidium-contrib/                   # Adapters + reference impls
 |---|---|---|---|---|---|
 | Policy Engine | `PolicyEngine` | `CelPolicyEngine` (in-process CEL) | `PolicyService` GenServer | OPA, Cedar | |
 | Agent Registry | `AgentRegistry` | `InMemoryRegistry` / `SqliteRegistry` | `RegistryService` (Postgres) | | Postgres registry with grants + trust |
-| Credential Provider | `CredentialProvider` | `EnvCredentialProvider` / `FileCredentialProvider` | | HashiCorp Vault, AWS Secrets Manager | |
+| Credential Provider | `CredentialProvider` | `EnvCredentialProvider` / `FileCredentialProvider` | | OpenBao (Vault-compatible), AWS Secrets Manager | |
 | Trust Scorer | `TrustScorer` | `RuleBasedTrustScorer` | `LearningTrustScorer` | | Trust scoring for AI agents |
 | HITL / Approval | `ApprovalService` | `CallbackApprovalProvider` | | Slack, Temporal, PagerDuty | |
 | Audit Enricher | `AuditEnricher` | `InProcessAuditEnricher` | | Datadog, Splunk, ELK (via Civitas AuditSink) | |
@@ -324,7 +324,7 @@ These wrap products that already exist. The adapter implements the Presidium pro
 
 **`adapters/cedar.py`** — Cedar `PolicyEngine` adapter. Use when you need Cedar's authorization model (entity-based, fine-grained).
 
-**`adapters/vault.py`** — HashiCorp Vault `CredentialProvider`. Reads secrets from Vault's KV engine. Handles token renewal.
+**`adapters/openbao.py`** — OpenBao `CredentialProvider`. Reads secrets from OpenBao/Vault KV v2 engine via `hvac`. Handles token renewal. API-compatible with HashiCorp Vault — existing Vault deployments work unchanged. OpenBao is the MPL 2.0 community fork under Linux Foundation / OpenSSF Sandbox.
 
 **`adapters/agentgateway.py`** — AgentGateway `GovernedModelProvider` + `GovernedToolProvider`. Routes LLM and MCP calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry observability, A2A protocol support. Replaces LiteLLM adapter — AgentGateway is agent-centric (LLM + MCP + A2A) rather than LLM-centric.
 

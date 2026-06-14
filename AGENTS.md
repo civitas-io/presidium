@@ -53,7 +53,7 @@ presidium/
 │   └── presidium-contrib/           # Adapters + reference implementations
 │       └── src/presidium_contrib/
 │           ├── opa/                 # OPA adapter (presidium-contrib[opa])
-│           ├── vault/               # Vault credential backend (presidium-contrib[vault])
+│           ├── openbao/             # OpenBao/Vault credential backend (presidium-contrib[openbao])
 │           ├── agentgateway/         # AgentGateway adapter (presidium-contrib[agentgateway])
 │           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
 │           ├── registry/            # Reference impl: Agent Registry with grants + trust
@@ -172,7 +172,7 @@ All concrete implementations. Organized into two categories:
 | Extra | Module | Wraps |
 |---|---|---|
 | `[opa]` | `presidium_contrib.opa` | Open Policy Agent — for teams already running OPA |
-| `[vault]` | `presidium_contrib.vault` | HashiCorp Vault — credential management |
+| `[openbao]` | `presidium_contrib.openbao` | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) — credential management |
 | `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — LLM + MCP + A2A routing with CEL policies |
 | `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
 
@@ -184,14 +184,14 @@ All concrete implementations. Organized into two categories:
 | `presidium_contrib.mcp_gateway` | `MCPGatewayProtocol` | MCP governance — MCP is new, no tooling exists |
 | `presidium_contrib.trust` | `TrustScoringProtocol` | Trust scoring engine — novel concept |
 
-Install: `pip install presidium-contrib[opa,vault]` (mix and match extras)
+Install: `pip install presidium-contrib[opa,openbao]` (mix and match extras)
 
 ### Dependency Rules
 
 1. `presidium` may depend on `civitas` and `cel-python` only
 2. `presidium` must not depend on `presidium-contrib` or any adapter library
 3. `presidium-contrib` depends on `presidium` (for protocols and models)
-4. `presidium-contrib` adapter extras depend on their respective backends (opa, hvac, agentgateway, slack-sdk) as optional dependencies
+4. `presidium-contrib` adapter extras depend on their respective backends (opa, hvac/openbao, agentgateway, slack-sdk) as optional dependencies
 5. No circular dependencies
 6. No package should import from another package's `_internal` modules
 
@@ -301,7 +301,7 @@ Before merging:
 | **Presidium** | Latin: "garrison, guard, protection" — governance for agent systems |
 | **CEL** | Common Expression Language. Embeddable policy language used by Kubernetes and Google Cloud IAM. Evaluates in microseconds in-process. The default policy engine in `presidium`. |
 | **Interface Library** | A package whose primary value is the contracts it defines (Python `Protocol` classes, dataclasses), not the implementations. `presidium` is an interface library. |
-| **Adapter** | A concrete implementation of a `presidium` protocol that wraps an existing product (OPA, Vault, AgentGateway). Lives in `presidium-contrib`. |
+| **Adapter** | A concrete implementation of a `presidium` protocol that wraps an existing product (OPA, OpenBao, AgentGateway). Lives in `presidium-contrib`. |
 | **Reference Implementation** | A concrete implementation of a `presidium` protocol for a component where no mature product exists to wrap. Lives in `presidium-contrib`. |
 | **Library Mode** | Running a component in-process as a Python import. No network calls, no sidecar, microsecond latency. The default for all Presidium components. |
 | **Service Mode** | Running a component as a standalone HTTP service or GenServer for distributed deployments. Optional. The interface is identical to library mode. |

@@ -74,7 +74,7 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 - [ ] Adapters (existing products):
   - `OPAPolicyEngine` — wraps OPA REST API for teams with existing Rego policies
   - `CedarPolicyEngine` — Cedar authorization model
-  - `VaultCredentialProvider` — HashiCorp Vault KV engine with token renewal
+  - `OpenBaoCredentialProvider` — OpenBao/Vault-compatible KV engine with token renewal (MPL 2.0, OpenSSF Sandbox)
   - `AgentGatewayAdapter` — routes LLM + MCP calls through AgentGateway (Linux Foundation, CEL-native, OTEL)
   - `SlackApprovalService` — approval requests via Slack with approve/deny buttons
   - `TemporalApprovalService` — human task workflows via Temporal
@@ -86,9 +86,9 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 - [ ] Service mode GenServer wrappers for registry, policy, and trust scoring
 - [ ] Policy hot-reload without restart
 - [ ] Concurrent grant modification (optimistic concurrency for service mode)
-- [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[vault]`, `presidium-contrib[slack]`, `presidium-contrib[agentgateway]` extras
+- [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[openbao]`, `presidium-contrib[slack]`, `presidium-contrib[agentgateway]` extras
 
-**Deliverable:** `pip install presidium-contrib[opa,vault,slack,agentgateway]`
+**Deliverable:** `pip install presidium-contrib[opa,openbao,slack,agentgateway]`
 
 ---
 
