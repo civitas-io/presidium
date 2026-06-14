@@ -20,7 +20,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|
 | [Manifesto](vision/manifesto.md) | Core thesis: governance should be architectural, not bolted on. 88% of agents fail in production due to infrastructure, not models. Principles: OSS-first, Python-native, developer-centric, vendor-neutral. |
 | [Market Positioning](vision/positioning.md) | Competitive 2x2 (governance depth × runtime depth). Presidium occupies the only empty quadrant. Detailed comparisons vs. AGT, Fiddler, Temporal. Target users: platform engineers, agent developers, enterprise compliance. |
-| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces + CEL policy) → M3 (contrib adapters + reference impls) → M4 (autonomy progression) → M5 (SDK) → M6 (cloud). |
+| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces + CEL policy, complete) → M3 (contrib adapters + post-execution hooks + AgentGateway) → M4 (autonomy progression) → M5 (SDK) → M6 (cloud). |
 
 ## Architecture
 

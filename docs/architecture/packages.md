@@ -7,7 +7,7 @@
 
 ## Overview
 
-Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, Vault, LiteLLM, Slack, and the novel components that have no existing product equivalent.
+Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, Vault, AgentGateway, Slack, and the novel components that have no existing product equivalent.
 
 This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the core package defines the contracts, contrib provides the implementations.
 
@@ -27,7 +27,7 @@ presidium-contrib/                   # Adapters + reference impls
     opa.py                           # OPA PolicyEngine adapter
     cedar.py                         # Cedar PolicyEngine adapter
     vault.py                         # HashiCorp Vault CredentialProvider
-    litellm_proxy.py                 # LiteLLM GovernedModelProvider adapter
+    agentgateway.py              # AgentGateway adapter (LLM + MCP routing)
     slack_approval.py                # Slack-based HITL adapter
     temporal_approval.py             # Temporal human task adapter
   reference/
@@ -52,7 +52,7 @@ presidium-contrib/                   # Adapters + reference impls
 | Trust Scorer | `TrustScorer` | `RuleBasedTrustScorer` | `LearningTrustScorer` | | Trust scoring for AI agents |
 | HITL / Approval | `ApprovalService` | `CallbackApprovalProvider` | | Slack, Temporal, PagerDuty | |
 | Audit Enricher | `AuditEnricher` | `InProcessAuditEnricher` | | Datadog, Splunk, ELK (via Civitas AuditSink) | |
-| LLM Gateway | `GovernedModelProvider` | In-process grant checks + rate limits | | LiteLLM Proxy, Portkey | |
+| LLM Gateway | `GovernedModelProvider` | In-process grant checks + rate limits | | AgentGateway (Linux Foundation) | |
 | MCP Governance | `GovernedToolProvider` | In-process ACL checks | | | MCP governance (no existing product) |
 
 ---
@@ -326,7 +326,7 @@ These wrap products that already exist. The adapter implements the Presidium pro
 
 **`adapters/vault.py`** — HashiCorp Vault `CredentialProvider`. Reads secrets from Vault's KV engine. Handles token renewal.
 
-**`adapters/litellm_proxy.py`** — LiteLLM Proxy `GovernedModelProvider`. Routes LLM calls through a running LiteLLM proxy. Inherits LiteLLM's provider support (100+ models).
+**`adapters/agentgateway.py`** — AgentGateway `GovernedModelProvider` + `GovernedToolProvider`. Routes LLM and MCP calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry observability, A2A protocol support. Replaces LiteLLM adapter — AgentGateway is agent-centric (LLM + MCP + A2A) rather than LLM-centric.
 
 **`adapters/slack_approval.py`** — Slack `ApprovalService`. Posts approval requests to a Slack channel with approve/deny buttons. Waits for response via Slack Events API.
 

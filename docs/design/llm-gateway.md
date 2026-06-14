@@ -1,10 +1,10 @@
 # Design: LLM Gateway
 
-> `presidium-llm-gateway` — LLM request routing, rate limiting, and cost tracking.
+> Governed LLM access — authorization via Presidium, operations via AgentGateway.
 
-**Status:** Draft
-**Package:** `presidium-llm-gateway`
-**Milestone:** M3
+**Status:** Draft (revised June 2026)
+**Package:** `presidium` (GovernedModelProvider) + `presidium-contrib[agentgateway]` (AgentGateway adapter)
+**Milestone:** M2 (authorization) / M3 (AgentGateway adapter, post-execution validation)
 
 ## Problem Statement
 
@@ -12,18 +12,47 @@ Agents call LLMs without constraints. There's no per-agent rate limiting, no cos
 
 ## Goals
 
-1. Route LLM requests through a governed gateway
-2. Per-agent rate limiting (requests/min, tokens/min)
-3. Per-agent cost tracking and budget enforcement
-4. Provider routing (send agent A to Claude, agent B to GPT-4)
-5. Implemented as a Civitas `ModelProvider` plugin (not an external proxy)
+1. Grant-based authorization: can this agent use this model? (Presidium)
+2. Trust-gated decisions: does the agent's trust level allow this action? (Presidium)
+3. Approval routing for sensitive actions (Presidium)
+4. Rate limiting, cost tracking, provider routing (AgentGateway)
+5. Post-execution output validation via `POST_LLM` stage (M3)
 
 ## Non-Goals
 
-- LLM output quality evaluation — that's `presidium-eval`
-- Content filtering (toxicity, PII) — that's Fiddler Guardrails
-- Model fine-tuning or training — out of scope entirely
-- Caching/semantic caching — potential future feature, not M3
+- LLM output quality evaluation (hallucination, toxicity) — separate concern (NeMo Guardrails, Guardrails AI)
+- Model fine-tuning or training — out of scope
+- Caching/semantic caching — potential future feature
+- Reimplementing rate limiting or cost tracking that AgentGateway already provides
+
+## Responsibility Split
+
+Presidium and AgentGateway serve different layers of the governance stack:
+
+| Concern | Owner | Why |
+|---|---|---|
+| **Authorization** (can agent X use model Y?) | Presidium | Grant-based, trust-gated, CEL policies |
+| **Approval routing** (REQUIRE_APPROVAL decisions) | Presidium | HITL workflow, fail-closed timeout |
+| **Audit enrichment** (governance context on events) | Presidium | Agent identity, trust tier, owner |
+| **Rate limiting** (requests/min, tokens/min) | AgentGateway | Native, per-agent, configurable |
+| **Cost tracking** (USD per call, budget enforcement) | AgentGateway | Native, per-provider pricing tables |
+| **Provider routing** (agent A → Claude, agent B → GPT-4) | AgentGateway | Native, rule-based routing |
+| **Content filtering** (guardrails, moderation) | AgentGateway | Multi-layered, webhook-extensible |
+| **Post-execution validation** (schema, PII, content policy) | Presidium (`POST_LLM`) | CEL-based output policies (M3) |
+
+**Architecture:** Presidium's `GovernedModelProvider.check()` runs *before* the call reaches AgentGateway. If the check returns DENY, the call never leaves the process. If ALLOW, the call proceeds to AgentGateway which handles routing, rate limiting, and cost tracking.
+
+```
+Agent calls LLM
+    ↓
+GovernedModelProvider.check()     ← Presidium (authorization)
+    ↓ ALLOW
+AgentGateway                      ← Operations (routing, rate limits, cost)
+    ↓ response
+GovernedModelProvider.post_check() ← Presidium POST_LLM (M3, output validation)
+    ↓
+Agent receives response
+```
 
 ## Design
 

@@ -64,28 +64,31 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ## M3: Contrib Adapters + Reference Impls
 
-**Goal:** `presidium-contrib` with adapters for existing products and reference implementations for novel components. Service mode for registry, policy, and trust scoring.
+**Goal:** `presidium-contrib` with adapters for existing products and reference implementations for novel components. Post-execution evaluation stages. Service mode for distributed deployment.
 
-- [ ] `presidium-contrib` package
+- [ ] `presidium-contrib` package (second workspace member)
+- [ ] Post-execution evaluation stages in `presidium` core:
+  - `POST_TOOL` — validate tool outputs (PII detection, result filtering, size limits)
+  - `POST_LLM` — validate LLM responses (schema compliance, content policy)
+  - `pre_message` — agent-to-agent message governance (requires Civitas MessageBus hook)
 - [ ] Adapters (existing products):
   - `OPAPolicyEngine` — wraps OPA REST API for teams with existing Rego policies
   - `CedarPolicyEngine` — Cedar authorization model
   - `VaultCredentialProvider` — HashiCorp Vault KV engine with token renewal
-  - `LiteLLMModelProvider` — routes through LiteLLM Proxy (100+ model support)
+  - `AgentGatewayAdapter` — routes LLM + MCP calls through AgentGateway (Linux Foundation, CEL-native, OTEL)
   - `SlackApprovalService` — approval requests via Slack with approve/deny buttons
   - `TemporalApprovalService` — human task workflows via Temporal
   - `WebhookApprovalProvider` — POST approval requests to webhook URL, listen for callbacks
 - [ ] Reference implementations (novel):
   - `PostgresAgentRegistry` — agent records, grant sets, trust score history in Postgres
-  - `MCPGovernedToolProvider` — full MCP governance: ACL, tool poisoning detection, credential redaction
+  - `MCPGovernedToolProvider` — full MCP governance: ACL, tool poisoning detection, credential redaction, output PII masking
   - `LearningTrustScorer` — starts rule-based, learns from decision journal over time
-- [ ] `pre_message` evaluation stage — requires Civitas MessageBus hook (3rd Civitas change, deferred from M2)
 - [ ] Service mode GenServer wrappers for registry, policy, and trust scoring
 - [ ] Policy hot-reload without restart
 - [ ] Concurrent grant modification (optimistic concurrency for service mode)
-- [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[vault]`, `presidium-contrib[slack]` extras
+- [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[vault]`, `presidium-contrib[slack]`, `presidium-contrib[agentgateway]` extras
 
-**Deliverable:** `pip install presidium-contrib[opa,vault,slack]`
+**Deliverable:** `pip install presidium-contrib[opa,vault,slack,agentgateway]`
 
 ---
 

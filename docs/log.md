@@ -426,3 +426,27 @@ All 6 phases of the M2 implementation plan completed. 18 source modules, 234 tes
 - 2 Civitas changes: add `"presidium"` to `_KNOWN_CONFIG_KEYS`, extract `from_config_dict()` classmethod
 - Integration tests with real Civitas Runtime
 - Getting started guide
+
+---
+
+## [2026-06-14] design | M3 architecture revision — AgentGateway, post-hooks, MCP governance
+
+**Research conducted:**
+- AgentGateway (Linux Foundation, Agentic AI Foundation): Rust-based gateway for LLM + MCP + A2A, native CEL policies, OpenTelemetry, 3.3k stars
+- MCP governance landscape: 10+ projects surveyed (mcp-zero, mcp-guardian, mcpx, mcp-proxy, mcp-gov, secure-mcp-gateway, etc.)
+- Post-execution patterns: NeMo Guardrails output rails, Guardrails AI validators, MCP gateway response scanning
+
+**Architecture decisions:**
+1. **Replace LiteLLM with AgentGateway** — AgentGateway is agent-centric (LLM + MCP + A2A) vs LiteLLM's LLM-centric focus. Native CEL policy engine aligns with Presidium. Linux Foundation backing.
+2. **Responsibility split defined** — Presidium owns authorization (grants, trust, approval). AgentGateway owns operations (routing, rate limiting, cost tracking). Clear boundary.
+3. **Post-execution stages** — `POST_TOOL` and `POST_LLM` added to M3 scope. Same CEL engine for governance checks (PII detection, result filtering). Content validation (hallucination, toxicity) is a separate concern via NeMo/Guardrails AI contrib adapters.
+4. **MCP governance patterns adopted** — default-deny via grants, tool fingerprinting (hash-based), output PII masking (POST_TOOL + regex/Presidio detection), credential redaction, shadow/audit mode.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — M3 scope revised: LiteLLM → AgentGateway, post-execution stages added
+- `docs/architecture/packages.md` — LiteLLM references replaced with AgentGateway
+- `docs/design/policy-engine.md` — POST_TOOL/POST_LLM stages added, P7 decision updated, open question resolved
+- `docs/design/llm-gateway.md` — responsibility split between Presidium (authorization) and AgentGateway (operations)
+- `docs/design/mcp-gateway.md` — post-execution output validation, PII masking, MCP landscape research
+- `AGENTS.md` — LiteLLM → AgentGateway in package structure, adapters, dependency rules, glossary
+- `docs/index.md` — roadmap summary updated

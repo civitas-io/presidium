@@ -78,6 +78,8 @@ class EvaluationStage(Enum):
     PRE_TOOL = "pre_tool"
     PRE_LLM = "pre_llm"
     REGISTRATION = "registration"
+    POST_TOOL = "post_tool"      # M3 — validate tool outputs
+    POST_LLM = "post_llm"        # M3 — validate LLM responses
     # PRE_MESSAGE = "pre_message"  — deferred to M3 (requires Civitas MessageBus hook)
 ```
 
@@ -213,6 +215,8 @@ class CelPolicyEngine:
 | `pre_llm` | Before LLM call | `GovernedModelProvider` | Model allowlists, cost limits, grant checks |
 | `pre_message` | Before agent-to-agent message | M3 (requires Civitas MessageBus hook) | Deferred — inter-agent communication governance |
 | `registration` | When agent registers | `AgentRegistry` | Owner requirement, naming conventions |
+| `post_tool` | After tool execution (M3) | `GovernedToolProvider` | Output PII detection, result size limits, sensitive data masking |
+| `post_llm` | After LLM response (M3) | `GovernedModelProvider` | Schema compliance, content policy, response validation |
 
 ---
 
@@ -435,7 +439,7 @@ Same pattern as GovernedModelProvider but evaluates `PRE_TOOL` stage and wraps `
 | P4 | Enforcement modes | advisory/soft/hard per-policy | Global-only mode, no advisory | Per-policy modes enable gradual rollout. Advisory mode is essential for testing in production. From policy lifecycle pipeline pattern. |
 | P5 | Default behavior | No match → ALLOW | No match → DENY | The engine is generic. Grant enforcement is a policy at priority 100, not engine logic. This lets users customize the "default deny" behavior without modifying the engine. |
 | P6 | Grant integration | Grants are data, policies are logic | Grants as executable rules, grants as policies | Clean separation enables independent evolution. CEL reads grants as structured data. Don't conflate data with logic. |
-| P7 | Evaluation stages | 3 stages for M2 (pre_tool, pre_llm, registration). pre_message deferred to M3. | Single stage, 8 stages (AGT-style) | 3 covers M2 enforcement points. pre_message requires a Civitas MessageBus hook outside the 2 minimal M2 changes. Post-execution stages (post_tool, post_llm) also deferred to M3. |
+| P7 | Evaluation stages | 3 stages for M2 (pre_tool, pre_llm, registration). post_tool, post_llm, and pre_message added in M3. | Single stage, 8 stages (AGT-style) | M2: 3 stages cover enforcement points. M3 adds post-execution validation (post_tool for output PII/filtering, post_llm for response compliance) and pre_message (requires Civitas MessageBus hook). Post-execution uses the same CEL engine — governance checks, not content validation (NeMo/Guardrails AI are separate concerns). |
 
 ---
 
@@ -443,6 +447,6 @@ Same pattern as GovernedModelProvider but evaluates `PRE_TOOL` stage and wraps `
 
 1. **Policy composition from agent groups**: should agents inherit policies from their team/group? (M3)
 2. **Policy violations → trust score**: should policy violations automatically trigger trust decay? (M2 — lean yes, via TrustEvent.POLICY_VIOLATION)
-3. **Post-execution evaluation**: should we evaluate policies after tool/LLM calls for output validation? (M3)
+3. **Post-execution evaluation**: M3 adds `post_tool` and `post_llm` stages for CEL-based output validation (PII detection, result filtering, schema compliance). Content validation (hallucination, toxicity) is a separate concern handled by NeMo Guardrails or Guardrails AI adapters in contrib.
 4. **Custom CEL functions**: should we support custom function registration for domain-specific checks? (M2 — lean yes for extensibility)
 5. **Policy versioning**: should policy rules have version numbers for audit trail? (M3)
