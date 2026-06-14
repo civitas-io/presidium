@@ -17,7 +17,7 @@ build-backend = "hatchling.build"
 only-include = ["_nonexistent"]
 
 [tool.uv.sources]
-civitas = { path = "../python-civitas", editable = true }
+civitas = { git = "https://github.com/civitas-io/python-civitas.git", branch = "main" }
 presidium = { workspace = true }
 
 [tool.uv.workspace]
