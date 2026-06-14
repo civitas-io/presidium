@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import pytest
 
@@ -27,6 +28,7 @@ def _make_context(
     trust_tier: TrustTier = TrustTier.STANDARD,
     grants: list[Grant] | None = None,
     owner: str = "alice@acme.com",
+    result: dict[str, Any] | None = None,
 ) -> EvaluationContext:
     agent = AgentRecord(
         agent_id="presidium://local/test",
@@ -42,6 +44,7 @@ def _make_context(
         agent=agent,
         request=ActionRequest(resource=resource, action=action),
         time=datetime.now(UTC),
+        result=result,
     )
 
 
@@ -269,3 +272,72 @@ class TestCelPolicyEngineFailClosed:
         assert result.policy_name == "bad-field-access"
         assert result.enforcement == EnforcementMode.HARD
         assert "fail-closed" in (result.reason or "").lower()
+
+
+class TestCelPolicyEnginePostExecution:
+    async def test_post_tool_evaluates_result(self) -> None:
+        engine = CelPolicyEngine()
+        rule = PolicyRule(
+            name="block-large-results",
+            stage=EvaluationStage.POST_TOOL,
+            expression="result.size_bytes > 100000",
+            decision=PolicyDecision.DENY,
+            reason="Tool result exceeds size limit",
+            priority=80,
+        )
+        engine.load_policies([rule])
+        ctx = _make_context(result={"size_bytes": 200000, "content": "large data"})
+        result = await engine.evaluate(EvaluationStage.POST_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+        assert result.policy_name == "block-large-results"
+
+    async def test_post_tool_allows_small_result(self) -> None:
+        engine = CelPolicyEngine()
+        rule = PolicyRule(
+            name="block-large-results",
+            stage=EvaluationStage.POST_TOOL,
+            expression="result.size_bytes > 100000",
+            decision=PolicyDecision.DENY,
+            priority=80,
+        )
+        engine.load_policies([rule])
+        ctx = _make_context(result={"size_bytes": 500, "content": "small"})
+        result = await engine.evaluate(EvaluationStage.POST_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_post_llm_evaluates_response(self) -> None:
+        engine = CelPolicyEngine()
+        rule = PolicyRule(
+            name="block-empty-responses",
+            stage=EvaluationStage.POST_LLM,
+            expression='result.content == ""',
+            decision=PolicyDecision.DENY,
+            reason="LLM returned empty response",
+            priority=80,
+        )
+        engine.load_policies([rule])
+        ctx = _make_context(result={"content": "", "tokens": 0})
+        result = await engine.evaluate(EvaluationStage.POST_LLM, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_post_llm_allows_valid_response(self) -> None:
+        engine = CelPolicyEngine()
+        rule = PolicyRule(
+            name="block-empty-responses",
+            stage=EvaluationStage.POST_LLM,
+            expression='result.content == ""',
+            decision=PolicyDecision.DENY,
+            priority=80,
+        )
+        engine.load_policies([rule])
+        ctx = _make_context(result={"content": "valid response", "tokens": 50})
+        result = await engine.evaluate(EvaluationStage.POST_LLM, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_result_empty_dict_for_pre_execution(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        ctx = _make_context(grants=[])
+        assert ctx.result is None
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY

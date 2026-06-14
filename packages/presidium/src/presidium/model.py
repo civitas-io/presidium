@@ -62,6 +62,8 @@ class EvaluationStage(Enum):
     PRE_TOOL = "pre_tool"
     PRE_LLM = "pre_llm"
     REGISTRATION = "registration"
+    POST_TOOL = "post_tool"
+    POST_LLM = "post_llm"
 
 
 class EnforcementMode(Enum):
@@ -229,11 +231,17 @@ class ActionRequest:
 
 @dataclass
 class EvaluationContext:
-    """Full context passed to the policy engine for evaluation."""
+    """Full context passed to the policy engine for evaluation.
+
+    For pre-execution stages (PRE_TOOL, PRE_LLM, REGISTRATION), ``result``
+    is None. For post-execution stages (POST_TOOL, POST_LLM), ``result``
+    contains the tool output or LLM response as a dict.
+    """
 
     agent: AgentRecord
     request: ActionRequest
     time: datetime
+    result: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------

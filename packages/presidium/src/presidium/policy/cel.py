@@ -82,27 +82,28 @@ class CelPolicyEngine:
                 }
             )
 
-        return celpy.json_to_cel(  # type: ignore[attr-defined]
-            {
-                "agent": {
-                    "name": context.agent.name,
-                    "agent_id": context.agent.agent_id,
-                    "owner": context.agent.owner or "",
-                    "status": context.agent.status.value,
-                    "trust": {
-                        "value": context.agent.trust_value,
-                        "tier": context.agent.trust_tier.value,
-                    },
-                    "grants": active_grants,
+        data: dict[str, Any] = {
+            "agent": {
+                "name": context.agent.name,
+                "agent_id": context.agent.agent_id,
+                "owner": context.agent.owner or "",
+                "status": context.agent.status.value,
+                "trust": {
+                    "value": context.agent.trust_value,
+                    "tier": context.agent.trust_tier.value,
                 },
-                "request": {
-                    "resource": context.request.resource,
-                    "action": context.request.action,
-                    "parameters": context.request.parameters,
-                },
-                "time": now.isoformat(),
-            }
-        )
+                "grants": active_grants,
+            },
+            "request": {
+                "resource": context.request.resource,
+                "action": context.request.action,
+                "parameters": context.request.parameters,
+            },
+            "time": now.isoformat(),
+            "result": context.result or {},
+        }
+
+        return celpy.json_to_cel(data)  # type: ignore[attr-defined]
 
     async def evaluate(
         self,

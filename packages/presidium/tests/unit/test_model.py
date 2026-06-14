@@ -64,11 +64,11 @@ class TestPolicyDecisionEnum:
 
 class TestEvaluationStageEnum:
     def test_all_values(self) -> None:
-        expected = {"pre_tool", "pre_llm", "registration"}
+        expected = {"pre_tool", "pre_llm", "registration", "post_tool", "post_llm"}
         assert {s.value for s in EvaluationStage} == expected
 
     def test_exhaustive_count(self) -> None:
-        assert len(EvaluationStage) == 3
+        assert len(EvaluationStage) == 5
 
 
 class TestEnforcementModeEnum:
