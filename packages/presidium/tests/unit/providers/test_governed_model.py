@@ -184,3 +184,38 @@ class TestGovernedModelProviderAudit:
         details = sink.events[0]["details"]
         assert isinstance(details, dict)
         assert details["stage"] == "pre_llm"
+
+
+BLOCK_EMPTY_RESPONSE = PolicyRule(
+    name="block-empty-response",
+    stage=EvaluationStage.POST_LLM,
+    expression='result.content == ""',
+    decision=PolicyDecision.DENY,
+    reason="LLM returned empty response",
+    priority=80,
+)
+
+
+class TestGovernedModelProviderPostCheck:
+    async def test_post_check_allows_valid_response(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([BLOCK_EMPTY_RESPONSE])
+        provider = GovernedModelProvider(engine, reg)
+        result = await provider.post_check(
+            "test", "claude-sonnet", {"content": "hello", "tokens": 5}
+        )
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_post_check_denies_empty_response(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([BLOCK_EMPTY_RESPONSE])
+        provider = GovernedModelProvider(engine, reg)
+        with pytest.raises(PolicyDeniedError, match="empty response"):
+            await provider.post_check("test", "claude-sonnet", {"content": "", "tokens": 0})
+
+    async def test_post_check_nonexistent_agent_raises(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([])
+        provider = GovernedModelProvider(engine, reg)
+        with pytest.raises(PolicyDeniedError):
+            await provider.post_check("ghost", "claude-sonnet", {})

@@ -125,3 +125,31 @@ class GovernedModelProvider:
                 )
 
         return result
+
+    async def post_check(
+        self,
+        agent_name: str,
+        model: str,
+        result_data: dict[str, Any],
+    ) -> Any:
+        """Evaluate POST_LLM policies against LLM response. Returns PolicyResult."""
+        record = await self._registry.lookup(agent_name)
+        if record is None:
+            raise PolicyDeniedError("Agent not found in registry", None)
+
+        context = EvaluationContext(
+            agent=record,
+            request=ActionRequest(resource=f"llm:{model}", action="invoke"),
+            time=datetime.now(UTC),
+            result=result_data,
+        )
+        post_result = await self._engine.evaluate(EvaluationStage.POST_LLM, context)
+        await self._emit_audit(post_result, context)
+
+        if post_result.enforcement in (EnforcementMode.ADVISORY, EnforcementMode.SOFT):
+            return post_result
+
+        if post_result.decision == PolicyDecision.DENY:
+            raise PolicyDeniedError(post_result.reason, post_result.policy_name)
+
+        return post_result

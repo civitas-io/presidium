@@ -124,3 +124,32 @@ class GovernedToolProvider:
                 )
 
         return result
+
+    async def post_check(
+        self,
+        agent_name: str,
+        tool: str,
+        action: str,
+        result_data: dict[str, Any],
+    ) -> Any:
+        """Evaluate POST_TOOL policies against tool output. Returns PolicyResult."""
+        record = await self._registry.lookup(agent_name)
+        if record is None:
+            raise PolicyDeniedError("Agent not found in registry", None)
+
+        context = EvaluationContext(
+            agent=record,
+            request=ActionRequest(resource=f"tool:{tool}", action=action),
+            time=datetime.now(UTC),
+            result=result_data,
+        )
+        post_result = await self._engine.evaluate(EvaluationStage.POST_TOOL, context)
+        await self._emit_audit(post_result, context)
+
+        if post_result.enforcement in (EnforcementMode.ADVISORY, EnforcementMode.SOFT):
+            return post_result
+
+        if post_result.decision == PolicyDecision.DENY:
+            raise PolicyDeniedError(post_result.reason, post_result.policy_name)
+
+        return post_result

@@ -172,3 +172,36 @@ class TestGovernedToolProviderAudit:
         details = sink.events[0]["details"]
         assert isinstance(details, dict)
         assert details["stage"] == "pre_tool"
+
+
+BLOCK_LARGE_RESULTS = PolicyRule(
+    name="block-large-results",
+    stage=EvaluationStage.POST_TOOL,
+    expression="result.size_bytes > 100000",
+    decision=PolicyDecision.DENY,
+    reason="Result exceeds size limit",
+    priority=80,
+)
+
+
+class TestGovernedToolProviderPostCheck:
+    async def test_post_check_allows_small_result(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([BLOCK_LARGE_RESULTS])
+        provider = GovernedToolProvider(engine, reg)
+        result = await provider.post_check("test", "database", "read", {"size_bytes": 500})
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_post_check_denies_large_result(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([BLOCK_LARGE_RESULTS])
+        provider = GovernedToolProvider(engine, reg)
+        with pytest.raises(PolicyDeniedError, match="size limit"):
+            await provider.post_check("test", "database", "read", {"size_bytes": 200000})
+
+    async def test_post_check_nonexistent_agent_raises(self) -> None:
+        reg, engine = await _setup()
+        engine.load_policies([])
+        provider = GovernedToolProvider(engine, reg)
+        with pytest.raises(PolicyDeniedError):
+            await provider.post_check("ghost", "database", "read", {})
