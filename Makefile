@@ -1,4 +1,4 @@
-.PHONY: install lint format test test-presidium test-contrib typecheck check clean
+.PHONY: install lint format test test-presidium test-contrib typecheck check clean version release-presidium release-contrib
 
 install:
 	uv sync --all-extras --package presidium --package presidium-contrib
@@ -25,6 +25,30 @@ typecheck:
 
 check: lint typecheck test
 	@echo "All checks passed."
+
+version:
+	@echo "presidium:       $$(grep '^version' packages/presidium/pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/')"
+	@echo "presidium-contrib: $$(grep '^version' packages/presidium-contrib/pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/')"
+
+release-presidium: check
+	@VERSION=$$(grep '^version' packages/presidium/pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/'); \
+	echo "Releasing presidium v$$VERSION"; \
+	echo "Steps:"; \
+	echo "  1. Update CHANGELOG.md (move Unreleased → v$$VERSION)"; \
+	echo "  2. git add -A && git commit -m 'release: presidium v$$VERSION'"; \
+	echo "  3. git tag v$$VERSION"; \
+	echo "  4. git push origin main --tags"; \
+	echo "  → publish.yml builds + publishes to PyPI on tag push"
+
+release-contrib: check
+	@VERSION=$$(grep '^version' packages/presidium-contrib/pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/'); \
+	echo "Releasing presidium-contrib v$$VERSION"; \
+	echo "Steps:"; \
+	echo "  1. Update CHANGELOG.md (move Unreleased → contrib-v$$VERSION)"; \
+	echo "  2. git add -A && git commit -m 'release: presidium-contrib v$$VERSION'"; \
+	echo "  3. git tag contrib-v$$VERSION"; \
+	echo "  4. git push origin main --tags"; \
+	echo "  → publish.yml builds + publishes to PyPI on tag push"
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
