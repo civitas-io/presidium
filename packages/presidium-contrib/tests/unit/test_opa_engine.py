@@ -170,6 +170,30 @@ class TestOPAPolicyEngineRequest:
         assert call_kwargs["headers"]["Authorization"] == "Bearer tok"
 
 
+class TestOPAPolicyEngineInvalidValues:
+    async def test_invalid_decision_defaults_to_deny(self) -> None:
+        mock_client = _mock_opa_response({"decision": "bogus_value"})
+
+        with patch("presidium_contrib.opa.engine.httpx.AsyncClient", return_value=mock_client):
+            engine = OPAPolicyEngine("http://localhost:8181")
+            result = await engine.evaluate(EvaluationStage.PRE_TOOL, _make_context())
+
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_invalid_enforcement_defaults_to_hard(self) -> None:
+        mock_client = _mock_opa_response({
+            "decision": "allow",
+            "enforcement": "bogus_mode",
+        })
+
+        with patch("presidium_contrib.opa.engine.httpx.AsyncClient", return_value=mock_client):
+            engine = OPAPolicyEngine("http://localhost:8181")
+            result = await engine.evaluate(EvaluationStage.PRE_TOOL, _make_context())
+
+        assert result.decision == PolicyDecision.ALLOW
+        assert result.enforcement == EnforcementMode.HARD
+
+
 class TestOPAPolicyEngineLoadPolicies:
     def test_load_policies_is_noop(self) -> None:
         engine = OPAPolicyEngine()
