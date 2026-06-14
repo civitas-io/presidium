@@ -18,6 +18,7 @@ only-include = ["_nonexistent"]
 
 [tool.uv.sources]
 civitas = { path = "../python-civitas", editable = true }
+presidium = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
