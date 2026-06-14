@@ -181,10 +181,12 @@ class TestOPAPolicyEngineInvalidValues:
         assert result.decision == PolicyDecision.DENY
 
     async def test_invalid_enforcement_defaults_to_hard(self) -> None:
-        mock_client = _mock_opa_response({
-            "decision": "allow",
-            "enforcement": "bogus_mode",
-        })
+        mock_client = _mock_opa_response(
+            {
+                "decision": "allow",
+                "enforcement": "bogus_mode",
+            }
+        )
 
         with patch("presidium_contrib.opa.engine.httpx.AsyncClient", return_value=mock_client):
             engine = OPAPolicyEngine("http://localhost:8181")
