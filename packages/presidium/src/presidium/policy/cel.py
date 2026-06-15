@@ -40,7 +40,7 @@ class CelPolicyEngine:
         self._rules_by_stage: dict[EvaluationStage, list[_CompiledRule]] = {}
 
     def load_policies(self, rules: list[PolicyRule]) -> None:
-        self._rules_by_stage.clear()
+        new_rules: dict[EvaluationStage, list[_CompiledRule]] = {}
 
         for rule in rules:
             if not rule.enabled:
@@ -61,11 +61,13 @@ class CelPolicyEngine:
                 stages = [rule.stage]
 
             for stage in stages:
-                self._rules_by_stage.setdefault(stage, [])
-                self._rules_by_stage[stage].append(compiled)
+                new_rules.setdefault(stage, [])
+                new_rules[stage].append(compiled)
 
-        for stage_rules in self._rules_by_stage.values():
+        for stage_rules in new_rules.values():
             stage_rules.sort(key=lambda c: c.rule.priority, reverse=True)
+
+        self._rules_by_stage = new_rules
 
     def _build_activation(self, context: EvaluationContext) -> Any:
         now = context.time

@@ -138,6 +138,21 @@ class GovernedRuntime:
         if self._runtime is not None:
             await self._runtime.start()
 
+    def reload_policies(self, path: str | Path) -> int:
+        """Hot-reload policies from a YAML file without restarting the runtime.
+
+        Parses the ``presidium.policies`` block and atomically replaces the
+        compiled rules in the policy engine. Returns the number of rules loaded.
+        """
+        full_config = yaml.safe_load(Path(path).read_text())
+        full_config = substitute_vars(full_config)
+        presidium_config = full_config.get("presidium", {})
+        policies_cfg = presidium_config.get("policies", [])
+        rules = _parse_policy_rules(policies_cfg)
+        self.engine.load_policies(rules)
+        logger.info("policy.reload rules=%d source=%s", len(rules), path)
+        return len(rules)
+
     async def stop(self) -> None:
         if self._runtime is not None:
             await self._runtime.stop()

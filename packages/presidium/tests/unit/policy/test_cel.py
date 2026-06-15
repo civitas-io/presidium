@@ -341,3 +341,125 @@ class TestCelPolicyEnginePostExecution:
         assert ctx.result is None
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
         assert result.decision == PolicyDecision.DENY
+
+
+class TestPreMessageStage:
+    async def test_pre_message_stage_exists(self) -> None:
+        assert EvaluationStage.PRE_MESSAGE.value == "pre_message"
+
+    async def test_pre_message_policies_evaluated(self) -> None:
+        rule = PolicyRule(
+            name="block-untrusted-messages",
+            stage=EvaluationStage.PRE_MESSAGE,
+            expression='agent.trust.tier == "restricted"',
+            decision=PolicyDecision.DENY,
+            reason="Restricted agents cannot send messages",
+            priority=90,
+        )
+        engine = CelPolicyEngine()
+        engine.load_policies([rule])
+        ctx = _make_context(
+            resource="message:task",
+            action="send",
+            trust_value=0.1,
+            trust_tier=TrustTier.RESTRICTED,
+        )
+        result = await engine.evaluate(EvaluationStage.PRE_MESSAGE, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_pre_message_allow_trusted(self) -> None:
+        rule = PolicyRule(
+            name="block-untrusted-messages",
+            stage=EvaluationStage.PRE_MESSAGE,
+            expression='agent.trust.tier == "restricted"',
+            decision=PolicyDecision.DENY,
+            reason="Restricted agents cannot send messages",
+            priority=90,
+        )
+        engine = CelPolicyEngine()
+        engine.load_policies([rule])
+        ctx = _make_context(
+            resource="message:task",
+            action="send",
+            trust_value=0.8,
+            trust_tier=TrustTier.TRUSTED,
+        )
+        result = await engine.evaluate(EvaluationStage.PRE_MESSAGE, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_pre_message_in_multi_stage_rule(self) -> None:
+        rule = PolicyRule(
+            name="universal-grant-check",
+            stage=[EvaluationStage.PRE_TOOL, EvaluationStage.PRE_LLM, EvaluationStage.PRE_MESSAGE],
+            expression="agent.grants.size() == 0",
+            decision=PolicyDecision.DENY,
+            reason="No grants",
+            priority=100,
+        )
+        engine = CelPolicyEngine()
+        engine.load_policies([rule])
+        ctx = _make_context(grants=[])
+        result = await engine.evaluate(EvaluationStage.PRE_MESSAGE, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+
+class TestPolicyHotReload:
+    async def test_load_replaces_previous_rules(self) -> None:
+        engine = CelPolicyEngine()
+        rule1 = PolicyRule(
+            name="block-all",
+            stage=EvaluationStage.PRE_TOOL,
+            expression="true",
+            decision=PolicyDecision.DENY,
+            reason="Blocked",
+            priority=100,
+        )
+        engine.load_policies([rule1])
+        ctx = _make_context()
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+        rule2 = PolicyRule(
+            name="allow-all",
+            stage=EvaluationStage.PRE_TOOL,
+            expression="false",
+            decision=PolicyDecision.DENY,
+            reason="Never matches",
+            priority=100,
+        )
+        engine.load_policies([rule2])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_reload_clears_old_stages(self) -> None:
+        engine = CelPolicyEngine()
+        rule_tool = PolicyRule(
+            name="tool-block",
+            stage=EvaluationStage.PRE_TOOL,
+            expression="true",
+            decision=PolicyDecision.DENY,
+            reason="Blocked",
+            priority=100,
+        )
+        rule_llm = PolicyRule(
+            name="llm-block",
+            stage=EvaluationStage.PRE_LLM,
+            expression="true",
+            decision=PolicyDecision.DENY,
+            reason="Blocked",
+            priority=100,
+        )
+        engine.load_policies([rule_tool, rule_llm])
+
+        engine.load_policies([rule_tool])
+        ctx = _make_context()
+        result = await engine.evaluate(EvaluationStage.PRE_LLM, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_empty_reload(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        engine.load_policies([])
+        ctx = _make_context(grants=[])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
