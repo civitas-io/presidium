@@ -62,33 +62,38 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ---
 
-## M3: Contrib Adapters + Reference Impls
+## M3: Contrib Adapters + Trust Scoring Foundation
 
-**Goal:** `presidium-contrib` with adapters for existing products and reference implementations for novel components. Post-execution evaluation stages. Service mode for distributed deployment.
+**Goal:** `presidium-contrib` with adapters for existing products and reference implementations. Trust scoring enhancements for enterprise adoption: windowed aggregation, controllability, cold-start, spec introspection, bounded learning. Post-execution evaluation stages.
 
-- [ ] `presidium-contrib` package (second workspace member)
-- [ ] Post-execution evaluation stages in `presidium` core:
-  - `POST_TOOL` — validate tool outputs (PII detection, result filtering, size limits)
-  - `POST_LLM` — validate LLM responses (schema compliance, content policy)
-  - `pre_message` — agent-to-agent message governance (requires Civitas MessageBus hook)
-- [ ] Adapters (existing products):
-  - `OPAPolicyEngine` — wraps OPA REST API for teams with existing Rego policies
-  - `CedarPolicyEngine` — Cedar authorization model
-  - `OpenBaoCredentialProvider` — OpenBao/Vault-compatible KV engine with token renewal (MPL 2.0, OpenSSF Sandbox)
-  - `AgentGatewayAdapter` — routes LLM + MCP calls through AgentGateway (Linux Foundation, CEL-native, OTEL)
-  - `SlackApprovalService` — approval requests via Slack with approve/deny buttons
-  - `TemporalApprovalService` — human task workflows via Temporal
-  - `WebhookApprovalProvider` — POST approval requests to webhook URL, listen for callbacks
-- [ ] Reference implementations (novel):
-  - `PostgresAgentRegistry` — agent records, grant sets, trust score history in Postgres
-  - `MCPGovernedToolProvider` — full MCP governance: ACL, tool poisoning detection, credential redaction, output PII masking
-  - `LearningTrustScorer` — starts rule-based, learns from decision journal over time
-- [ ] Service mode GenServer wrappers for registry, policy, and trust scoring
+**Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-3.1–3.8, FR-E.1–E.6)
+
+- [x] `presidium-contrib` package (second workspace member)
+- [x] Post-execution evaluation stages: `POST_TOOL`, `POST_LLM`
+- [x] Adapters: `OPAPolicyEngine`, `OpenBaoCredentialProvider`, `AgentGatewayClient`, `SlackApprovalService`, `WebhookApprovalProvider`
+- [x] Reference impls: `PostgresAgentRegistry`, `LearningTrustScorer` (draft)
+- [ ] Trust scoring enhancements (presidium core):
+  - Windowed aggregation — last N events or last T hours (FR-3.1)
+  - Exponential decay opt-in with configurable half-life (FR-3.2)
+  - Controllability filter — `controllable: bool` on events (FR-3.3)
+  - Cold-start strategies — optimistic, neutral, pessimistic (FR-3.4)
+  - Spec introspection — `IntrospectableScorer` Protocol with `ScoringSpec` + `spec_hash` (FR-3.5)
+  - Bounded learning with max weight delta and rate limiting (FR-3.7)
+  - Reason surfacing — `QueryableScorer` Protocol (FR-3.8)
+- [ ] Enterprise requirements:
+  - Spec pinning for compliance periods (FR-E.1)
+  - Override attribution — `actor_id` required on HUMAN_OVERRIDE (FR-E.2)
+  - Performance budget — <1ms p99 reads (FR-E.3)
+  - Zero-downtime M2→M3 migration (FR-E.4)
+  - Determinism contract on scorers (FR-E.5)
+  - OpenTelemetry spans for trust operations (FR-E.6)
+- [ ] Remaining adapters: `CedarPolicyEngine`, `TemporalApprovalService`
+- [ ] `pre_message` evaluation stage (Civitas MessageBus hook)
+- [ ] MCP governance reference impl (tool poisoning, credential redaction, PII masking)
+- [ ] Service mode GenServer wrappers
 - [ ] Policy hot-reload without restart
-- [ ] Concurrent grant modification (optimistic concurrency for service mode)
-- [ ] `pip install presidium-contrib[opa]`, `presidium-contrib[openbao]`, `presidium-contrib[slack]`, `presidium-contrib[agentgateway]` extras
 
-**Deliverable:** `pip install presidium-contrib[opa,openbao,slack,agentgateway]`
+**Deliverable:** `pip install presidium-contrib[opa,openbao,slack,agentgateway]` + enterprise-ready trust scoring
 
 ---
 
@@ -96,28 +101,37 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ![Autonomy Progression](../assets/autonomy-progression.svg)
 
-**Goal:** Close the feedback loop. Agents earn autonomy through demonstrated reliability.
+**Goal:** Close the feedback loop. Agents earn autonomy through demonstrated reliability. Multi-dimensional trust scoring. Capability gating by tier. Decision journal for full auditability.
 
-- [ ] Decision journal GenServer — records (action, context, outcome, human_decision) for every HITL interaction
-- [ ] Confidence-gated routing — automatic HITL when agent confidence falls below threshold
-- [ ] Heuristic-to-learned policy progression — `RuleBasedTrustScorer` hands off to `LearningTrustScorer` as data accumulates
-- [ ] Composite trust scoring — combines audit signals, eval scores, and human approval patterns
-- [ ] Autonomy level API — agents can query their current autonomy level and what's needed to increase it
+**Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-4.1–4.6)
+
+- [ ] Multi-dimensional trust scoring — `MultiDimensionalTrustScorer` Protocol with per-dimension scores and configurable aggregation (FR-4.1)
+- [ ] Capability gating — tier-to-capability mapping via `CapabilityGate`, CEL references `agent.trust.capabilities` (FR-4.2)
+- [ ] Graduated deactivation — `TierUpgraded`/`TierDegraded` events, subscriber pattern, no binary kill switch (FR-4.3)
+- [ ] Confidence-gated routing — `ConfidenceRouter` selects agents or escalates to human (FR-4.4)
+- [ ] Decision journal — all routing decisions and tier transitions recorded with trust snapshots (FR-4.5)
+- [ ] Trust spec export — JSON, Markdown, detached JWS for tamper-evidence (FR-4.6)
+- [ ] Heuristic-to-learned progression — `LearningTrustScorer` activates after data threshold
+- [ ] Autonomy level API — agents query current level and promotion criteria
 - [ ] Design doc: Autonomy Progression
 
-**Deliverable:** Agents that start constrained and earn autonomy through behavior.
+**Deliverable:** Agents that start constrained and earn autonomy through behavior. Full decision audit trail.
 
 ---
 
 ## M5: SDK + CLI
 
-**Goal:** One package, one install, complete experience.
+**Goal:** One package, one install, complete experience. Trust CLI for operators.
 
-- [ ] `presidium` package unified imports: `from presidium import GovernedRuntime, Policy, AgentRecord`
-- [ ] CLI: `presidium run`, `presidium policy validate`, `presidium registry list`, `presidium trust show`
+**Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-5.1–5.3)
+
+- [ ] CLI: `presidium trust show`, `presidium trust events`, `presidium trust spec`, `presidium trust replay` (FR-5.1)
+- [ ] Event export — JSON Lines, CSV with embedded `spec_hash` (FR-5.2)
+- [ ] Deterministic replay — reproduce scores from historical events + spec (FR-5.3)
+- [ ] CLI: `presidium run`, `presidium policy validate`, `presidium registry list`
 - [ ] Comprehensive documentation site (MkDocs)
 - [ ] Example applications (3-5 real-world scenarios)
-- [ ] v0.1.0 release
+- [ ] v1.0.0 release
 
 **Deliverable:** `pip install presidium` — the full experience, documented and released.
 
@@ -125,16 +139,21 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ## M6: Cloud
 
-**Goal:** Managed service and enterprise features.
+**Goal:** Managed service and enterprise features. Trust feedback loop measurement. Compliance reporting.
 
+**Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-6.1–6.4)
+
+- [ ] Multi-tenant trust isolation — events, specs, audits partitioned by tenant (FR-6.1)
+- [ ] Centralized event store — REST + gRPC, idempotent submissions (FR-6.2)
+- [ ] Feedback loop metric — % of agents recovering from RESTRICTED to STANDARD+ (FR-6.3)
+- [ ] Compliance reports — NIST AI RMF, ISO/IEC 42001 mappings (FR-6.4)
 - [ ] Presidium Cloud (managed runtime + governance)
 - [ ] Enterprise features (SSO, RBAC, SOC 2 compliance)
-- [ ] Compliance automation (EU AI Act, NIST AI RMF mapping)
 - [ ] Multi-region deployment
 - [ ] SLA guarantees
 - [ ] Pricing tiers (Free → Starter → Pro → Enterprise)
 
-**Deliverable:** Commercial offering.
+**Deliverable:** Commercial offering with trust analytics and compliance automation.
 
 ---
 

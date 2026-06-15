@@ -20,7 +20,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|
 | [Manifesto](vision/manifesto.md) | Core thesis: governance should be architectural, not bolted on. 88% of agents fail in production due to infrastructure, not models. Principles: OSS-first, Python-native, developer-centric, vendor-neutral. |
 | [Market Positioning](vision/positioning.md) | Competitive 2x2 (governance depth × runtime depth). Presidium occupies the only empty quadrant. Detailed comparisons vs. AGT, Fiddler, Temporal. Target users: platform engineers, agent developers, enterprise compliance. |
-| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces + CEL policy, complete) → M3 (contrib adapters + post-execution hooks + AgentGateway) → M4 (autonomy progression) → M5 (SDK) → M6 (cloud). |
+| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces, complete) → M3 (contrib adapters + trust scoring foundation) → M4 (autonomy progression + multi-dimensional trust) → M5 (SDK + CLI) → M6 (cloud + compliance). |
 
 ## Architecture
 
@@ -56,6 +56,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [MCP Gateway](design/mcp-gateway.md) | `presidium` (protocol) + `presidium-contrib` (ref impl) | M3 | Draft |
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |
 | [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
+| [Trust Scoring Requirements](design/trust-scoring-requirements.md) | `presidium` + `presidium-contrib` | M3-M6 | Draft |
 | [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Draft (deferred) |
 
 ## Research
@@ -69,6 +70,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Monetization Strategy](research/monetization.md) | Open core + managed cloud playbook. Temporal/LangChain/CrewAI revenue comparisons. Four-tier pricing model. Revenue projections Y1-Y4. Defensible moats analysis. | 5 comparable companies |
 | [Fiddler Relationship](research/fiddler-relationship.md) | Complementary, not competitive. Fiddler observes agents (layer above), Presidium runs them (layer below). Natural pipeline: Presidium generates telemetry → Fiddler analyzes. Watch areas: "control plane" branding, policy enforcement direction. | Stack position analysis |
 | [Agent Registry Research](research/agent-registry-research.md) | Industry research on agent identity, registration, authorization, and trust across AWS Bedrock, Google Gemini, Microsoft AGT, IBM watsonx, SPIFFE/SPIRE, K8s RBAC, OAuth 2.0, and 4 academic papers. Comparative analysis and 8 key patterns. | 4 providers + 3 infra systems + 4 papers |
+| [Trust Scoring Research](research/trust-scoring-research.md) | Production trust systems (eBay, Uber, FICO, Stack Overflow), AI governance (AGT, OpenAI, Anthropic, NIST), academic papers (A-Trust, DynaTrust, TrustFlow), 10+ OSS implementations. 10 universal patterns identified with gap analysis. | 5 production systems + 4 AI frameworks + 10+ OSS impls |
 
 ## RFCs
 
