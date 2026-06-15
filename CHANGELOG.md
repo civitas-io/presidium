@@ -10,6 +10,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ### Added
 
+#### presidium — Remaining M3 Core Features
+
+- **PRE_MESSAGE evaluation stage**: `EvaluationStage.PRE_MESSAGE` for inter-agent message governance via Civitas MessageBus hook
+- **Policy hot-reload**: `GovernedRuntime.reload_policies(path)` atomically replaces compiled rules from YAML without restart; `CelPolicyEngine.load_policies()` now uses atomic swap instead of clear-then-populate
+- 336 core tests passing, 97% coverage
+
+#### presidium-contrib — MCP Governance + Service Mode
+
+- **Tool poisoning detection**: `PoisoningDetector` with hash-based `ToolSnapshot` fingerprinting; detects description/parameter changes after approval
+- **Credential redaction**: `redact_string()` / `redact_dict()` with regex patterns for API keys, Bearer tokens, AWS keys, GitHub PATs; recursive nested dict support
+- **PII detection**: `PIIDetector` with configurable regex patterns (SSN, credit card, email, phone, IP); `scan_string()`, `scan_dict()`, `mask_string()`, `mask_dict()` methods
+- **Service mode GenServer wrappers**: `PolicyEvaluatorServer` and `RegistryServer` expose governance components as Civitas GenServer processes for distributed deployments
+
 #### presidium — Enterprise Trust Requirements (M3: FR-E.1–E.6)
 
 - **FR-E.1 Spec Pinning**: `WindowedTrustScorer(pinned_spec_hash=...)` validates scorer config hash at construction; raises `SpecMismatchError` on mismatch
