@@ -79,3 +79,30 @@ class ApprovalTimeoutError(PresidiumError):
         self.request_id = request_id
         self.timeout_seconds = timeout_seconds
         super().__init__(f"Approval request {request_id!r} timed out after {timeout_seconds}s")
+
+
+# ---------------------------------------------------------------------------
+# Trust scoring errors (FR-E.1, FR-E.2)
+# ---------------------------------------------------------------------------
+
+
+class TrustScoringError(PresidiumError):
+    """Base exception for trust scoring operations."""
+
+
+class SpecMismatchError(TrustScoringError):
+    """Raised when a scorer's current spec_hash doesn't match the pinned hash (FR-E.1)."""
+
+    def __init__(self, expected: str, actual: str) -> None:
+        self.expected = expected
+        self.actual = actual
+        super().__init__(f"Spec hash mismatch: pinned={expected[:12]}… current={actual[:12]}…")
+
+
+class MissingAttributionError(TrustScoringError):
+    """Raised when a HUMAN_OVERRIDE event lacks a required actor_id (FR-E.2)."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "HUMAN_OVERRIDE events require actor_id in EventContext for audit attribution"
+        )

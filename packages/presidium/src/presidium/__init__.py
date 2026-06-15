@@ -14,11 +14,14 @@ from presidium.errors import (
     ApprovalTimeoutError,
     CredentialAccessDenied,
     GrantNotFoundError,
+    MissingAttributionError,
     PolicyCompilationError,
     PolicyDeniedError,
     PolicyEvaluationError,
     PresidiumError,
     RegistryError,
+    SpecMismatchError,
+    TrustScoringError,
 )
 from presidium.model import (
     ActionRequest,
@@ -89,9 +92,12 @@ __all__ = [
     "ApprovalTimeoutError",
     "CredentialAccessDenied",
     "GrantNotFoundError",
+    "MissingAttributionError",
     "PolicyCompilationError",
     "PolicyDeniedError",
     "PolicyEvaluationError",
     "PresidiumError",
     "RegistryError",
+    "SpecMismatchError",
+    "TrustScoringError",
 ]
