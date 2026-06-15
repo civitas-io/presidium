@@ -284,3 +284,36 @@ class TestRecentEvents:
             scorer.record_event(TrustEvent.SUCCESS)
         recent = scorer.recent_events(limit=5)
         assert len(recent) == 5
+
+
+class TestLearnCooldown:
+    def test_cooldown_blocks_rapid_learning(self) -> None:
+        now = datetime.now(UTC)
+        scorer = LearningTrustScorer(learn_cooldown_hours=24.0, clock=lambda: now)
+        scorer.record_event(TrustEvent.FAILURE)
+        scorer.set_value(0.50)
+
+        before = scorer.weights[TrustEvent.FAILURE]
+        scorer.learn_from_history(learning_rate=0.5)
+        after_first = scorer.weights[TrustEvent.FAILURE]
+        assert after_first != before
+
+        scorer.record_event(TrustEvent.FAILURE)
+        scorer.set_value(0.50)
+        scorer.learn_from_history(learning_rate=0.5)
+        after_second = scorer.weights[TrustEvent.FAILURE]
+        assert after_second == after_first
+
+    def test_cooldown_none_allows_unlimited(self) -> None:
+        now = datetime.now(UTC)
+        scorer = LearningTrustScorer(learn_cooldown_hours=None, clock=lambda: now)
+        scorer.record_event(TrustEvent.FAILURE)
+        scorer.set_value(0.50)
+        scorer.learn_from_history(learning_rate=0.5)
+        first = scorer.weights[TrustEvent.FAILURE]
+
+        scorer.record_event(TrustEvent.FAILURE)
+        scorer.set_value(0.50)
+        scorer.learn_from_history(learning_rate=0.5)
+        second = scorer.weights[TrustEvent.FAILURE]
+        assert second != first

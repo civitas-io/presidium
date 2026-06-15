@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from presidium.errors import MissingAttributionError
@@ -63,6 +63,7 @@ class LearningTrustScorer:
         window: WindowConfig | None = None,
         cold_start: ColdStartStrategy | None = None,
         max_weight_delta: float = 0.05,
+        learn_cooldown_hours: float | None = 24.0,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self._cold_start_strategy = cold_start or NeutralStart()
@@ -71,6 +72,8 @@ class LearningTrustScorer:
         self._window = window or WindowConfig()
         self._cold_start = self._cold_start_strategy
         self._max_weight_delta = max_weight_delta
+        self._learn_cooldown_hours = learn_cooldown_hours
+        self._last_learn_at: datetime | None = None
         self._clock = clock or (lambda: datetime.now(UTC))
 
         raw_weights = weights or {
@@ -226,7 +229,16 @@ class LearningTrustScorer:
         event was too lenient — increase its penalty.
 
         Enforces |weight_change| <= max_weight_delta per event type (FR-3.7).
+        Rate-limited by learn_cooldown_hours (default 24h, None to disable).
         """
+        now = self._clock()
+        if (
+            self._learn_cooldown_hours is not None
+            and self._last_learn_at is not None
+            and (now - self._last_learn_at) < timedelta(hours=self._learn_cooldown_hours)
+        ):
+            return {TrustEvent(k): v for k, v in self._weights.items()}
+
         adjustments: dict[TrustEvent, list[float]] = {}
         events_considered = 0
 
@@ -258,10 +270,11 @@ class LearningTrustScorer:
             weight_changes[event.value] = (before, before + capped_change)
             max_delta = max(max_delta, abs(capped_change))
 
-        now = self._clock()
+        audit_now = self._clock()
+        self._last_learn_at = audit_now
         self._learning_audits.append(
             LearningAudit(
-                timestamp=now,
+                timestamp=audit_now,
                 events_considered=events_considered,
                 weight_changes=weight_changes,
                 max_delta_applied=max_delta,
