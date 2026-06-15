@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import time
 from datetime import UTC, datetime
 
 import pytest
 
+from presidium.errors import MissingAttributionError, SpecMismatchError
 from presidium.model import TrustEvent, TrustTier
 from presidium.scoring.config import WindowConfig
 from presidium.scoring.events import EventContext
 from presidium.scoring.spec import ScoringSpec
 from presidium.trust import (
+    LinearTrustScore,
     WindowedTrustScorer,
 )
 from presidium.trust.cold_start import (
@@ -241,3 +244,173 @@ class TestWindowedTrustScorerSetValue:
         scorer.set_value(0.9)
         assert scorer.value == pytest.approx(0.9, abs=0.001)
         assert scorer.tier == TrustTier.TRUSTED
+
+
+# ---------------------------------------------------------------------------
+# FR-E.1: Spec Pinning
+# ---------------------------------------------------------------------------
+
+
+class TestSpecPinning:
+    def test_pinned_hash_matches(self) -> None:
+        scorer = WindowedTrustScorer()
+        pinned = scorer.spec.spec_hash
+        scorer2 = WindowedTrustScorer(pinned_spec_hash=pinned)
+        assert scorer2.spec.spec_hash == pinned
+
+    def test_pinned_hash_mismatch_raises(self) -> None:
+        with pytest.raises(SpecMismatchError) as exc_info:
+            WindowedTrustScorer(pinned_spec_hash="wrong_hash_value")
+        assert exc_info.value.expected == "wrong_hash_value"
+
+    def test_no_pin_allows_any_config(self) -> None:
+        scorer = WindowedTrustScorer(initial_value=0.9)
+        assert scorer.value == pytest.approx(0.9, abs=0.01)
+
+
+# ---------------------------------------------------------------------------
+# FR-E.2: Override Attribution
+# ---------------------------------------------------------------------------
+
+
+class TestOverrideAttribution:
+    def test_human_override_without_context_raises(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        with pytest.raises(MissingAttributionError):
+            scorer.record_event(TrustEvent.HUMAN_OVERRIDE)
+
+    def test_human_override_without_actor_id_raises(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        with pytest.raises(MissingAttributionError):
+            scorer.record_event(
+                TrustEvent.HUMAN_OVERRIDE,
+                context=EventContext(actor_id=None),
+            )
+
+    def test_human_override_with_actor_id_accepted(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        scorer.record_event(
+            TrustEvent.HUMAN_OVERRIDE,
+            context=EventContext(actor_id="admin@example.com"),
+        )
+        recent = scorer.recent_events(limit=1)
+        assert len(recent) == 1
+
+    def test_non_override_events_dont_require_attribution(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        scorer.record_event(TrustEvent.SUCCESS)
+        scorer.record_event(TrustEvent.FAILURE)
+        scorer.record_event(TrustEvent.POLICY_VIOLATION)
+        assert len(scorer.recent_events(limit=10)) == 3
+
+
+# ---------------------------------------------------------------------------
+# FR-E.3: Performance Budget
+# ---------------------------------------------------------------------------
+
+
+class TestPerformanceBudget:
+    def test_value_read_under_1ms_100_events(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        for _ in range(100):
+            scorer.record_event(TrustEvent.SUCCESS)
+
+        times = []
+        for _ in range(100):
+            start = time.perf_counter_ns()
+            _ = scorer.value
+            elapsed_ns = time.perf_counter_ns() - start
+            times.append(elapsed_ns)
+
+        times.sort()
+        p99_ns = times[98]
+        assert p99_ns < 1_000_000, f"p99 read latency {p99_ns/1000:.0f}μs exceeds 1ms"
+
+    def test_tier_read_under_1ms_100_events(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        for _ in range(100):
+            scorer.record_event(TrustEvent.SUCCESS)
+
+        times = []
+        for _ in range(100):
+            start = time.perf_counter_ns()
+            _ = scorer.tier
+            elapsed_ns = time.perf_counter_ns() - start
+            times.append(elapsed_ns)
+
+        times.sort()
+        p99_ns = times[98]
+        assert p99_ns < 1_000_000, f"p99 tier latency {p99_ns/1000:.0f}μs exceeds 1ms"
+
+
+# ---------------------------------------------------------------------------
+# FR-E.4: Zero-Downtime Migration (M2 events readable by M3 scorers)
+# ---------------------------------------------------------------------------
+
+
+class TestZeroDowntimeMigration:
+    def test_m2_trust_events_work_in_m3_scorer(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now)
+        for event in TrustEvent:
+            if event == TrustEvent.HUMAN_OVERRIDE:
+                scorer.record_event(
+                    event, context=EventContext(actor_id="migration@system")
+                )
+            else:
+                scorer.record_event(event)
+        assert 0.0 <= scorer.value <= 1.0
+
+    def test_m2_linear_and_m3_windowed_accept_same_events(self) -> None:
+        linear = LinearTrustScore(initial_value=0.5)
+        now = datetime.now(UTC)
+        windowed = WindowedTrustScorer(clock=lambda: now)
+
+        linear.record_event(TrustEvent.SUCCESS)
+        windowed.record_event(TrustEvent.SUCCESS)
+        linear.record_event(TrustEvent.FAILURE)
+        windowed.record_event(TrustEvent.FAILURE)
+
+        assert 0.0 <= linear.value <= 1.0
+        assert 0.0 <= windowed.value <= 1.0
+
+
+# ---------------------------------------------------------------------------
+# FR-E.5: Determinism Contract
+# ---------------------------------------------------------------------------
+
+
+class TestDeterminismContract:
+    def test_linear_is_deterministic(self) -> None:
+        assert LinearTrustScore.deterministic is True
+
+    def test_windowed_is_deterministic(self) -> None:
+        assert WindowedTrustScorer.deterministic is True
+
+    def test_determinism_as_instance_attribute(self) -> None:
+        scorer = WindowedTrustScorer()
+        assert scorer.deterministic is True
+
+
+# ---------------------------------------------------------------------------
+# FR-E.6: OpenTelemetry (no-op when not installed)
+# ---------------------------------------------------------------------------
+
+
+class TestTelemetryNoOp:
+    def test_record_event_works_without_otel(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now, agent_id="test-agent")
+        scorer.record_event(TrustEvent.SUCCESS)
+        assert scorer.value == pytest.approx(0.52, abs=0.01)
+
+    def test_value_read_works_without_otel(self) -> None:
+        now = datetime.now(UTC)
+        scorer = WindowedTrustScorer(clock=lambda: now, agent_id="test-agent")
+        assert scorer.value == pytest.approx(0.5, abs=0.001)
