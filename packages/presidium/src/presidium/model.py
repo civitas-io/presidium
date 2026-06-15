@@ -61,6 +61,7 @@ class EvaluationStage(Enum):
 
     PRE_TOOL = "pre_tool"
     PRE_LLM = "pre_llm"
+    PRE_MESSAGE = "pre_message"
     REGISTRATION = "registration"
     POST_TOOL = "post_tool"
     POST_LLM = "post_llm"
