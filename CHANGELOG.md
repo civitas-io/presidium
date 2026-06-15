@@ -8,6 +8,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [Unreleased]
 
+### Added
+
+#### presidium — Enterprise Trust Requirements (M3: FR-E.1–E.6)
+
+- **FR-E.1 Spec Pinning**: `WindowedTrustScorer(pinned_spec_hash=...)` validates scorer config hash at construction; raises `SpecMismatchError` on mismatch
+- **FR-E.2 Override Attribution**: `HUMAN_OVERRIDE` events require `actor_id` in `EventContext`; raises `MissingAttributionError` when missing
+- **FR-E.3 Performance Budget**: Benchmark tests verify <1ms p99 for `.value` and `.tier` reads with 100 events
+- **FR-E.4 Zero-Downtime Migration**: M2 `TrustEvent` enum values flow into M3 `WindowedTrustScorer` without re-scoring
+- **FR-E.5 Determinism Contract**: `deterministic: bool` class attribute on scorers (`LinearTrustScore`=True, `WindowedTrustScorer`=True, `LearningTrustScorer`=False); added to `IntrospectableScorer` Protocol
+- **FR-E.6 OpenTelemetry**: `presidium.trust.telemetry` module with no-op fallback; spans on `record_event` and `value` reads with `trust.agent_id`, `trust.event_type`, `trust.value`, `trust.tier`, `trust.spec_hash` attributes; `presidium[otel]` optional extra
+- New errors: `TrustScoringError`, `SpecMismatchError`, `MissingAttributionError`
+- `WindowedTrustScorer` gains `agent_id` parameter for OTel span attribution
+
+#### presidium-contrib — LearningTrustScorer Refactor
+
+- Refactored `LearningTrustScorer` to delegate scoring math to `presidium.scoring.functions`
+- Implements `IntrospectableScorer` (`.spec`, `.deterministic`) and `QueryableScorer` (`.recent_events()`) Protocols
+- Enforces override attribution (FR-E.2) on `HUMAN_OVERRIDE` events
+- Added `LearningAudit` dataclass and `learning_audits` property for FR-3.6/FR-3.7 bounded learning
+- Accepts `DecayConfig`, `WindowConfig`, `ColdStartStrategy`, injectable clock
+- `max_weight_delta` parameter caps per-invocation weight changes (FR-3.7, default 0.05)
+
 ## [0.1.0] - 2026-06-14
 
 ### Added
