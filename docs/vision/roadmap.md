@@ -71,8 +71,8 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 - [x] `presidium-contrib` package (second workspace member)
 - [x] Post-execution evaluation stages: `POST_TOOL`, `POST_LLM`
 - [x] Adapters: `OPAPolicyEngine`, `OpenBaoCredentialProvider`, `AgentGatewayClient`, `SlackApprovalService`, `WebhookApprovalProvider`
-- [x] Reference impls: `PostgresAgentRegistry`, `LearningTrustScorer` (draft)
-- [ ] Trust scoring enhancements (presidium core):
+- [x] Reference impls: `PostgresAgentRegistry`, `LearningTrustScorer` (refactored to use `presidium.scoring` library)
+- [x] Trust scoring enhancements (presidium core):
   - Windowed aggregation — last N events or last T hours (FR-3.1)
   - Exponential decay opt-in with configurable half-life (FR-3.2)
   - Controllability filter — `controllable: bool` on events (FR-3.3)
@@ -80,18 +80,18 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
   - Spec introspection — `IntrospectableScorer` Protocol with `ScoringSpec` + `spec_hash` (FR-3.5)
   - Bounded learning with max weight delta and rate limiting (FR-3.7)
   - Reason surfacing — `QueryableScorer` Protocol (FR-3.8)
-- [ ] Enterprise requirements:
+- [x] Enterprise requirements:
   - Spec pinning for compliance periods (FR-E.1)
   - Override attribution — `actor_id` required on HUMAN_OVERRIDE (FR-E.2)
   - Performance budget — <1ms p99 reads (FR-E.3)
   - Zero-downtime M2→M3 migration (FR-E.4)
   - Determinism contract on scorers (FR-E.5)
   - OpenTelemetry spans for trust operations (FR-E.6)
-- [ ] Remaining adapters: `CedarPolicyEngine`, `TemporalApprovalService`
-- [ ] `pre_message` evaluation stage (Civitas MessageBus hook)
-- [ ] MCP governance reference impl (tool poisoning, credential redaction, PII masking)
-- [ ] Service mode GenServer wrappers
-- [ ] Policy hot-reload without restart
+- [ ] Deferred adapters: `CedarPolicyEngine`, `TemporalApprovalService`
+- [x] `pre_message` evaluation stage (Civitas MessageBus hook via `GovernedMessageBus`)
+- [x] MCP governance reference impl (tool poisoning, credential redaction, PII masking)
+- [x] Service mode GenServer wrappers (`PolicyEvaluatorServer`, `RegistryServer`)
+- [x] Policy hot-reload without restart (`GovernedRuntime.reload_policies()`)
 
 **Deliverable:** `pip install presidium-contrib[opa,openbao,slack,agentgateway]` + enterprise-ready trust scoring
 
