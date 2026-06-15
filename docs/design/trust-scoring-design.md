@@ -3,20 +3,52 @@
 > Architecture for Presidium's trust scoring enhancements.
 > Implements FR-3.1 through FR-3.8 and FR-E.1 through FR-E.6.
 >
-> Status: Draft — pending review
+> Status: Draft (revised) — scoring as a reusable library
 > Requirements: [trust-scoring-requirements.md](trust-scoring-requirements.md)
 > Research: [trust-scoring-research.md](../research/trust-scoring-research.md)
-> Last updated: 2026-06-14
+> Last updated: 2026-06-15
 
 ---
 
 ## Design Principles
 
 1. **Frozen Protocol is a feature.** `TrustScorer` (value, tier, last_updated, record_event) never changes. New capabilities = new Protocols.
-2. **Composition over inheritance.** WindowedTrustScorer wraps any ReplayableScorer. No deep hierarchies.
-3. **Spec captures config, journal captures history.** Specs are immutable. Current state is derived from spec + events.
-4. **Clock injection everywhere.** No implicit `datetime.now()`. Determinism depends on it.
-5. **Small, composable Protocols.** Scorers implement only what they need.
+2. **Scoring logic as a reusable library.** Pure functions that compute scores from events. No infrastructure baked in. Trust, evals, budget, and compliance all use the same scoring primitives.
+3. **Don't reinvent aggregation.** The scoring math is 20 lines of Python. Use plain Python for M3 library-mode (window of 100 events = microseconds). Add `presidium[fast]` with polars (Rust-backed) for M5/M6 batch replay at scale.
+4. **Infrastructure is pluggable.** Events can come from memory, SQLite, Postgres, Kafka, Redis Streams — the library operates on `Iterable[Event]` and doesn't care.
+5. **Spec captures config, journal captures history.** Specs are immutable. Current state is derived from spec + events.
+6. **Clock injection everywhere.** No implicit `datetime.now()`. Determinism depends on it.
+7. **Small, composable Protocols.** Scorers implement only what they need.
+
+---
+
+## Two-Layer Architecture
+
+### Layer 1: Scoring Library (domain-agnostic, reusable)
+
+Pure functions and lightweight stateful wrappers. No Presidium-specific concepts.
+
+```
+Event(id, timestamp, tags, values)
+  → filter by tags
+  → window by time or count
+  → score(events, config) → float          PURE FUNCTION
+  → scorer.ingest(event) → scorer.value    STATEFUL WRAPPER
+  → replay(events, config, as_of) → float  DETERMINISTIC REPLAY
+```
+
+Consumers:
+- Trust scoring (weighted decay + tiers)
+- Eval metrics (pass rate + quality gates)
+- Budget tracking (cost sum + caps)
+- Compliance (policy compliance rate)
+
+### Layer 2: Domain Layers (trust-specific, eval-specific, etc.)
+
+Thin composition on top of Layer 1. Adds domain concepts:
+- Trust: cold-start blending, tier mapping, capability gating
+- Evals: version comparison, quality gates, correction signals
+- Budget: hard caps, alerts, cost attribution
 
 ---
 
@@ -24,12 +56,14 @@
 
 | # | Decision | Choice | Alternatives rejected |
 |---|---|---|---|
-| T1 | Windowed aggregation location | Core, as wrapper over ReplayableScorer | Built into LearningTrustScorer only (limits reuse); mixin (complexity) |
-| T2 | Controllability + frozen Protocol | Optional `context: EventContext` kwarg in ContextualTrustScorer Protocol | New enum values (enum bloat); separate method (fragmented API); post-hoc annotation (awkward) |
-| T3 | Spec for learning scorers | Spec = immutable config; current weights = derived state from spec + journal | Spec captures current weights (hashes change constantly, pinning is meaningless) |
-| T4 | Cold-start ↔ windowing | Linear blend during warmup: `(1-n/min)*cold_start + (n/min)*computed` | Hard switch (score discontinuity); no blending (cold-start value ignored after first event) |
-| T5 | Core vs contrib | Protocols + WindowedTrustScorer + ColdStart in core; LearningTrustScorer + Journal in contrib | Everything in core (bloats core); everything in contrib (protocols not reusable) |
-| T6 | Protocol granularity | Separate @runtime_checkable Protocols, mix and match | Single ExtendedTrustScorer (forces implementing unused methods) |
+| T1 | Scoring engine | Pure Python functions + stateful wrapper. No custom aggregation framework. polars (Rust) as optional `[fast]` extra for M5/M6 batch replay. | Custom EventStore + WindowedTrustScorer wrapper (over-engineered); polars as core dep (30MB for trivial math) |
+| T2 | Controllability + frozen Protocol | Optional `context: EventContext` kwarg in ContextualTrustScorer Protocol | New enum values (bloat); separate method (fragmented API) |
+| T3 | Spec for learning scorers | Spec = immutable config; current weights = derived state from spec + journal | Spec captures current weights (hashes change, pinning meaningless) |
+| T4 | Cold-start ↔ windowing | Linear blend during warmup: `(1-n/min)*cold_start + (n/min)*computed` | Hard switch (discontinuity) |
+| T5 | Core vs contrib | Scoring primitives + Protocols in core; LearningTrustScorer in contrib | Everything in core (bloats it); everything in contrib (not reusable) |
+| T6 | Protocol granularity | Separate @runtime_checkable Protocols, mix and match | Single ExtendedTrustScorer (forces unused methods) |
+| T7 | Library vs platform | Scoring logic as reusable library. Trust, evals, budget are consumers. Don't build a platform — build the library, let M4 evals validate the abstraction. | Build unified scoring platform first (over-abstraction without second consumer) |
+| T8 | Compute optimization | Pure Python for M3 (100 events × weighted sum = microseconds). polars as optional Rust-backed extra for batch operations. No custom Rust/C bindings. | polars as core dep (heavy for library); custom Rust (unnecessary until proven bottleneck) |
 
 ---
 
@@ -37,198 +71,172 @@
 
 ```
 presidium/src/presidium/
+└── scoring/                 # NEW: domain-agnostic scoring library
+    ├── __init__.py           # re-exports
+    ├── events.py             # Event, EventContext, EventRecord
+    ├── functions.py          # Pure scoring functions: score(), decay(), windowed_score()
+    ├── config.py             # ScoringConfig, DecayConfig, WindowConfig
+    └── spec.py               # ScoringSpec + spec_hash
+
 └── trust/                   # promote from single file to package
-    ├── __init__.py           # re-exports: TrustScorer, LinearTrustScore, tier_for_value
-    ├── core.py               # M2 FROZEN: TrustScorer Protocol, TrustEvent, TrustTier, tier_for_value
-    ├── linear.py             # M2 base preserved + new compute_value() for ReplayableScorer
-    ├── events.py             # EventContext, EventRecord, ValueExplanation
-    ├── protocols.py          # ContextualTrustScorer, IntrospectableScorer,
-    │                         # QueryableScorer, ReplayableScorer
-    ├── spec.py               # ScoringSpec, WindowConfig, DecayConfig,
-    │                         # ColdStartConfig, BoundedLearningConfig
-    ├── cold_start.py         # ColdStartStrategy Protocol + OptimisticStart,
-    │                         # NeutralStart, PessimisticStart
-    └── windowed.py           # WindowedTrustScorer (wraps ReplayableScorer)
+    ├── __init__.py           # re-exports (backward compat: from presidium.trust import ...)
+    ├── core.py               # M2 FROZEN: TrustScorer Protocol, TrustEvent, TrustTier
+    ├── linear.py             # M2 LinearTrustScore (preserved) + compute_value() for replay
+    ├── protocols.py          # ContextualTrustScorer, IntrospectableScorer, QueryableScorer
+    ├── cold_start.py         # ColdStartStrategy + 3 impls
+    └── windowed.py           # WindowedTrustScorer (thin: buffer + cold-start blend + delegates to scoring.functions)
 
 presidium-contrib/src/presidium_contrib/
 └── trust/
     ├── scorer.py             # LearningTrustScorer (implements all Protocols)
-    └── journal.py            # JournalEntry, LearningAudit, append-only log
+    └── journal.py            # JournalEntry, LearningAudit
 ```
 
-Note: `trust.py` (current single file) gets promoted to `trust/` package. `trust/__init__.py` re-exports everything from `core.py` and `linear.py` so `from presidium.trust import TrustScorer, LinearTrustScore` still works.
+Key insight: `presidium.scoring` is the reusable library. `presidium.trust` is one consumer. `presidium.eval` (M4) will be another consumer. Both import from `presidium.scoring`.
 
 ---
 
-## Protocol Definitions
+## Scoring Library Interface
 
-### EventContext (FR-3.3, FR-E.2)
+### Pure Functions (no state, no storage)
 
 ```python
+# presidium/scoring/functions.py
+
+def score(
+    events: Iterable[Event],
+    config: ScoringConfig,
+    as_of: datetime | None = None,
+) -> float:
+    """Compute a score from events. Pure function — no side effects."""
+
+def windowed_score(
+    events: Iterable[Event],
+    config: ScoringConfig,
+    window: WindowConfig,
+    as_of: datetime | None = None,
+) -> float:
+    """Score only events within the window. Pure function."""
+
+def decay(
+    value: float,
+    elapsed: timedelta,
+    config: DecayConfig,
+) -> float:
+    """Apply decay to a value over elapsed time. Pure function."""
+
+def replay(
+    events: Iterable[Event],
+    config: ScoringConfig,
+    as_of: datetime,
+) -> float:
+    """Deterministic replay — reproduce a score at any point in time."""
+```
+
+### Event Schema (domain-agnostic)
+
+```python
+# presidium/scoring/events.py
+
+@dataclass(frozen=True)
+class Event:
+    id: str
+    timestamp: datetime
+    tags: Mapping[str, str]      # {"agent": "x", "type": "success", "tool": "db"}
+    values: Mapping[str, float]  # {"delta": 0.02, "cost_usd": 0.05}
+
 @dataclass(frozen=True)
 class EventContext:
     controllable: bool = True
     reason: str | None = None
-    actor_id: str | None = None         # required for HUMAN_OVERRIDE (FR-E.2)
-    correlation_id: str | None = None
+    actor_id: str | None = None
     metadata: Mapping[str, str] = field(default_factory=dict)
 ```
 
-### EventRecord
+### Config
 
 ```python
+# presidium/scoring/config.py
+
 @dataclass(frozen=True)
-class EventRecord:
-    event: TrustEvent
-    timestamp: datetime
-    context: EventContext | None = None
-    delta_applied: float | None = None  # set post-hoc by scorer
-```
-
-### New Protocols
-
-```python
-@runtime_checkable
-class ContextualTrustScorer(TrustScorer, Protocol):
-    """Accepts rich per-event context. Extends frozen TrustScorer."""
-    def record_event(
-        self, event: TrustEvent, *, context: EventContext | None = None,
-    ) -> None: ...
-
-@runtime_checkable
-class IntrospectableScorer(Protocol):
-    """Exposes immutable config for audit and spec pinning."""
-    @property
-    def spec(self) -> ScoringSpec: ...
-
-@runtime_checkable
-class QueryableScorer(Protocol):
-    """Surfaces reasons behind the current value."""
-    def recent_events(self, limit: int = 10) -> list[EventRecord]: ...
-    def explain_value(self) -> ValueExplanation: ...
-
-@runtime_checkable
-class ReplayableScorer(Protocol):
-    """Pure function: same (events, now) → same value. No side effects.
-    Required by WindowedTrustScorer. This is the determinism contract."""
-    def compute_value(self, events: Sequence[EventRecord], now: datetime) -> float: ...
-```
-
-### ScoringSpec (FR-3.5, FR-E.1)
-
-```python
+class DecayConfig:
+    function: Literal["linear", "exponential"] = "linear"
+    rate: float = 0.01           # linear: per hour; exponential: half-life in hours
+    
 @dataclass(frozen=True)
-class ScoringSpec:
-    scorer_fqn: str                                  # fully qualified class name
-    spec_version: int                                # bump on structural changes
-    initial_weights: Mapping[str, float]
-    window: WindowConfig | None = None
+class WindowConfig:
+    max_events: int | None = 100
+    max_age_hours: float | None = 168.0  # 7 days
+
+@dataclass(frozen=True)
+class ScoringConfig:
+    weights: Mapping[str, float]  # {"success": 0.02, "failure": -0.05, ...}
+    initial_value: float = 0.5
     decay: DecayConfig = field(default_factory=DecayConfig)
-    cold_start: ColdStartConfig = field(default_factory=ColdStartConfig)
-    controllability_filter: bool = False
-    bounded_learning: BoundedLearningConfig | None = None
-
-    @cached_property
-    def spec_hash(self) -> str:
-        canonical = json.dumps(
-            asdict(self), sort_keys=True,
-            separators=(",", ":"), default=str,
-        )
-        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    window: WindowConfig | None = None
 ```
 
 ---
 
-## Windowed Aggregation (FR-3.1)
-
-WindowedTrustScorer wraps a ReplayableScorer. It owns event storage (ring buffer) and cold-start blending. The inner scorer owns the math.
-
-### Write path
-
-```
-caller.record_event(SUCCESS, context=EventContext(controllable=True))
-  │
-  ▼
-WindowedTrustScorer.record_event
-  1. Controllability filter: if spec.controllability_filter and not ctx.controllable → drop
-  2. record = EventRecord(event, clock(), context)
-  3. buffer.append(record)          ← deque caps at max_events
-  4. n_seen_total += 1
-```
-
-### Read path
-
-```
-caller.value
-  │
-  ▼
-WindowedTrustScorer.value
-  1. now = clock()
-  2. windowed = [r for r in buffer if r.timestamp >= now − max_age]
-  3. n = len(windowed)
-  4. Branch:
-     n == 0         → cold_start.value(n_seen_total)
-     n < min_normal → blend: (1-n/min)*cold_start + (n/min)*computed
-     n >= min_normal → computed
-  5. computed = inner.compute_value(windowed, now)
-  6. clamp [0.0, 1.0]
-```
-
-### Decay inside inner
-
-The inner ReplayableScorer handles decay during compute_value:
-
-```
-for each EventRecord (oldest → newest):
-    value -= decay(event.timestamp − prev_timestamp)
-    value += weights[event.event]
-value -= decay(now − last_event.timestamp)
-return clamp(value)
-```
-
----
-
-## Cold-Start (FR-3.4)
-
-Three regimes based on `n` (events in window) and `min` (min_events_for_normal):
-
-| Regime | Condition | Formula |
-|---|---|---|
-| Cold | n == 0 | `cold_start.value(n_seen_total)` |
-| Warm-up | 0 < n < min | `(1 - n/min) * cold_start + (n/min) * computed` |
-| Normal | n >= min | `computed` |
-
-Set `min_events_for_normal = 0` to skip warm-up (single event → normal mode).
-
-Uses `n_seen_total` (never decremented) so agents with events that aged out of the window still get credit for having existed.
-
-### Strategies
+## Trust Layer (thin consumer of scoring library)
 
 ```python
-class ColdStartStrategy(Protocol):
-    def initial_value(self) -> float: ...
-    @property
-    def min_events_for_normal(self) -> int: ...
+# presidium/trust/windowed.py
 
-class OptimisticStart:    initial=0.7, min_events=0
-class NeutralStart:       initial=0.5, min_events=0    # M2 default
-class PessimisticStart:   initial=0.2, min_events=5
+class WindowedTrustScorer:
+    """Stateful trust scorer. Buffer + cold-start + delegates math to scoring.functions."""
+    
+    def __init__(self, config: TrustConfig, cold_start: ColdStartStrategy, *, clock=None):
+        self._events: list[Event] = []
+        self._config = config
+        self._cold_start = cold_start
+        self._clock = clock or (lambda: datetime.now(UTC))
+    
+    def record_event(self, event: TrustEvent, *, context: EventContext | None = None) -> None:
+        self._events.append(_to_scoring_event(event, self._clock(), context))
+    
+    @property
+    def value(self) -> float:
+        now = self._clock()
+        windowed = [e for e in self._events if _in_window(e, now, self._config.window)]
+        n = len(windowed)
+        
+        if n == 0:
+            return self._cold_start.initial_value()
+        
+        computed = windowed_score(windowed, self._config.scoring, self._config.window, now)
+        
+        if n < self._cold_start.min_events_for_normal:
+            blend = n / self._cold_start.min_events_for_normal
+            return clamp((1 - blend) * self._cold_start.initial_value() + blend * computed)
+        
+        return clamp(computed)
+    
+    @property
+    def tier(self) -> TrustTier:
+        return tier_for_value(self.value)
 ```
+
+The trust layer is **~30 lines** of code that delegates to `scoring.functions`. It adds:
+- Cold-start blending (trust concept)
+- Tier mapping (trust concept)
+- TrustEvent → Event conversion (trust concept)
+
+Everything else — windowing, decay, scoring math — comes from the reusable library.
 
 ---
 
-## Spec Hash for Learning Scorers (T3)
+## Performance Analysis
 
-Two hashes:
-
-| Hash | What it captures | When it changes | Use |
+| Operation | Events | Python time | Bottleneck? |
 |---|---|---|---|
-| `spec_hash` | Immutable config (initial weights, decay, window, thresholds) | Never (spec is frozen at construction) | FR-E.1 spec pinning, audit |
-| `state_hash` | `hash(spec_hash + journal_hash)` | Every learning invocation | Snapshot identity, cheap equality |
+| `.value` read (hot path) | 100 (default window) | ~10μs | ❌ |
+| `.value` read | 10K events | ~1ms | ❌ (at budget) |
+| Batch replay 500 agents | 50M events | Minutes | ✅ Use polars |
+| 1000 agents/sec scoring | 100K total events | ~10ms | ❌ |
 
-**Audit invariant:** `(spec, full_journal) → reproduces any historical value`.
-
-To pin a scorer (FR-E.1), pin the `spec_hash`. To prove a value at time T (FR-E.5), replay events through a fresh inner built from the spec.
+**M3 decision:** Pure Python. The math is trivial at library-mode scale.
+**M5/M6 decision:** Add `presidium[fast]` extra with polars (Rust-backed) for batch replay and cross-tenant aggregation.
 
 ---
 
@@ -240,9 +248,18 @@ To pin a scorer (FR-E.1), pin the `spec_hash`. To prove a value at time T (FR-E.
 | `LinearTrustScore(initial_value=0.5)` | Same behavior, same defaults |
 | `scorer.value`, `.tier`, `.last_updated`, `.record_event()` | Frozen |
 | `agent.trust.value` / `agent.trust.tier` in CEL | Unchanged |
-| `trust_events` table schema | Additive only (new optional columns) |
+| `trust_events` table schema | Additive only |
 
-Adding `compute_value()` to LinearTrustScore is non-breaking — it's a new method, not a Protocol change.
+---
+
+## What We Don't Build
+
+- **Custom aggregation framework** — Python list comprehensions + basic math are sufficient
+- **Custom EventStore** — events come from whatever the caller uses (list, SQLite, Postgres, Kafka)
+- **Custom windowing engine** — a list filter is fine at 100 events; polars for batch at scale
+- **Unified scoring platform** — build the library, prove it with trust, validate with evals in M4
+- **Rust/C bindings** — polars IS Rust; no need for custom native code
+- **Background workers** — lazy evaluation only
 
 ---
 
@@ -250,22 +267,10 @@ Adding `compute_value()` to LinearTrustScore is non-breaking — it's a new meth
 
 | Component | Effort |
 |---|---|
-| EventContext, EventRecord, ValueExplanation dataclasses | < 1 hour |
-| New Protocols (4 definitions) | < 1 hour |
-| ScoringSpec + sub-configs + spec_hash + canonical JSON tests | 2-4 hours |
-| ColdStartStrategy + 3 impls | < 1 hour |
-| WindowedTrustScorer (buffer, blend, clock, edge cases) | 1-2 days |
-| LinearTrustScore.compute_value() retrofit | 2-4 hours |
-| LearningTrustScorer refactor (all Protocols, bounded learning) | 1-2 days |
-| JournalEntry + LearningAudit | 2-4 hours |
-| Determinism property tests | 1-2 days |
-| **Total** | **~5-8 days** |
-
----
-
-## Risks
-
-1. **Clock injection discipline.** Every component that reads time takes a `clock` parameter. Any implicit `datetime.now()` breaks determinism. Enforce via code review.
-2. **spec_hash stability.** `json.dumps(sort_keys=True, separators=(",",":"))` is reliable, but `default=str` is fuzzy. Pin specific hashes in golden tests across Python 3.12/3.13.
-3. **Cold-start blend can be gamed.** If agent learns it gets 0.7 from OptimisticStart, it might stay near zero events. Mitigated by `n_seen_total` — aged-out events still count.
-4. **Learning weight drift.** 0.05/invocation × daily × 60 days = 3.0 total swing. FR-3.7 rate-limits invocations. Revisit if real-world drift exceeds expectations.
+| `presidium.scoring` package (events, functions, config, spec) | 1-2 days |
+| `presidium.trust` promotion to package + WindowedTrustScorer | 1-2 days |
+| Protocol definitions (Contextual, Introspectable, Queryable) | < 1 day |
+| ColdStartStrategy + 3 impls | < half day |
+| LearningTrustScorer refactor to use scoring library | 1 day |
+| Tests (determinism, windowing, cold-start, replay) | 1-2 days |
+| **Total** | **~5-7 days** |
