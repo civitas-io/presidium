@@ -53,6 +53,8 @@ class LinearTrustScore:
     Materialize-on-write: decay is baked in before applying event deltas.
     """
 
+    deterministic: bool = True
+
     _DELTAS: dict[TrustEvent, float] = {
         TrustEvent.SUCCESS: 0.02,
         TrustEvent.FAILURE: -0.05,

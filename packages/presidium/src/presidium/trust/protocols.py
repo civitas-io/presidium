@@ -19,7 +19,9 @@ class ContextualTrustScorer(TrustScorer, Protocol):
 
 @runtime_checkable
 class IntrospectableScorer(Protocol):
-    """Exposes immutable scoring config for audit and spec pinning (FR-3.5, FR-E.1)."""
+    """Exposes immutable scoring config for audit and spec pinning (FR-3.5, FR-E.1, FR-E.5)."""
+
+    deterministic: bool
 
     @property
     def spec(self) -> ScoringSpec: ...
