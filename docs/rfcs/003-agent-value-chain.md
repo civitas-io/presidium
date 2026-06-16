@@ -79,7 +79,7 @@ Baseline: $45/approval (manual, N=50, Q4 2025)
 **Solution:** `workflow.trace_id` propagated through audit events gives the tree view. Cost attribution per agent within the trace shows the spend distribution. Value capture at the workflow outcome ties back to the trace. The "forest" view aggregates across traces by root agent.
 
 <p align="center">
-<img src="../assets/value-chain-topology.svg" alt="Topology Derived from Trace Context" width="800"/>
+<img src="../assets/value-chain-topology.svg" alt="Topology Derived from Trace Context" width="900"/>
 </p>
 
 ### Problem 3: "Agent costs spiked 300% this month — why?"
