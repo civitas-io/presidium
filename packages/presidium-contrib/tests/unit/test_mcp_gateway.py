@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from presidium_contrib.mcp_gateway.pii import PIIDetector
 from presidium_contrib.mcp_gateway.poisoning import PoisoningDetector, PoisoningStatus
 from presidium_contrib.mcp_gateway.redaction import redact_dict, redact_string
@@ -28,7 +26,9 @@ class TestPoisoningDetector:
     def test_parameters_changed(self) -> None:
         detector = PoisoningDetector()
         detector.approve_tool("db_query", "Query the database", {"sql": "string"}, "admin@co.com")
-        result = detector.check("db_query", "Query the database", {"sql": "string", "admin": "bool"})
+        result = detector.check(
+            "db_query", "Query the database", {"sql": "string", "admin": "bool"}
+        )
         assert result.status == PoisoningStatus.PARAMETERS_CHANGED
 
     def test_revoke_tool(self) -> None:
@@ -114,10 +114,12 @@ class TestPIIDetector:
 
     def test_scan_dict(self) -> None:
         detector = PIIDetector()
-        result = detector.scan_dict({
-            "user": {"email": "bob@example.com", "age": 30},
-            "notes": "Contact at 123-45-6789",
-        })
+        result = detector.scan_dict(
+            {
+                "user": {"email": "bob@example.com", "age": 30},
+                "notes": "Contact at 123-45-6789",
+            }
+        )
         assert result.contains_pii is True
         assert "email" in result.pattern_names
         assert "ssn" in result.pattern_names

@@ -329,7 +329,7 @@ class TestPerformanceBudget:
 
         times.sort()
         p99_ns = times[98]
-        assert p99_ns < 1_000_000, f"p99 read latency {p99_ns/1000:.0f}μs exceeds 1ms"
+        assert p99_ns < 1_000_000, f"p99 read latency {p99_ns / 1000:.0f}μs exceeds 1ms"
 
     def test_tier_read_under_1ms_100_events(self) -> None:
         now = datetime.now(UTC)
@@ -346,7 +346,7 @@ class TestPerformanceBudget:
 
         times.sort()
         p99_ns = times[98]
-        assert p99_ns < 1_000_000, f"p99 tier latency {p99_ns/1000:.0f}μs exceeds 1ms"
+        assert p99_ns < 1_000_000, f"p99 tier latency {p99_ns / 1000:.0f}μs exceeds 1ms"
 
 
 # ---------------------------------------------------------------------------
@@ -360,9 +360,7 @@ class TestZeroDowntimeMigration:
         scorer = WindowedTrustScorer(clock=lambda: now)
         for event in TrustEvent:
             if event == TrustEvent.HUMAN_OVERRIDE:
-                scorer.record_event(
-                    event, context=EventContext(actor_id="migration@system")
-                )
+                scorer.record_event(event, context=EventContext(actor_id="migration@system"))
             else:
                 scorer.record_event(event)
         assert 0.0 <= scorer.value <= 1.0
