@@ -1,0 +1,72 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">Cost-Value Feedback Loop</text>
+  <text x="400" y="46" text-anchor="middle" font-size="11" fill="#64748b">Reuses existing trust scoring, policy engine, and scoring library</text>
+
+  <!-- Agent acts -->
+  <rect x="30" y="75" width="140" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="100" y="97" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Agent acts</text>
+  <text x="100" y="112" text-anchor="middle" font-size="9" fill="#3b82f6">LLM call / tool call</text>
+
+  <line x1="170" y1="100" x2="210" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowMid)"/>
+
+  <!-- Cost recorded -->
+  <rect x="210" y="75" width="140" height="50" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="280" y="97" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Cost recorded</text>
+  <text x="280" y="112" text-anchor="middle" font-size="9" fill="#16a34a">CostLedger.record()</text>
+
+  <line x1="350" y1="100" x2="390" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowMid)"/>
+
+  <!-- Outcome evaluated -->
+  <rect x="390" y="75" width="160" height="50" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="470" y="92" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Outcome evaluated</text>
+  <text x="470" y="107" text-anchor="middle" font-size="9" fill="#16a34a">POST_TOOL CEL policy</text>
+  <text x="470" y="119" text-anchor="middle" font-size="9" fill="#16a34a">success_criteria check</text>
+
+  <line x1="550" y1="100" x2="590" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowMid)"/>
+
+  <!-- Value recorded -->
+  <rect x="590" y="75" width="160" height="50" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="670" y="97" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">Value recorded</text>
+  <text x="670" y="112" text-anchor="middle" font-size="9" fill="#7c3aed">ValueLedger.record()</text>
+
+  <!-- Down to ROI -->
+  <line x1="670" y1="125" x2="670" y2="165" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrowPurpleMid)"/>
+
+  <!-- ROI computed -->
+  <rect x="530" y="165" width="280" height="55" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="670" y="188" text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">ROI computed</text>
+  <text x="670" y="205" text-anchor="middle" font-size="10" fill="#7c3aed">scoring.windowed_score(cost_events + value_events)</text>
+  <text x="670" y="215" text-anchor="middle" font-size="9" fill="#7c3aed">spec-hashed · replayable · auditable</text>
+
+  <!-- Down to trust -->
+  <line x1="670" y1="220" x2="670" y2="260" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrowPurpleMid)"/>
+
+  <!-- Trust adjusted -->
+  <rect x="530" y="260" width="280" height="50" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="670" y="282" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Trust adjusted (M6)</text>
+  <text x="670" y="297" text-anchor="middle" font-size="9" fill="#3b82f6">ROI as dimension in MultiDimensionalTrustScorer</text>
+
+  <!-- Left arrow back up -->
+  <line x1="530" y1="285" x2="100" y2="285" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <line x1="100" y1="285" x2="100" y2="130" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arrowBlueMid)"/>
+  <text x="315" y="278" text-anchor="middle" font-size="10" fill="#2563eb">Autonomy gates updated → agent capabilities change</text>
+
+  <!-- Bottom: what's reused -->
+  <rect x="30" y="335" width="740" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="400" y="355" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">Components reused from existing Presidium</text>
+  <text x="400" y="372" text-anchor="middle" font-size="10" fill="#64748b">scoring.Event · scoring.windowed_score · ScoringSpec · CelPolicyEngine · AuditEnricher · TrustScorer</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowMid" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#64748b"/>
+    </marker>
+    <marker id="arrowPurpleMid" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrowBlueMid" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#2563eb"/>
+    </marker>
+  </defs>
+</svg>
