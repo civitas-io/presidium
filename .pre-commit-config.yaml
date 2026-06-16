@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -13,13 +13,49 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.6
+    rev: v0.15.17
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.2
+    rev: v8.30.0
     hooks:
       - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: mypy-presidium
+        name: mypy (presidium)
+        entry: bash -c 'cd packages/presidium && uv run mypy src/presidium/'
+        language: system
+        pass_filenames: false
+        files: ^packages/presidium/src/
+        types: [python]
+
+      - id: mypy-contrib
+        name: mypy (presidium-contrib)
+        entry: bash -c 'cd packages/presidium-contrib && uv run mypy src/presidium_contrib/'
+        language: system
+        pass_filenames: false
+        files: ^packages/presidium-contrib/src/
+        types: [python]
+
+      - id: tests-presidium
+        name: tests (presidium)
+        entry: uv run --package presidium pytest packages/presidium/tests/ -x -q --no-header --tb=line --no-cov
+        language: system
+        pass_filenames: false
+        files: ^packages/presidium/
+        types: [python]
+        stages: [pre-push]
+
+      - id: tests-contrib
+        name: tests (presidium-contrib)
+        entry: bash -c 'cd packages/presidium-contrib && uv run pytest tests/ -x -q --no-header --tb=line --no-cov'
+        language: system
+        pass_filenames: false
+        files: ^packages/presidium-contrib/
+        types: [python]
+        stages: [pre-push]

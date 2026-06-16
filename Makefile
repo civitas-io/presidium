@@ -1,7 +1,12 @@
-.PHONY: install lint format test test-presidium test-contrib typecheck check clean version release-presidium release-contrib
+.PHONY: install setup lint format test test-presidium test-contrib typecheck check clean version release-presidium release-contrib
 
 install:
 	uv sync --all-extras --package presidium --package presidium-contrib
+
+setup: install
+	pre-commit install
+	pre-commit install --hook-type pre-push
+	@echo "Hooks installed: pre-commit (lint + mypy) and pre-push (tests)"
 
 lint:
 	uv run ruff check packages/presidium/src/ packages/presidium/tests/
