@@ -1,7 +1,7 @@
 # AGENTS.md — Presidium
 
 > Machine-readable project reference for AI coding assistants.
-> Last updated: 2026-06-11
+> Last updated: 2026-06-16
 
 ## Project Identity
 
@@ -47,18 +47,29 @@ presidium/
 ├── packages/                        # Code packages (uv workspace members)
 │   ├── presidium/                   # Interface library (protocols, dataclasses, CEL engine)
 │   │   └── src/presidium/
-│   │       ├── protocols/           # Python Protocols for every component
-│   │       ├── models/              # Shared dataclasses (AgentRecord, Policy, etc.)
-│   │       └── policy/             # CEL policy engine (default implementation)
+│   │       ├── policy/              # CEL policy engine (default implementation)
+│   │       ├── providers/           # GovernedModelProvider, GovernedToolProvider
+│   │       ├── registry/            # AgentRegistry Protocol + InMemory/Sqlite defaults
+│   │       ├── scoring/             # Domain-agnostic scoring library (events, functions, config, spec)
+│   │       ├── trust/               # Trust scoring (core, protocols, windowed, cold_start, telemetry)
+│   │       ├── bus.py               # GovernedMessageBus (PRE_MESSAGE enforcement)
+│   │       ├── model.py             # Shared dataclasses (AgentRecord, Policy, etc.)
+│   │       ├── errors.py            # PresidiumError hierarchy
+│   │       ├── approval.py          # ApprovalService Protocol + CallbackApprovalProvider
+│   │       ├── audit.py             # AuditEnricher Protocol + InProcessAuditEnricher
+│   │       ├── credentials.py       # CredentialProvider Protocol + Env/File defaults
+│   │       └── runtime.py           # GovernedRuntime (from_config, reload_policies)
 │   └── presidium-contrib/           # Adapters + reference implementations
 │       └── src/presidium_contrib/
 │           ├── opa/                 # OPA adapter (presidium-contrib[opa])
-│           ├── openbao/             # OpenBao/Vault credential backend (presidium-contrib[openbao])
-│           ├── agentgateway/         # AgentGateway adapter (presidium-contrib[agentgateway])
+│           ├── openbao/             # OpenBao credential backend (presidium-contrib[openbao])
+│           ├── agentgateway/        # AgentGateway adapter (presidium-contrib[agentgateway])
 │           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
-│           ├── registry/            # Reference impl: Agent Registry with grants + trust
-│           ├── mcp_gateway/         # Reference impl: MCP governance gateway
-│           └── trust/               # Reference impl: Trust scoring engine
+│           ├── webhook/             # Webhook approval adapter (presidium-contrib[webhook])
+│           ├── registry/            # Reference impl: PostgresAgentRegistry
+│           ├── mcp_gateway/         # Reference impl: tool poisoning, credential redaction, PII masking
+│           ├── trust/               # Reference impl: LearningTrustScorer
+│           └── service/             # Service mode: PolicyEvaluatorServer, RegistryServer (GenServer)
 ├── docs/                            # All documentation
 │   ├── vision/                      # Why — manifesto, positioning, roadmap
 │   ├── architecture/                # How — system design, package map

@@ -1,7 +1,7 @@
 # Package Map
 
 > What each package does, its boundaries, and dependencies.
-> Last updated: 2026-05-05
+> Last updated: 2026-06-16
 
 ![Interface-First Architecture](../assets/interface-first-architecture.svg)
 
@@ -13,27 +13,50 @@ This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the co
 
 ```
 presidium/                          # Interface library (pip install presidium)
-  registry.py                       # AgentRecord, Grant, TrustScorer protocols
-  policy.py                         # PolicyEngine protocol + CelPolicyEngine default
-  credentials.py                    # CredentialProvider protocol
-  llm_gateway.py                    # GovernedModelProvider protocol
-  mcp_gateway.py                    # GovernedToolProvider protocol
+  model.py                          # AgentRecord, Grant, PolicyRule, EvaluationStage, etc.
+  errors.py                         # PresidiumError hierarchy
+  approval.py                       # ApprovalService protocol + CallbackApprovalProvider
   audit.py                          # AuditEnricher protocol (wraps Civitas AuditSink)
-  hitl.py                           # ApprovalService protocol
-  trust.py                          # TrustScorer protocol
+  bus.py                            # GovernedMessageBus (PRE_MESSAGE enforcement)
+  credentials.py                    # CredentialProvider protocol + Env/File defaults
+  runtime.py                        # GovernedRuntime (from_config, reload_policies)
+  policy/
+    _base.py                        # PolicyEngine protocol
+    cel.py                          # CelPolicyEngine default (compile-once, fail-closed)
+  providers/
+    model.py                        # GovernedModelProvider (PRE_LLM / POST_LLM)
+    tool.py                         # GovernedToolProvider (PRE_TOOL / POST_TOOL)
+  registry/
+    _base.py                        # AgentRegistry protocol
+    memory.py                       # InMemoryRegistry (dict-backed, snapshot semantics)
+    sqlite.py                       # SqliteRegistry (WAL mode, asyncio.Lock)
+  scoring/                          # Domain-agnostic scoring library
+    events.py                       # Event, EventContext
+    functions.py                    # score(), windowed_score(), decay(), replay()
+    config.py                       # ScoringConfig, DecayConfig, WindowConfig
+    spec.py                         # ScoringSpec (immutable, spec_hash)
+  trust/                            # Trust scoring (consumer of scoring library)
+    core.py                         # TrustScorer protocol, LinearTrustScore, tier_for_value
+    protocols.py                    # ContextualTrustScorer, IntrospectableScorer, QueryableScorer
+    windowed.py                     # WindowedTrustScorer (cold-start, spec pinning, OTel)
+    cold_start.py                   # ColdStartStrategy + Optimistic/Neutral/Pessimistic
+    telemetry.py                    # Optional OTel instrumentation (no-op fallback)
 
 presidium-contrib/                   # Adapters + reference impls
-  adapters/
-    opa.py                           # OPA PolicyEngine adapter
-    cedar.py                         # Cedar PolicyEngine adapter
-    openbao.py                       # OpenBao/Vault CredentialProvider (MPL 2.0)
-    agentgateway.py              # AgentGateway adapter (LLM + MCP routing)
-    slack_approval.py                # Slack-based HITL adapter
-    temporal_approval.py             # Temporal human task adapter
-  reference/
-    postgres_registry.py             # Reference impl: agent registry (novel)
-    mcp_governance.py                # Reference impl: MCP governance (novel)
-    trust_scorer.py                  # Reference impl: trust scoring (novel)
+  opa/engine.py                     # OPA PolicyEngine adapter (REST API)
+  openbao/provider.py               # OpenBao CredentialProvider (hvac, MPL 2.0)
+  agentgateway/client.py            # AgentGateway adapter (LLM + MCP + A2A routing)
+  slack/approval.py                 # Slack HITL adapter (Block Kit buttons)
+  webhook/approval.py               # Webhook approval adapter (POST + callback)
+  registry/postgres.py              # PostgresAgentRegistry (asyncpg)
+  mcp_gateway/                      # MCP governance reference impl
+    poisoning.py                    # Tool poisoning detection (hash-based snapshots)
+    redaction.py                    # Credential redaction (regex patterns)
+    pii.py                          # PII detection + masking (configurable patterns)
+  trust/scorer.py                   # LearningTrustScorer (adjustable weights, journal)
+  service/                          # Service mode GenServer wrappers
+    policy.py                       # PolicyEvaluatorServer (distributed evaluation)
+    registry.py                     # RegistryServer (distributed lookups)
 ```
 
 ![Dependency Graph](../assets/dependency-graph.svg)
@@ -49,7 +72,7 @@ presidium-contrib/                   # Adapters + reference impls
 | Policy Engine | `PolicyEngine` | `CelPolicyEngine` (in-process CEL) | `PolicyService` GenServer | OPA, Cedar | |
 | Agent Registry | `AgentRegistry` | `InMemoryRegistry` / `SqliteRegistry` | `RegistryService` (Postgres) | | Postgres registry with grants + trust |
 | Credential Provider | `CredentialProvider` | `EnvCredentialProvider` / `FileCredentialProvider` | | OpenBao (Vault-compatible), AWS Secrets Manager | |
-| Trust Scorer | `TrustScorer` | `RuleBasedTrustScorer` | `LearningTrustScorer` | | Trust scoring for AI agents |
+| Trust Scorer | `TrustScorer` | `LinearTrustScore` / `WindowedTrustScorer` | `LearningTrustScorer` | | Trust scoring with windowed aggregation, cold-start, spec pinning |
 | HITL / Approval | `ApprovalService` | `CallbackApprovalProvider` | | Slack, Temporal, PagerDuty | |
 | Audit Enricher | `AuditEnricher` | `InProcessAuditEnricher` | | Datadog, Splunk, ELK (via Civitas AuditSink) | |
 | LLM Gateway | `GovernedModelProvider` | In-process grant checks + rate limits | | AgentGateway (Linux Foundation) | |
@@ -76,6 +99,8 @@ class EvaluationStage(Enum):
     PRE_LLM = "pre_llm"
     PRE_MESSAGE = "pre_message"
     REGISTRATION = "registration"
+    POST_TOOL = "post_tool"
+    POST_LLM = "post_llm"
 
 @dataclass
 class PolicyResult:
@@ -326,7 +351,7 @@ These wrap products that already exist. The adapter implements the Presidium pro
 
 **`adapters/openbao.py`** — OpenBao `CredentialProvider`. Reads secrets from OpenBao/Vault KV v2 engine via `hvac`. Handles token renewal. API-compatible with HashiCorp Vault — existing Vault deployments work unchanged. OpenBao is the MPL 2.0 community fork under Linux Foundation / OpenSSF Sandbox.
 
-**`adapters/agentgateway.py`** — AgentGateway `GovernedModelProvider` + `GovernedToolProvider`. Routes LLM and MCP calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry observability, A2A protocol support. Replaces LiteLLM adapter — AgentGateway is agent-centric (LLM + MCP + A2A) rather than LLM-centric.
+**`agentgateway/client.py`** — AgentGateway `GovernedModelProvider` + `GovernedToolProvider`. Routes LLM and MCP calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry observability, A2A protocol support.
 
 **`adapters/slack_approval.py`** — Slack `ApprovalService`. Posts approval requests to a Slack channel with approve/deny buttons. Waits for response via Slack Events API.
 

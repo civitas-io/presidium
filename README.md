@@ -6,7 +6,7 @@ Runtime + governance as one architecture. Not bolted on, not a sidecar, native.
 
 ---
 
-> **Status:** Pre-alpha. Documentation-first phase. No code yet — design docs and RFCs are being written before implementation begins.
+> **Status:** Pre-alpha. M2 (core interfaces) complete. M3 (contrib adapters + trust scoring) complete. 442 tests, 95%+ coverage, mypy strict, ruff clean.
 
 ## What Is Presidium?
 
@@ -41,27 +41,29 @@ presidium/
 │   ├── research/        # Competitive analysis, market research
 │   ├── rfcs/            # Request for Comments
 │   └── guides/          # Getting started, contributing
-├── packages/            # Code packages (coming soon)
-│   ├── presidium/       # Interface library (protocols, CEL engine)
+├── packages/            # Code packages
+│   ├── presidium/       # Interface library (protocols, CEL engine, scoring library)
 │   └── presidium-contrib/  # Adapters + reference implementations
 ├── AGENTS.md            # AI assistant instructions
 └── pyproject.toml       # Workspace config
 ```
 
-## Packages (Planned)
+## Packages
 
 | Package | Purpose | Install | Status |
 |---|---|---|---|
-| `presidium` | Protocols, dataclasses, CEL policy engine (default) | `pip install presidium` | Design |
-| `presidium-contrib` | Adapters for OPA, Vault, LiteLLM Proxy, Slack HITL; reference impls for Agent Registry, MCP governance, trust scoring | `pip install presidium-contrib[opa]` | Design |
+| `presidium` | Protocols, dataclasses, CEL policy engine, scoring library, trust scoring | `pip install presidium` | M3 complete |
+| `presidium-contrib` | Adapters for OPA, OpenBao, AgentGateway, Slack; reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M3 complete |
 
 `presidium` is the only required dependency. `presidium-contrib` extras are opt-in:
 
 ```
-presidium-contrib[opa]      # OPA adapter (for teams already running OPA)
-presidium-contrib[vault]    # HashiCorp Vault credential backend
-presidium-contrib[litellm]  # LiteLLM Proxy for LLM routing
-presidium-contrib[slack]    # Slack-based human-in-the-loop
+presidium-contrib[opa]           # OPA adapter (for teams already running OPA)
+presidium-contrib[openbao]       # OpenBao credential backend (Vault-compatible, MPL 2.0)
+presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — LLM + MCP + A2A routing
+presidium-contrib[slack]         # Slack-based human-in-the-loop
+presidium-contrib[webhook]       # Webhook-based approval provider
+presidium-contrib[postgres]      # PostgreSQL agent registry backend
 ```
 
 ### Library Mode vs. Service Mode
@@ -86,9 +88,9 @@ Mature products exist for some components. Presidium wraps them:
 | Component | Backend | How |
 |---|---|---|
 | Policy engine | CEL (default), OPA (adapter) | `presidium-contrib[opa]` |
-| Credential management | HashiCorp Vault | `presidium-contrib[vault]` |
-| LLM routing | LiteLLM Proxy | `presidium-contrib[litellm]` |
-| Human-in-the-loop | Slack, Temporal | `presidium-contrib[slack]` |
+| Credential management | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) | `presidium-contrib[openbao]` |
+| LLM + MCP routing | AgentGateway (Linux Foundation, CEL-native) | `presidium-contrib[agentgateway]` |
+| Human-in-the-loop | Slack, Webhook | `presidium-contrib[slack]` |
 
 For components where nothing mature exists, Presidium ships reference implementations in `presidium-contrib`:
 
@@ -112,4 +114,4 @@ Civitas is the **runtime**. Presidium is the **governance layer**. They share th
 
 ## Contributing
 
-This project is in its documentation-first phase. Contributions to design docs and RFCs are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [getting started guide](docs/guides/getting-started.md).

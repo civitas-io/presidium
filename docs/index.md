@@ -2,13 +2,13 @@
 
 > Content catalog for the Presidium knowledge base.
 > AI assistants: read this file first to find relevant pages before drilling in.
-> Last updated: 2026-06-12
+> Last updated: 2026-06-16
 
-**The governed agent platform built on [Civitas](https://github.com/jerynmathew/python-civitas).**
+**The governed agent platform built on [Civitas](https://github.com/civitas-io/civitas-forge).**
 
 Runtime + governance as one architecture — not bolted on, not a sidecar, native.
 
-**Status:** Pre-alpha. M2 implementation complete (Phases 1-6). Civitas integration remaining.
+**Status:** Pre-alpha. M2 (core interfaces) complete. M3 (contrib adapters + trust scoring) complete. 442 tests, 95%+ coverage.
 
 ---
 
@@ -20,7 +20,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|
 | [Manifesto](vision/manifesto.md) | Core thesis: governance should be architectural, not bolted on. 88% of agents fail in production due to infrastructure, not models. Principles: OSS-first, Python-native, developer-centric, vendor-neutral. |
 | [Market Positioning](vision/positioning.md) | Competitive 2x2 (governance depth × runtime depth). Presidium occupies the only empty quadrant. Detailed comparisons vs. AGT, Fiddler, Temporal. Target users: platform engineers, agent developers, enterprise compliance. |
-| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces, complete) → M3 (contrib adapters + trust scoring foundation) → M4 (autonomy progression + multi-dimensional trust) → M5 (SDK + CLI) → M6 (cloud + compliance). |
+| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces, complete) → M3 (contrib adapters + trust scoring, complete) → M4 (autonomy progression + agent value chain) → M5 (SDK + CLI) → M6 (cloud + compliance). |
 
 ## Architecture
 
@@ -29,7 +29,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | Page | Summary |
 |---|---|
 | [System Overview](architecture/overview.md) | Full system architecture diagram (Mermaid). Seven key design decisions: governance as supervisor constraints, registry as source of truth, gateways as Civitas plugins, eval as feedback loop, interface-first architecture, CEL as default policy language, library-first service-optional. Data flow and startup sequence. |
-| [Package Map](architecture/packages.md) | Two-package structure: `presidium` (protocols + CEL defaults) and `presidium-contrib` (adapters for OPA/Vault/LiteLLM/Slack + reference impls for novel components). Component map, Protocol definitions, dependency graph. |
+| [Package Map](architecture/packages.md) | Two-package structure: `presidium` (protocols + CEL defaults + scoring library) and `presidium-contrib` (adapters for OPA/OpenBao/AgentGateway/Slack + reference impls for novel components). Component map, Protocol definitions, dependency graph. |
 | [Full Stack](architecture/stack.md) | Three-layer model: Run (Civitas) → Govern (Presidium) → Observe (Fiddler/Arize). Library mode vs service mode deployment. Three deployment scenarios with YAML topology examples (laptop → staging → production). |
 | [Architecture Diagrams](assets/) | SVG assets: interface-first-architecture, deployment-modes, autonomy-progression, product-mapping, policy-evaluation-flow, full-stack-layers, eval-architecture, deepeval-integration, test-harness-architecture |
 
@@ -52,7 +52,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Topology Integration Requirements](design/topology-integration-requirements.md) | `presidium` + `civitas` (2 minimal changes) | M2 | Draft |
 | [Topology Integration](design/topology-integration.md) | `presidium` (GovernedRuntime) | M2 | Draft |
 | [Implementation Plan](design/implementation-plan.md) | All M2 components | M2 | Phases 1-6 complete |
-| [LLM Gateway](design/llm-gateway.md) | `presidium` (protocol) + `presidium-contrib[litellm]` | M3 | Draft |
+| [LLM Gateway](design/llm-gateway.md) | `presidium` (protocol) + `presidium-contrib[agentgateway]` | M3 | Draft |
 | [MCP Gateway](design/mcp-gateway.md) | `presidium` (protocol) + `presidium-contrib` (ref impl) | M3 | Draft |
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |
 | [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |

@@ -175,7 +175,7 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 |---|---|---|
 | M1: Foundation | Q2 2026 | Complete |
 | M2: Core Interfaces + CEL Policy | Q3 2026 | Complete |
-| M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Planning |
+| M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Complete |
 | M4: Autonomy Progression | Q4 2026 | Planning |
 | M5: SDK + CLI | Q1 2027 | Planning |
 | M6: Cloud | 2027+ | Future |
