@@ -450,3 +450,33 @@ All 6 phases of the M2 implementation plan completed. 18 source modules, 234 tes
 - `docs/design/mcp-gateway.md` — post-execution output validation, PII masking, MCP landscape research
 - `AGENTS.md` — LiteLLM → AgentGateway in package structure, adapters, dependency rules, glossary
 - `docs/index.md` — roadmap summary updated
+
+## [2026-06-16] implementation | M3 complete — enterprise trust, MCP governance, service mode
+
+**M3 implementation completed in full.** 442 tests passing (336 core + 106 contrib), 95%+ coverage, mypy strict, ruff clean.
+
+**Implemented (presidium core):**
+- Enterprise trust requirements FR-E.1–E.6: spec pinning, override attribution, performance budget, zero-downtime migration, determinism contract, OpenTelemetry instrumentation
+- `presidium.scoring` library validated as reusable across trust consumers
+- `WindowedTrustScorer` with cold-start blending, controllability filter, spec introspection
+- `GovernedMessageBus` — PRE_MESSAGE policy enforcement point
+- Policy hot-reload via `GovernedRuntime.reload_policies()` (atomic swap)
+- New errors: `SpecMismatchError`, `MissingAttributionError`, `TrustScoringError`
+
+**Implemented (presidium-contrib):**
+- `LearningTrustScorer` refactored to use `presidium.scoring` library
+- MCP governance reference impl: `PoisoningDetector`, `redact_dict`, `PIIDetector`
+- Service mode GenServer wrappers: `PolicyEvaluatorServer`, `RegistryServer`
+
+**RFC-003 drafted:** Agent Value Chain — from registry to business value. Five SVG diagrams, 15+ industry/academic sources cited.
+
+**Pages updated:**
+- `AGENTS.md` — package map refreshed with all M3 modules
+- `README.md` — status updated, LiteLLM → AgentGateway, packages table refreshed
+- `docs/index.md` — status updated, LiteLLM → AgentGateway
+- `docs/vision/roadmap.md` — M3 checkboxes marked complete, timeline updated
+- `docs/architecture/packages.md` — module layout rewritten to match actual code
+- `docs/design/credential-provider.md` — Vault → OpenBao terminology
+- `docs/rfcs/001-presidium-scope.md` — removed LiteLLM from Civitas plugin list
+- `CHANGELOG.md` — M3 features documented under Unreleased
+- `HANDOFF.md` — verified 100% accurate

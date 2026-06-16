@@ -72,7 +72,7 @@ Presidium is a **governance layer for AI agent systems**, built on Civitas. It p
 - State persistence (InMemory, SQLite, Postgres)
 - OTEL tracing, audit event emission pipeline (`AuditSink`)
 - Plugin interfaces: `ModelProvider`, `ToolProvider`, `StateStore`, `ExportBackend`
-- Concrete plugins: Anthropic, OpenAI, Gemini, Mistral, LiteLLM, NATS, ZMQ, Postgres
+- Concrete plugins: Anthropic, OpenAI, Gemini, Mistral, NATS, ZMQ, Postgres
 - MCP client integration (connectivity mechanics)
 - HTTP Gateway (infrastructure edge)
 - EvalLoop (agent self-correction signals — separate from governance audit)
