@@ -80,6 +80,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|---|
 | [RFC-001](rfcs/001-presidium-scope.md) | Presidium Scope and Boundaries | Draft |
 | [RFC-002](rfcs/002-multi-dimensional-evaluation.md) | Multi-Dimensional Evaluation for Non-Deterministic Systems | Seed |
+| [RFC-003](rfcs/003-agent-value-chain.md) | Agent Value Chain — From Registry to Business Value | Draft |
 
 ## Guides
 
