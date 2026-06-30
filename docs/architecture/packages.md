@@ -76,7 +76,7 @@ presidium-contrib/                   # Adapters + reference impls
 | HITL / Approval | `ApprovalService` | `CallbackApprovalProvider` | | Slack, Temporal, PagerDuty | |
 | Audit Enricher | `AuditEnricher` | `InProcessAuditEnricher` | | Datadog, Splunk, ELK (via Civitas AuditSink) | |
 | LLM Gateway | `GovernedModelProvider` | In-process grant checks + rate limits | | AgentGateway (Linux Foundation) | |
-| MCP Governance | `GovernedToolProvider` | In-process ACL checks | | | MCP governance (no existing product) |
+| MCP Governance | `GovernedToolProvider` | In-process ACL checks | | | MCP governance (no standalone library to wrap) |
 
 ---
 
@@ -175,7 +175,7 @@ class AgentRegistry(Protocol):
 
 > See [agent-registry design doc](../design/agent-registry.md) for full data model, SPIFFE identity format, dynamic spawning rules, and design decisions.
 
-No existing product tracks agent grants and trust scores together. This is novel territory.
+No standalone library packages agent grants and trust scores together for reuse — existing registries (e.g. Google Gemini) and trust models (e.g. Microsoft AGT) are coupled to their host platforms. This is the gap the reference implementation fills.
 
 ### Credential Provider
 
@@ -227,7 +227,7 @@ class LinearTrustScore:
 
 > See [agent-registry design doc](../design/agent-registry.md) for trust tier thresholds, decay model, and the AGT-style learning scorer in presidium-contrib.
 
-No existing product does trust scoring for AI agents. The reference implementation in `presidium-contrib` adds learning from historical patterns.
+Mature agent trust models exist (e.g. Microsoft AGT's 0–1000 scorer) but none ship as a reusable library. The reference implementation in `presidium-contrib` adds learning from historical patterns.
 
 ### HITL / Approval Service
 
@@ -333,7 +333,7 @@ class GovernedToolProvider(Protocol):
     async def check_access(self, agent: str, tool: str) -> bool: ...
 ```
 
-No existing product governs MCP tool access at this level. The reference implementation in `presidium-contrib` adds tool poisoning detection and credential redaction.
+Existing MCP gateways (incl. Microsoft AGT's MCP Security Gateway) aren't available as standalone libraries to wrap. The reference implementation in `presidium-contrib` adds tool poisoning detection and credential redaction.
 
 ---
 

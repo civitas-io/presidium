@@ -187,13 +187,13 @@ All concrete implementations. Organized into two categories:
 | `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — LLM + MCP + A2A routing with CEL policies |
 | `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
 
-**Reference Implementations** (novel components, no prior art to wrap):
+**Reference Implementations** (components with no standalone library to wrap):
 
 | Module | Implements | Why here |
 |---|---|---|
-| `presidium_contrib.registry` | `RegistryProtocol` | Agent Registry with grants + trust scores — no existing product models this |
-| `presidium_contrib.mcp_gateway` | `MCPGatewayProtocol` | MCP governance — MCP is new, no tooling exists |
-| `presidium_contrib.trust` | `TrustScoringProtocol` | Trust scoring engine — novel concept |
+| `presidium_contrib.registry` | `RegistryProtocol` | Agent Registry with grants + trust scores — prior art exists (Google Gemini, AGT) but not as a swappable library |
+| `presidium_contrib.mcp_gateway` | `MCPGatewayProtocol` | MCP governance — existing gateways (incl. AGT) aren't standalone libraries to wrap |
+| `presidium_contrib.trust` | `TrustScoringProtocol` | Trust scoring engine — mature models exist (e.g. AGT) but none ship as a reusable library |
 
 Install: `pip install presidium-contrib[opa,openbao]` (mix and match extras)
 

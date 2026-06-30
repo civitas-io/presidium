@@ -92,13 +92,13 @@ Mature products exist for some components. Presidium wraps them:
 | LLM + MCP routing | AgentGateway (Linux Foundation, CEL-native) | `presidium-contrib[agentgateway]` |
 | Human-in-the-loop | Slack, Webhook | `presidium-contrib[slack]` |
 
-For components where nothing mature exists, Presidium ships reference implementations in `presidium-contrib`:
+For components where prior art exists but isn't packaged as a standalone, swappable library to wrap, Presidium ships reference implementations in `presidium-contrib`:
 
 | Component | Why a reference impl |
 |---|---|
-| Agent Registry with grants + trust scores | No existing product models agent identity this way |
-| MCP governance gateway | MCP is new; no governance tooling exists yet |
-| Trust scoring | Novel concept; no prior art to wrap |
+| Agent Registry with grants + trust scores | Prior art exists (Google Gemini registry, Microsoft AGT) but not as a swappable Python library |
+| MCP governance gateway | Existing MCP gateways (incl. Microsoft AGT's MCP Security Gateway) aren't standalone libraries to wrap |
+| Trust scoring | Mature models exist (e.g. Microsoft AGT, 0–1000 scale) but none ship as a reusable library |
 
 ## Relationship to Civitas
 
