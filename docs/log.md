@@ -480,3 +480,18 @@ All 6 phases of the M2 implementation plan completed. 18 source modules, 234 tes
 - `docs/rfcs/001-presidium-scope.md` — removed LiteLLM from Civitas plugin list
 - `CHANGELOG.md` — M3 features documented under Unreleased
 - `HANDOFF.md` — verified 100% accurate
+
+---
+
+## [2026-06-30] lint | Corrected competitor prior-art overclaims
+
+**Issue:** Several positioning surfaces claimed no prior art / no existing product exists for MCP governance, trust scoring, and agent registries. This contradicted the competitive research already in this wiki (Microsoft AGT ships an MCP Security Gateway and a 0–1000 trust model; Google Gemini ships an agent registry) and the design docs referencing the AGT-style scorer.
+
+**Correction:** The accurate rationale for shipping reference implementations is that prior art exists but is coupled to its host platform and not available as a standalone, swappable library to wrap — not that the space is empty.
+
+**Pages updated:**
+- `README.md` — "Where Presidium Builds vs. Wraps" table (registry, MCP governance, trust scoring rows) + section intro
+- `AGENTS.md` — reference-implementations table + heading
+- `docs/architecture/packages.md` — component map note, overview, and the registry / trust / MCP "reference impl" rationale lines
+
+**Superseded:** The 2026-04-30 entry's "Where nothing exists (Agent Registry with grants+trust, MCP governance, Trust scoring)" framing is corrected by this entry — prior art exists; it simply isn't packaged as a reusable library.

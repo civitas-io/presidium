@@ -7,7 +7,7 @@
 
 ## Overview
 
-Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, OpenBao, AgentGateway, Slack, and the novel components that have no existing product equivalent.
+Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, OpenBao, AgentGateway, Slack, and reference implementations for components whose prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone, swappable library.
 
 This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the core package defines the contracts, contrib provides the implementations.
 
@@ -359,7 +359,7 @@ These wrap products that already exist. The adapter implements the Presidium pro
 
 ### Reference Implementations (novel)
 
-These implement components where no existing product fits. They're production-ready but not wrappers.
+These implement components where prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone library to wrap. They're production-ready but not wrappers.
 
 **`reference/postgres_registry.py`** — `AgentRegistry` backed by Postgres. Stores agent records, grant sets, and trust score history. Supports the `RegistryService` GenServer for service mode.
 
