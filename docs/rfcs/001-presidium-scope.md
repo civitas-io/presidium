@@ -1,9 +1,18 @@
 # RFC-001: Presidium Scope and Boundaries
 
-**Status:** Draft (revised 2026-05-05)
+**Status:** Draft (revised 2026-07-07)
 **Author:** Jeryn Mathew
 **Created:** 2026-04-30
 **Revised:** 2026-05-05 — Added AAA architecture, clarified capability/grant distinction, renamed `presidium-eval` → `presidium-audit`, formalized integration points.
+**Revised:** 2026-07-07 — Corrected stale "Cedar primary" policy-engine claim: **CEL is primary** (an
+embedded library, zero-ops, in-process — matches the "library mode" default established across
+Presidium and already shipped as the M2/M3 default in `presidium/policy/cel.py`). Cedar was the
+original RFC-001 proposal but was superseded by the CEL decision before M2 shipped; this document
+was never updated to match. OPA remains supported today via the `presidium-contrib[opa]` adapter;
+Cedar is deferred to a later roadmap milestone (`docs/vision/roadmap.md` already correctly lists
+`CedarPolicyEngine` under "Deferred adapters") for teams that need Cedar's formal-verification
+tooling or ecosystem. This revision brings RFC-001 in line with the roadmap and shipped code — no
+new decision is being made here, only a doc-drift fix.
 
 ---
 
@@ -31,7 +40,7 @@ These are additive. A customer never has to choose between a Civitas feature and
 Presidium is a **governance layer for AI agent systems**, built on Civitas. It provides five capabilities:
 
 1. **Agent Registry** — persistent agent identity (name, version, owner, lifecycle state, trust score) integrated with enterprise IdPs
-2. **Policy Engine** — declarative policies enforced at runtime (ALLOW, DENY, REQUIRE_APPROVAL); Cedar primary, OPA supported
+2. **Policy Engine** — declarative policies enforced at runtime (ALLOW, DENY, REQUIRE_APPROVAL); **CEL primary** (embedded library, zero-ops, in-process — the only implementation in `presidium` core per its interface-library rule), **OPA supported** via `presidium-contrib[opa]` adapter, **Cedar deferred** to a later milestone
 3. **Identity & Credentials** — agent identity grants (authorization), credential vault (OAuth tokens, API keys scoped per agent + user), token exchange for user-delegated access
 4. **Gateways** — governed LLM access (`GovernedModelProvider`) and governed tool access (`GovernedToolProvider`); wrap Civitas plugins, enforce grants and policy
 5. **Audit & Compliance** — governance metrics, policy compliance reporting, trust score tracking, external platform export (Fiddler, Arize, Langfuse)
@@ -95,7 +104,7 @@ Civitas does **not** provide:
 - **Agent identity** — persistent: name, version, owner, registered_at, lifecycle state. Survives restarts. Linked to IdP service principals.
 - **Agent grants** — authorization entitlements: what an agent is *permitted to access* (tool namespaces, LLM tiers, data scopes). Distinct from Civitas capability routing tags.
 - **Trust scores** — numeric, decays over time, updated by policy compliance signals
-- **Policy engine** — Cedar (primary) and OPA (plugin): evaluates `(agent, action, resource, context)` → ALLOW / DENY / REQUIRE_APPROVAL
+- **Policy engine** — CEL (primary, embedded in `presidium` core) and OPA (adapter, `presidium-contrib[opa]`): evaluates `(agent, action, resource, context)` → ALLOW / DENY / REQUIRE_APPROVAL. Cedar deferred (see roadmap)
 - **Identity & credentials** — credential vault scoped per `(agent_id, user_id)` tuple; token exchange (OBO, XAA/ID-JAG, client credentials); enterprise IdP integrations (Entra, Okta, Google, AWS IAM)
 - **LLM Gateway** (`GovernedModelProvider`) — wraps any Civitas `ModelProvider`; enforces per-agent rate limits, cost tracking, budget enforcement, grant-based provider routing
 - **MCP Gateway** (`GovernedToolProvider`) — wraps Civitas MCP client; enforces tool ACLs per agent grants, tool poisoning detection (snapshot hashes), credential redaction, audit logging
@@ -151,7 +160,7 @@ Authentication, Authorization, and Access Control span both layers. Neither laye
 
 | Decision | Who Makes It | How |
 |----------|-------------|-----|
-| Can agent A call tool T? | Presidium policy engine | Cedar policy: agent grants ∩ tool ACL |
+| Can agent A call tool T? | Presidium policy engine | CEL policy: agent grants ∩ tool ACL |
 | Can agent A call LLM with model M? | Presidium policy engine | Agent grants include `llm:<model>` |
 | Can agent A spend more budget today? | Presidium budget tracker | Per-agent cost tracking against configured limits |
 | Can agent A send a message to agent B? | Civitas routing registry | B is registered and reachable (operational, not governance) |
@@ -280,4 +289,11 @@ Accept this RFC as the governing scope document for Presidium. All package propo
 - Should Presidium include a minimal TUI for local development? (Not a web UI — a `presidium status` terminal view of which agents are running, their trust scores, recent policy decisions.)
 - At what point does Presidium need its own CLI vs. extending `civitas` CLI? Proposal: `presidium` CLI for governance commands (`presidium policy validate`, `presidium registry list`, `presidium audit export`); the `civitas` CLI remains for runtime operations.
 - Should `presidium-sdk` re-export Civitas APIs or keep them as separate imports? Leaning toward separate — customers should know they're using both layers.
-- Cedar vs. OPA as primary policy engine: Cedar is faster and formally verifiable; OPA has broader ecosystem. Proposal: Cedar primary (best-in-class for authorization), OPA supported via plugin adapter.
+
+**Resolved (was: "Cedar vs. OPA as primary policy engine"):** CEL is primary, shipped in M2/M3.
+Cedar's formal-verification and ecosystem strengths are real, but CEL's zero-ops, embeddable,
+pure-library nature matched Presidium's "library mode by default" principle better for a first
+implementation with no external service dependency. OPA is supported today as an adapter for teams
+already running it. Cedar remains a candidate for a future `presidium-contrib` adapter
+(`docs/vision/roadmap.md` "Deferred adapters") if enterprise demand for its verification tooling
+materializes — not a primary-engine swap, an additional adapter alongside CEL/OPA.
