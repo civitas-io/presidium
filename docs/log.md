@@ -495,3 +495,81 @@ All 6 phases of the M2 implementation plan completed. 18 source modules, 234 tes
 - `docs/architecture/packages.md` — component map note, overview, and the registry / trust / MCP "reference impl" rationale lines
 
 **Superseded:** The 2026-04-30 entry's "Where nothing exists (Agent Registry with grants+trust, MCP governance, Trust scoring)" framing is corrected by this entry — prior art exists; it simply isn't packaged as a reusable library.
+
+---
+
+## [2026-07-07] lint | Fixed stale Cedar-primary policy-engine claim in RFC-001
+
+**Issue:** `docs/rfcs/001-presidium-scope.md` still stated "Cedar primary, OPA supported" for the
+policy engine (in the Scope summary, the Presidium-Provides section, an AAA table row, and as an
+open unresolved question). This predates the actual M2 decision to ship CEL as the primary
+(embedded-library) policy engine — `docs/vision/roadmap.md` and `AGENTS.md` were already correct
+("CEL default", "CEL — the default policy engine in presidium"); RFC-001 was never updated to match
+when the Cedar→CEL pivot happened before M2 shipped.
+
+**Correction:** RFC-001 now states CEL is primary (shipped, `presidium/policy/cel.py`), OPA is
+supported via `presidium-contrib[opa]`, and Cedar is deferred to a future adapter (matching
+`docs/vision/roadmap.md`'s existing "Deferred adapters: CedarPolicyEngine" line) — not a
+primary-engine candidate. The open question "Cedar vs. OPA as primary policy engine" is resolved
+and moved out of Open Questions into the Decision section with rationale (CEL's zero-ops,
+embeddable nature fit Presidium's library-mode-by-default principle for a first implementation).
+
+**Pages updated:**
+- `docs/rfcs/001-presidium-scope.md` — header revision note, Scope summary, Presidium-Provides
+  bullet, AAA authorization-decisions table row, Open Questions → Decision resolution
+- `docs/index.md` — last-updated date, RFC-001 status note (this entry)
+
+---
+
+## [2026-07-07] design | Pluggable LLM/Tools gateway backends + agents-as-tools scoping
+
+**Discussion:** Human wants Presidium's gateway integration to support multiple LLM/MCP gateway
+products, not be hardcoded to AgentGateway — preferring AgentGateway as the reference but wanting
+real optionality (explicitly named preference for AgentGateway; explicitly does not want the second
+backend choice frozen). Also wants LLM Gateway and Tools/MCP Gateway kept as two logically separate
+components even though AgentGateway ships both in one product, specifically to keep the door open
+for "agents as tools" (A2A delegation through the same governed path as MCP tools) — outbound only
+for now, inbound (civitas agents exposed as A2A-callable) explicitly scoped as a non-goal/fast-follow
+rather than silently dropped.
+
+**Research done (this session):** Evidence-based comparison of 6 LLM/AI gateway candidates
+(LiteLLM Proxy, Kong AI Gateway, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry) across
+GitHub adoption, PyPI downloads, named customers, funding, self-hostability, Python-native fit, and
+license. LiteLLM Proxy is the strongest candidate for a second fully-built adapter (52.8k GitHub
+stars, MIT license, self-hostable, Python-native, named production users), with real caveats
+weighed (a recent CVE history on its auth path; heavier operational footprint than AgentGateway's
+single binary; the ~471M/30-day PyPI download figure is likely inflated by transitive-dependency
+installs, not read as a literal usage signal). Per explicit instruction, **this pick is a lean, not
+a lock-in** — documented as such everywhere it's mentioned.
+
+**Design decisions:**
+- New `LLMGatewayBackend` Protocol (`presidium/providers/gateway.py`) — `GovernedModelProvider`'s
+  operations dependency, extracted from its previous AgentGateway-only hardcoding.
+- New `ToolsGatewayBackend` Protocol (same file) — `GovernedToolProvider`'s operations dependency.
+  `call_tool()` is deliberately uniform for an MCP tool and an A2A-delegated agent (the "agents as
+  tools" scoping), outbound only.
+- AgentGateway is the reference/fully-built adapter for both protocols (though its `ToolsGatewayBackend`
+  side needs `list_tools`/`call_tool` added to its existing `client.py` — a real implementation gap,
+  not a design gap, tracked as a GH issue).
+- LiteLLM Proxy is the leading (not frozen) second `LLMGatewayBackend` candidate. Kong, Portkey,
+  Cloudflare AI Gateway, Helicone, TrueFoundry get stub-only adapters (interface-conformant,
+  `NotImplementedError`) to reserve the extras and prove the Protocol generalizes.
+- No second `ToolsGatewayBackend` candidate — documented as a real, current gap (nothing in the
+  market research does MCP+A2A with Presidium's self-hostable/Python-native bar), not filled in
+  arbitrarily.
+
+**Pages updated:**
+- `docs/design/llm-gateway.md` — pluggable backend Protocol, adapter comparison table, non-goals,
+  open questions
+- `docs/design/mcp-gateway.md` — pluggable backend Protocol, agents-as-tools design, inbound A2A
+  non-goal, MCP Governance Landscape note, open questions
+- `docs/architecture/packages.md` — package tree, Component Map table, LLM/MCP Gateway code
+  samples, presidium-contrib adapter list, overview paragraph
+- `docs/index.md` — LLM Gateway / MCP Gateway / Package Map row descriptions
+
+**Not done in this pass (deferred to implementation / GH issues):**
+- Actually writing `presidium/providers/gateway.py`, the `litellm/` adapter, or the stub adapters —
+  this pass is docs-only, per explicit instruction to sort docs before issues/code.
+- Adding `list_tools`/`call_tool` to `agentgateway/client.py` — same reason.
+- Resolving the grant shape for agent-targets (`agent:<name>:invoke`?) — flagged as an open question
+  in `mcp-gateway.md`, not resolved here.

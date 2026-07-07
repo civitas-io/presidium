@@ -1,10 +1,24 @@
 # Design: MCP Gateway
 
-> Governed tool access — authorization + post-execution validation via Model Context Protocol.
+> Governed tool access — authorization + post-execution validation via Model Context Protocol
+> and agent-to-agent (A2A) delegation, both through a pluggable gateway backend.
 
-**Status:** Draft (revised June 2026)
-**Package:** `presidium` (GovernedToolProvider) + `presidium-contrib` (MCP governance reference impl)
-**Milestone:** M2 (authorization) / M3 (post-execution, tool poisoning, PII masking)
+**Status:** Draft (revised 2026-07-07 — generalized to a pluggable `ToolsGatewayBackend` Protocol
+covering both MCP tools and A2A agent delegation with a uniform call shape; see changelog below)
+**Package:** `presidium` (`GovernedToolProvider` + new `ToolsGatewayBackend` Protocol) +
+`presidium-contrib` (MCP governance reference impl + backend adapters)
+**Milestone:** M2 (authorization) / M3 (post-execution, tool poisoning, PII masking) / M3+ (backend
+pluggability + agents-as-tools, this revision)
+
+> **2026-07-07 changelog:** two changes. (1) Extracted the operations dependency into a
+> `ToolsGatewayBackend` Protocol, matching `llm-gateway.md`'s `LLMGatewayBackend` — AgentGateway
+> remains the only backend that implements it today (see §"Pluggable backends" below; no other
+> researched product does MCP + A2A routing with the self-hostable, Python-friendly profile
+> Presidium wants, so unlike the LLM side there is currently no second candidate, only a documented
+> gap). (2) Scoped in "agents as tools": `call_tool()` is deliberately the same method whether the
+> target is a classic MCP tool or another agent reached via A2A — see §"Agents as tools" below.
+> **Inbound exposure (civitas agents discoverable/callable by external A2A clients) is an explicit
+> non-goal for this revision**, not a silent omission — see Non-Goals.
 
 ## Problem Statement
 
@@ -18,14 +32,83 @@ MCP (Model Context Protocol) gives agents access to external tools — databases
 4. Credential redaction from tool call parameters before audit logging
 5. Output PII masking — detect and redact sensitive data in tool results before returning to agent
 6. Audit log all tool interactions with governance context
+7. **Agents as tools (outbound)** — a civitas agent can `call_tool()` another agent (via A2A)
+   through the same governed path as a classic MCP tool call, with the same grant/policy/audit
+   treatment (M3+, this revision)
 
 ## Non-Goals
 
 - MCP server implementation — Civitas handles MCP client integration
 - Tool discovery — agents get tools through the gateway, not by scanning
 - Content validation (hallucination, factual accuracy) — separate concern (NeMo Guardrails, Guardrails AI)
+- **Inbound A2A exposure.** Making a civitas agent discoverable and callable BY external A2A
+  clients (other agent frameworks, other AgentGateway deployments) requires civitas to speak the
+  A2A *server* role, not just consume it as a client — that's a real, separate feature (likely a
+  civitas-side capability, not just a Presidium adapter) and is explicitly deferred, not silently
+  dropped. Tracked as a fast-follow once outbound is built and proven.
 
 ## Design
+
+### Pluggable backends: the `ToolsGatewayBackend` Protocol
+
+Mirrors `llm-gateway.md`'s `LLMGatewayBackend` — `GovernedToolProvider` depends on a `Protocol`,
+not a specific product:
+
+```python
+class ToolsGatewayBackend(Protocol):
+    """Operations backend for GovernedToolProvider: MCP tool + A2A agent-delegation routing.
+
+    Presidium owns authorization (grants, tool ACLs, CEL policy) and always runs it BEFORE this is
+    called. The backend resolves `name` to whichever transport applies (MCP server or A2A peer) —
+    the caller does not need to know or care which.
+    """
+
+    async def list_tools(self, *, agent_name: str | None = None) -> list[dict[str, Any]]: ...
+
+    async def call_tool(
+        self,
+        name: str,
+        arguments: dict[str, Any],
+        *,
+        agent_name: str | None = None,
+    ) -> dict[str, Any]: ...
+
+    async def health(self) -> bool: ...
+```
+
+**Current adapter status:** AgentGateway is the only implementation today, and it is currently
+**incomplete relative to this Protocol** — `presidium_contrib.agentgateway.client.AgentGatewayClient`
+(as shipped) only has `chat()`/`list_models()`/`health()` (the LLM side); `list_tools()`/
+`call_tool()` need to be added to actually exercise AgentGateway's MCP + A2A routing. This is a
+concrete, scoped implementation gap (not a design gap) — tracked as a GH issue rather than fixed
+silently in this doc pass.
+
+No second `ToolsGatewayBackend` candidate is proposed here, unlike the LLM side. The market
+research behind `llm-gateway.md`'s backend table did not turn up another product that does MCP +
+A2A routing with a self-hostable, Python-friendly profile — the ~10 MCP-gateway projects noted in
+§"MCP Governance Landscape" below (mcp-zero, mcp-guardian, etc.) informed *pattern* choices, not a
+second full backend. This is a documented gap, revisited if a concrete need or customer signal
+surfaces one.
+
+### Agents as tools (outbound)
+
+`call_tool(name, arguments)` is deliberately the same method whether `name` resolves to a classic
+MCP tool (`"database.query"`) or another agent reached via A2A (`"specialist_researcher"`). From
+the calling agent's and `GovernedToolProvider`'s perspective, both are just "invoke this named
+capability with these arguments" — the backend (AgentGateway) is what actually knows whether that
+name routes to an MCP server or an A2A peer, using its existing tool-federation/A2A capability
+discovery.
+
+Practically, this means:
+- The same grant model applies: an agent needs `tool:<name>` (or an equivalent grant shape for
+  agent-targets, TBD in implementation) whether the target is a tool or another agent.
+- The same `PRE_TOOL`/`POST_TOOL` CEL policy stages apply uniformly — a policy author does not
+  write separate rules for "calling a tool" vs. "delegating to an agent."
+- The same audit trail, tool-poisoning-style change detection, and credential redaction apply to
+  both, since they flow through one `call_tool()` path.
+
+This is scoped to **outbound only** — a civitas agent calling out through the gateway. See
+Non-Goals for the deferred inbound direction.
 
 ### Access Control
 
@@ -145,7 +228,11 @@ Research (June 2026) identified 10+ MCP gateway projects addressing tool governa
 | Shadow/audit mode | mcp-guardian | `advisory` enforcement mode |
 | Credential redaction | mcp-zero, mcp-guardian | Regex-based parameter redaction before audit |
 
-AgentGateway (Linux Foundation) provides native MCP routing with CEL policies. The `presidium-contrib[agentgateway]` adapter delegates MCP routing to AgentGateway while Presidium owns authorization and post-execution validation.
+AgentGateway (Linux Foundation) provides native MCP routing with CEL policies, and is the sole
+`ToolsGatewayBackend` implementation (see "Pluggable backends" above — the adapter needs
+`list_tools`/`call_tool` added to actually reach this, tracked as an issue). The
+`presidium-contrib[agentgateway]` adapter delegates MCP + A2A routing to AgentGateway while
+Presidium owns authorization and post-execution validation.
 
 ## Open Questions
 
@@ -154,3 +241,10 @@ AgentGateway (Linux Foundation) provides native MCP routing with CEL policies. T
 - PII detection backend: built-in regex patterns vs. external service (Presidio)? (Start regex, Presidio as contrib adapter)
 - Should POST_TOOL be able to *modify* results (redact inline) or only ALLOW/DENY? (Lean toward ALLOW/DENY/REDACT as a third decision type for post-execution)
 - Integration with Civitas's existing MCP module?
+- **What does a grant look like for an agent-target, not a tool-target?** `tool:database:read` is
+  natural for MCP tools; an A2A delegation target needs a grant shape too (e.g.
+  `agent:specialist_researcher:invoke`?) — needs to be pinned down when `call_tool()`'s agent-target
+  path is actually implemented, not just designed.
+- **Civitas issue #26** ("MCP client only supports stdio/sse transport — no Streamable HTTP") may
+  block reaching AgentGateway's MCP proxy over its preferred Streamable HTTP transport — worth
+  checking whether `list_tools`/`call_tool`'s implementation depends on that landing first.

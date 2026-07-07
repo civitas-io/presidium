@@ -53,18 +53,25 @@ presidium/
 | Package | Purpose | Install | Status |
 |---|---|---|---|
 | `presidium` | Protocols, dataclasses, CEL policy engine, scoring library, trust scoring | `pip install presidium` | M3 complete |
-| `presidium-contrib` | Adapters for OPA, OpenBao, AgentGateway, Slack; reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M3 complete |
+| `presidium-contrib` | Adapters for OPA, OpenBao, AgentGateway, LiteLLM, Slack (+ stubbed gateway backends: Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry); reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M3 complete; gateway backends pluggable as of M3+ (2026-07-07, not frozen) |
 
 `presidium` is the only required dependency. `presidium-contrib` extras are opt-in:
 
 ```
 presidium-contrib[opa]           # OPA adapter (for teams already running OPA)
 presidium-contrib[openbao]       # OpenBao credential backend (Vault-compatible, MPL 2.0)
-presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — LLM + MCP + A2A routing
+presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — reference LLM + MCP + A2A gateway
+presidium-contrib[litellm]       # LiteLLM Proxy — LLM-only gateway; current leading 2nd pick, not frozen
 presidium-contrib[slack]         # Slack-based human-in-the-loop
 presidium-contrib[webhook]       # Webhook-based approval provider
 presidium-contrib[postgres]      # PostgreSQL agent registry backend
 ```
+
+LLM Gateway and Tools/MCP Gateway are separate `presidium` Protocols
+(`LLMGatewayBackend`/`ToolsGatewayBackend`) even though AgentGateway ships both in one product —
+see [`docs/design/llm-gateway.md`](docs/design/llm-gateway.md) and
+[`docs/design/mcp-gateway.md`](docs/design/mcp-gateway.md) for why, and for the full adapter
+comparison (Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry are stubbed, not built).
 
 ### Library Mode vs. Service Mode
 
@@ -89,7 +96,8 @@ Mature products exist for some components. Presidium wraps them:
 |---|---|---|
 | Policy engine | CEL (default), OPA (adapter) | `presidium-contrib[opa]` |
 | Credential management | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) | `presidium-contrib[openbao]` |
-| LLM + MCP routing | AgentGateway (Linux Foundation, CEL-native) | `presidium-contrib[agentgateway]` |
+| LLM routing | AgentGateway (reference), LiteLLM (leading 2nd pick, not frozen) | `presidium-contrib[agentgateway\|litellm]` |
+| MCP + A2A routing | AgentGateway (sole backend today) | `presidium-contrib[agentgateway]` |
 | Human-in-the-loop | Slack, Webhook | `presidium-contrib[slack]` |
 
 For components where prior art exists but isn't packaged as a standalone, swappable library to wrap, Presidium ships reference implementations in `presidium-contrib`:

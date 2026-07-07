@@ -1,13 +1,13 @@
 # Package Map
 
 > What each package does, its boundaries, and dependencies.
-> Last updated: 2026-06-16
+> Last updated: 2026-07-07
 
 ![Interface-First Architecture](../assets/interface-first-architecture.svg)
 
 ## Overview
 
-Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, OpenBao, AgentGateway, Slack, and reference implementations for components whose prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone, swappable library.
+Presidium ships as two packages. `presidium` is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. `presidium-contrib` is the adapters and reference implementations: OPA, OpenBao, AgentGateway, LiteLLM, Slack, several stubbed gateway-backend adapters (Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry), and reference implementations for components whose prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone, swappable library.
 
 This follows the same pattern as Civitas (`civitas` + `civitas-contrib`): the core package defines the contracts, contrib provides the implementations.
 
@@ -26,6 +26,10 @@ presidium/                          # Interface library (pip install presidium)
   providers/
     model.py                        # GovernedModelProvider (PRE_LLM / POST_LLM)
     tool.py                         # GovernedToolProvider (PRE_TOOL / POST_TOOL)
+    gateway.py                      # LLMGatewayBackend + ToolsGatewayBackend protocols (2026-07-07:
+                                     # pluggable operations layer GovernedModelProvider/
+                                     # GovernedToolProvider delegate to — see llm-gateway.md,
+                                     # mcp-gateway.md)
   registry/
     _base.py                        # AgentRegistry protocol
     memory.py                       # InMemoryRegistry (dict-backed, snapshot semantics)
@@ -45,7 +49,15 @@ presidium/                          # Interface library (pip install presidium)
 presidium-contrib/                   # Adapters + reference impls
   opa/engine.py                     # OPA PolicyEngine adapter (REST API)
   openbao/provider.py               # OpenBao CredentialProvider (hvac, MPL 2.0)
-  agentgateway/client.py            # AgentGateway adapter (LLM + MCP + A2A routing)
+  agentgateway/client.py            # AgentGateway adapter — LLMGatewayBackend (shipped) +
+                                     # ToolsGatewayBackend (list_tools/call_tool: gap, see issue)
+  litellm/client.py                 # LiteLLM Proxy adapter — LLMGatewayBackend. Leading 2nd-adapter
+                                     # candidate (2026-07-07 market research), NOT frozen.
+  kong/client.py                    # Kong AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  portkey/client.py                 # Portkey adapter — LLMGatewayBackend. Stubbed.
+  cloudflare_ai_gateway/client.py   # Cloudflare AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  helicone/client.py                # Helicone AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  truefoundry/client.py             # TrueFoundry AI Gateway adapter — LLMGatewayBackend. Stubbed.
   slack/approval.py                 # Slack HITL adapter (Block Kit buttons)
   webhook/approval.py               # Webhook approval adapter (POST + callback)
   registry/postgres.py              # PostgresAgentRegistry (asyncpg)
@@ -75,8 +87,8 @@ presidium-contrib/                   # Adapters + reference impls
 | Trust Scorer | `TrustScorer` | `LinearTrustScore` / `WindowedTrustScorer` | `LearningTrustScorer` | | Trust scoring with windowed aggregation, cold-start, spec pinning |
 | HITL / Approval | `ApprovalService` | `CallbackApprovalProvider` | | Slack, Temporal, PagerDuty | |
 | Audit Enricher | `AuditEnricher` | `InProcessAuditEnricher` | | Datadog, Splunk, ELK (via Civitas AuditSink) | |
-| LLM Gateway | `GovernedModelProvider` | In-process grant checks + rate limits | | AgentGateway (Linux Foundation) | |
-| MCP Governance | `GovernedToolProvider` | In-process ACL checks | | | MCP governance (no standalone library to wrap) |
+| LLM Gateway | `GovernedModelProvider` + `LLMGatewayBackend` | In-process grant checks + rate limits | | AgentGateway (reference, built); LiteLLM (leading 2nd candidate, not frozen); Kong, Portkey, Cloudflare, Helicone, TrueFoundry (stubbed) | |
+| MCP Governance | `GovernedToolProvider` + `ToolsGatewayBackend` | In-process ACL checks | | AgentGateway (sole backend today — MCP+A2A methods pending, see issue) | MCP governance (no standalone library to wrap) |
 
 ---
 
@@ -316,6 +328,17 @@ class GovernedModelProvider(Protocol):
 
     async def check_grants(self, agent: str, model: str) -> bool: ...
     async def remaining_budget(self, agent: str) -> float | None: ...
+
+class LLMGatewayBackend(Protocol):
+    """Pluggable operations layer GovernedModelProvider delegates to after authorization passes.
+    AgentGateway is the reference/built adapter; see llm-gateway.md for the full candidate table
+    (LiteLLM is the current leading 2nd-adapter pick, not frozen)."""
+    async def chat(
+        self, messages: list[dict[str, str]], *, model: str | None = None,
+        agent_name: str | None = None, **kwargs: Any,
+    ) -> dict[str, Any]: ...
+    async def list_models(self) -> list[dict[str, Any]]: ...
+    async def health(self) -> bool: ...
 ```
 
 ### MCP Governance
@@ -331,6 +354,16 @@ class GovernedToolProvider(Protocol):
     ) -> ToolResult: ...
 
     async def check_access(self, agent: str, tool: str) -> bool: ...
+
+class ToolsGatewayBackend(Protocol):
+    """Pluggable operations layer GovernedToolProvider delegates to. call_tool() is deliberately
+    uniform for a classic MCP tool and an A2A-delegated agent (outbound only — see mcp-gateway.md
+    Non-Goals for deferred inbound A2A exposure). AgentGateway is the sole implementation today."""
+    async def list_tools(self, *, agent_name: str | None = None) -> list[dict[str, Any]]: ...
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any], *, agent_name: str | None = None,
+    ) -> dict[str, Any]: ...
+    async def health(self) -> bool: ...
 ```
 
 Existing MCP gateways (incl. Microsoft AGT's MCP Security Gateway) aren't available as standalone libraries to wrap. The reference implementation in `presidium-contrib` adds tool poisoning detection and credential redaction.
@@ -351,7 +384,20 @@ These wrap products that already exist. The adapter implements the Presidium pro
 
 **`adapters/openbao.py`** — OpenBao `CredentialProvider`. Reads secrets from OpenBao/Vault KV v2 engine via `hvac`. Handles token renewal. API-compatible with HashiCorp Vault — existing Vault deployments work unchanged. OpenBao is the MPL 2.0 community fork under Linux Foundation / OpenSSF Sandbox.
 
-**`agentgateway/client.py`** — AgentGateway `GovernedModelProvider` + `GovernedToolProvider`. Routes LLM and MCP calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry observability, A2A protocol support.
+**`agentgateway/client.py`** — AgentGateway `LLMGatewayBackend` (shipped) + `ToolsGatewayBackend`
+(MCP/A2A `list_tools`/`call_tool` methods pending — tracked as an issue). Routes LLM, MCP, and A2A
+calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry
+observability.
+
+**`litellm/client.py`** — LiteLLM Proxy `LLMGatewayBackend`. Current leading candidate for the
+second fully-built backend (2026-07-07 market research: highest OSS adoption signal, MIT license,
+Python-native, self-hostable) — **not frozen**, may change on customer/market signal. LiteLLM does
+not do MCP/A2A, so it does not implement `ToolsGatewayBackend`.
+
+**`kong/client.py`, `portkey/client.py`, `cloudflare_ai_gateway/client.py`, `helicone/client.py`,
+`truefoundry/client.py`** — `LLMGatewayBackend` stubs (interface-conformant, `NotImplementedError`
+bodies). Reserve the extras name and prove the Protocol isn't AgentGateway-shaped-in-disguise
+without committing build effort to all of them.
 
 **`adapters/slack_approval.py`** — Slack `ApprovalService`. Posts approval requests to a Slack channel with approve/deny buttons. Waits for response via Slack Events API.
 

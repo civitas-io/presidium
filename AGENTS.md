@@ -63,7 +63,13 @@ presidium/
 │       └── src/presidium_contrib/
 │           ├── opa/                 # OPA adapter (presidium-contrib[opa])
 │           ├── openbao/             # OpenBao credential backend (presidium-contrib[openbao])
-│           ├── agentgateway/        # AgentGateway adapter (presidium-contrib[agentgateway])
+│           ├── agentgateway/        # AgentGateway adapter — LLM+MCP+A2A gateway backend (reference)
+│           ├── litellm/             # LiteLLM Proxy adapter — LLM-only backend (leading 2nd pick, not frozen)
+│           ├── kong/                # Kong AI Gateway adapter — LLM-only backend (stub)
+│           ├── portkey/             # Portkey adapter — LLM-only backend (stub)
+│           ├── cloudflare_ai_gateway/ # Cloudflare AI Gateway adapter — LLM-only backend (stub)
+│           ├── helicone/            # Helicone AI Gateway adapter — LLM-only backend (stub)
+│           ├── truefoundry/         # TrueFoundry AI Gateway adapter — LLM-only backend (stub)
 │           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
 │           ├── webhook/             # Webhook approval adapter (presidium-contrib[webhook])
 │           ├── registry/            # Reference impl: PostgresAgentRegistry
@@ -184,7 +190,9 @@ All concrete implementations. Organized into two categories:
 |---|---|---|
 | `[opa]` | `presidium_contrib.opa` | Open Policy Agent — for teams already running OPA |
 | `[openbao]` | `presidium_contrib.openbao` | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) — credential management |
-| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — LLM + MCP + A2A routing with CEL policies |
+| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — reference `LLMGatewayBackend` + `ToolsGatewayBackend` (LLM + MCP + A2A) with CEL policies |
+| `[litellm]` | `presidium_contrib.litellm` | LiteLLM Proxy — `LLMGatewayBackend` only. Leading 2nd-adapter pick (2026-07-07 market research), **not frozen** — see `docs/design/llm-gateway.md` |
+| `[kong]`, `[portkey]`, `[cloudflare_ai_gateway]`, `[helicone]`, `[truefoundry]` | `presidium_contrib.{name}` | `LLMGatewayBackend` stubs — interface-conformant, `NotImplementedError`. Reserve the extras name; not built |
 | `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
 
 **Reference Implementations** (components with no standalone library to wrap):
