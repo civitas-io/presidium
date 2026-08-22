@@ -100,9 +100,30 @@ fictional cryptographic-identity claim would be worse than not releasing.
   item above, once the basic binding is fixed. Tracked under M7.
 - [ ] LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —
   real market flexibility; AgentGateway already covers the reference path so this isn't urgent.
-- [ ] Add an explicit `strict`/fail-closed-on-no-match mode to `CelPolicyEngine`. Today, no rule
-  matching a stage silently defaults to `ALLOW` — a real, currently-undecided security posture
-  question, not just a style nit. Worth deciding on purpose rather than leaving implicit.
+- [ ] **Default-deny for `CelPolicyEngine`'s no-rule-matched case — direction decided, implementation
+  deliberately deferred, not a style nit.** Today, no rule matching a stage silently defaults to
+  `ALLOW`. **Explicit real-world preference recorded 2026-08-22**: default DENY over default ALLOW
+  is the right posture, even at real UX cost, because it reduces blast radius — stated directly,
+  not inferred. **A real implementation attempt was made and reverted the same session**, on
+  purpose, once its actual blast radius became concrete: flipping `CelPolicyEngine`'s no-match
+  return from `ALLOW`/`"All policies passed"` to `DENY`/`HARD` broke **24 existing tests** across
+  `test_cel.py`, `test_governed_tool.py`, `test_governed_model.py`, and
+  `test_governed_runtime.py` — because Presidium's whole existing test suite (and, implicitly, its
+  whole current policy-authoring model) assumes an implicit allow-by-default; almost none of the
+  existing example/test policies declare an explicit terminal ALLOW rule. This is not a small,
+  local fix — it is a real change to how every Presidium deployment must author policies (an
+  allowlist model: explicit ALLOW + explicit DENY + explicit REQUIRE_APPROVAL, nothing implicit),
+  and needs its own dedicated design pass, not a one-line patch. **Real, scoped follow-up work
+  needed before implementing**: (1) decide whether this is a hard, unconditional default-deny
+  (matches the stated preference most directly) or a `default_decision`/`strict` constructor
+  parameter (safer migration path, more code); (2) update every existing example/test policy set
+  to add an explicit terminal ALLOW rule wherever one was previously implicit; (3) update
+  `docs/design/policy-engine.md`/`docs/quickstart.md`/any tutorial content that currently shows a
+  policy set without a terminal allow rule, since those examples would now deny everything;
+  (4) decide the exact `reason`/`policy_name` shape for the new default-deny `PolicyResult`
+  (already drafted once: `reason="No policy rule matched this request (fail-closed default — no
+  implicit allow)"`, worth reusing). Revisit as its own, dedicated piece of work — not bundled into
+  M7 or any other milestone by default.
 - [ ] **Add trust ceiling propagation — a real, currently-exploitable "trust washing" gap.**
   Surfaced by a direct comparison against Microsoft's Agent Governance Toolkit
   (`microsoft/agent-governance-toolkit`), whose `AGENTMESH-IDENTITY-TRUST-1.0` spec requires

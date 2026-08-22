@@ -922,3 +922,38 @@ confirmed present in the baseline (before any of this session's changes) and lef
   checklist item updated to point at it
 - `CHANGELOG.md` — real entries
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] design | Default-deny for CelPolicyEngine's no-match case — direction decided, implementation deferred
+
+**Trigger:** Mid-way through the M7 design walkthrough (specifically, deciding what `check_grant()`
+should return when no policy matches a given resource), a direct, explicit preference was stated:
+default DENY over default ALLOW, even at real UX cost, because it reduces blast radius.
+
+**Real attempt made and reverted the same session, on purpose**: flipped `CelPolicyEngine.
+evaluate()`'s no-rule-matched return from `ALLOW`/`"All policies passed"` to `DENY`/`HARD` and ran
+the full test suite to find the real blast radius before committing to anything. **24 tests failed**
+across `test_cel.py`, `test_governed_tool.py`, `test_governed_model.py`, and
+`test_governed_runtime.py` — confirming this is not a small, local fix. Presidium's entire existing
+test suite (and, by extension, its whole current policy-authoring model) assumes implicit
+allow-by-default; almost none of the existing example/test policies declare an explicit terminal
+ALLOW rule. Reverted cleanly (confirmed all 354 tests pass again) rather than force through a
+change with this much real, uninvestigated ripple effect mid-design-session.
+
+**Decision**: the *direction* (default-deny) is decided and recorded, not abandoned — but the
+*implementation* is deliberately deferred as its own, dedicated piece of work, not bundled into M7.
+Real, scoped follow-up items captured directly in `docs/vision/roadmap.md`'s P1 list: choose
+hard-unconditional-deny vs. an opt-in `strict` parameter; update every existing example/test
+policy set to add an explicit terminal ALLOW rule; update tutorial/quickstart content that would
+otherwise silently start denying everything; reuse the already-drafted `DENY`/`HARD`/reason shape
+when this is actually implemented.
+
+**M7's own design proceeds using today's real, current behavior** (no-match → ALLOW) for now —
+`check_grant()`'s documentation will note this default-deny direction as a known, real, pending
+change to core policy semantics, not silently assume it's already in place.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — the P1 item rewritten with the real attempt, its findings, and the
+  concrete follow-up work needed before implementing
+- `docs/log.md` — this entry
