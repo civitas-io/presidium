@@ -8,6 +8,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-22
+
+**First real, published release** (`presidium`/`presidium-contrib` were never previously tagged
+or published to PyPI — confirmed live via PyPI's own JSON API returning 404 for both, and no git
+tags existed before this release). Versioned `0.2.0`, not `0.1.0`, specifically to avoid colliding
+with this file's own pre-existing `[0.1.0] - 2026-06-14` entry below, which documents a real, but
+never-published, M2-completion snapshot — everything in this `[0.2.0]` entry represents real,
+substantial, additional work since then (M3 complete, M7/
+Presidium Server shipped end to end, drop-in Civitas provider adapters, a real Ed25519 identity
+fix). `Development Status` classifier bumped `2 - Pre-Alpha` → `3 - Alpha` to match, per
+`civitas-io/fabrica`'s own precedent at a comparable stage of real, tested maturity.
+
+**Real, current numbers**: 377 presidium core tests (95.69% coverage), 153 presidium-contrib
+tests (83% coverage), 3x stable, `ruff`/`mypy --strict` clean on both packages.
+
 ### Added
 
 #### presidium — Drop-in Civitas ModelProvider/ToolProvider adapters (2026-08-22)

@@ -1,16 +1,23 @@
 # Presidium
 
-**The governed agent platform built on [Civitas](https://github.com/jerynmathew/python-civitas).**
+**The governed agent platform built on [Civitas](https://github.com/civitas-io/python-civitas).**
 
 Runtime + governance as one architecture. Not bolted on, not a sidecar, native.
 
 ---
 
-> **Status:** Pre-alpha. M2 (core interfaces) complete. M3 (contrib adapters + trust scoring) complete. 442 tests, 95%+ coverage, mypy strict, ruff clean.
+> **Status:** Alpha, real and tested, not just designed. M1–M3 complete. **M7 (Presidium Server)
+> shipped**: `GovernedRuntime`'s governance is now reachable over real REST+mTLS
+> (`presidium-contrib[server]`), satisfying [`civitas-io/fabrica`](https://github.com/civitas-io/fabrica)'s
+> `PresidiumClient.check_grant()` contract exactly — verified end to end through an actual
+> `civitas.gateway.HTTPGateway`. `GovernedModelProvider`/`GovernedToolProvider` are also real,
+> drop-in Civitas `ModelProvider`/`ToolProvider` implementations now
+> (`presidium.providers.civitas_adapters`). 530 tests (377 `presidium` + 153
+> `presidium-contrib`), 95.69%/83% coverage, mypy strict, ruff clean.
 
 ## What Is Presidium?
 
-Presidium is a governance layer for AI agent systems, built natively on top of the [Civitas](https://github.com/jerynmathew/python-civitas) agent runtime. Where Civitas provides Erlang/OTP-style supervision trees, message passing, and transport abstraction, Presidium adds:
+Presidium is a governance layer for AI agent systems, built natively on top of the [Civitas](https://github.com/civitas-io/python-civitas) agent runtime. Where Civitas provides Erlang/OTP-style supervision trees, message passing, and transport abstraction, Presidium adds:
 
 - **Agent Registry** — identity, capabilities, trust tracking with grants
 - **Policy Engine** — CEL-based declarative policies enforced as supervisor constraints
@@ -52,26 +59,29 @@ presidium/
 
 | Package | Purpose | Install | Status |
 |---|---|---|---|
-| `presidium` | Protocols, dataclasses, CEL policy engine, scoring library, trust scoring | `pip install presidium` | M3 complete |
-| `presidium-contrib` | Adapters for OPA, OpenBao, AgentGateway, LiteLLM, Slack (+ stubbed gateway backends: Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry); reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M3 complete; gateway backends pluggable as of M3+ (2026-07-07, not frozen) |
+| `presidium` | Protocols, dataclasses, CEL policy engine, scoring library, trust scoring, `GovernedRuntime`, drop-in `ModelProvider`/`ToolProvider` adapters | `pip install presidium` | M1–M3 complete |
+| `presidium-contrib` | Real network server (`presidium-contrib[server]`, M7), adapters for OPA/OpenBao/AgentGateway/Slack/Webhook/Postgres; reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M1–M3 complete; M7 (Presidium Server) shipped |
 
 `presidium` is the only required dependency. `presidium-contrib` extras are opt-in:
 
 ```
+presidium-contrib[server]        # Presidium Server (M7) — check_grant() over real REST+mTLS
 presidium-contrib[opa]           # OPA adapter (for teams already running OPA)
 presidium-contrib[openbao]       # OpenBao credential backend (Vault-compatible, MPL 2.0)
 presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — reference LLM + MCP + A2A gateway
-presidium-contrib[litellm]       # LiteLLM Proxy — LLM-only gateway; current leading 2nd pick, not frozen
 presidium-contrib[slack]         # Slack-based human-in-the-loop
 presidium-contrib[webhook]       # Webhook-based approval provider
 presidium-contrib[postgres]      # PostgreSQL agent registry backend
 ```
 
-LLM Gateway and Tools/MCP Gateway are separate `presidium` Protocols
-(`LLMGatewayBackend`/`ToolsGatewayBackend`) even though AgentGateway ships both in one product —
-see [`docs/design/llm-gateway.md`](docs/design/llm-gateway.md) and
-[`docs/design/mcp-gateway.md`](docs/design/mcp-gateway.md) for why, and for the full adapter
-comparison (Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry are stubbed, not built).
+**Real, current gap, not hidden**: a `LLMGatewayBackend`/`ToolsGatewayBackend` *pluggable-vendor*
+abstraction (letting AgentGateway/LiteLLM/etc. be swapped as interchangeable backends) is designed
+(see [`docs/design/llm-gateway.md`](docs/design/llm-gateway.md) and
+[`docs/design/mcp-gateway.md`](docs/design/mcp-gateway.md)) but not built — there is no
+`presidium-contrib[litellm]` extra yet, despite earlier drafts of this README describing one.
+Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry are stubbed in the design docs only,
+not built either. `AgentGatewayClient` (`presidium-contrib[agentgateway]`) is real today, LLM-side
+only (no `list_tools`/`call_tool` yet).
 
 ### Library Mode vs. Service Mode
 
@@ -96,7 +106,7 @@ Mature products exist for some components. Presidium wraps them:
 |---|---|---|
 | Policy engine | CEL (default), OPA (adapter) | `presidium-contrib[opa]` |
 | Credential management | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) | `presidium-contrib[openbao]` |
-| LLM routing | AgentGateway (reference), LiteLLM (leading 2nd pick, not frozen) | `presidium-contrib[agentgateway\|litellm]` |
+| LLM routing | AgentGateway (reference, real, LLM-side only) | `presidium-contrib[agentgateway]` (LiteLLM is a designed, not-yet-built, leading 2nd-pick candidate — no extra exists yet) |
 | MCP + A2A routing | AgentGateway (sole backend today) | `presidium-contrib[agentgateway]` |
 | Human-in-the-loop | Slack, Webhook | `presidium-contrib[slack]` |
 
