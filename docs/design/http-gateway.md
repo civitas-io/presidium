@@ -2,9 +2,19 @@
 
 > External HTTP interface for Presidium-governed agent systems.
 
-**Status:** Draft (deferred to M4/M5)
-**Package:** TBD (possibly part of `presidium-sdk`)
-**Milestone:** M4+
+**Status:** Superseded 2026-08-22 by
+[`presidium-server-requirements.md`](presidium-server-requirements.md) +
+[`presidium-server.md`](presidium-server.md) (M7) — kept as real historical context, not deleted.
+This doc's own core insight ("Civitas has an HTTP Gateway — Presidium needs to extend it, not
+replace it") was correct when written and is exactly what M7 actually does; it simply sat
+unconnected to any milestone for a long time. The stale `presidium-sdk` package reference below is
+left as written for historical accuracy — that name never matched Presidium's real, shipped
+two-package structure (`presidium`/`presidium-contrib`); see `docs/rfcs/001-presidium-scope.md`'s
+own 2026-08-22 revision note for the same correction made elsewhere.
+
+**Original status:** Draft (deferred to M4/M5)
+**Original package:** TBD (possibly part of `presidium-sdk`)
+**Original milestone:** M4+
 
 ## Problem Statement
 

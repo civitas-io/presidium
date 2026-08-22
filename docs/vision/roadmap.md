@@ -351,13 +351,22 @@ any authenticated caller. M6 would eventually run as a managed, multi-tenant dep
 what M7 builds — not the reverse. Sequenced after M6 in this document because it was scoped
 later, not because it is architecturally dependent on M6.
 
+**Full design finalized 2026-08-22** — [presidium-server-requirements.md](../design/presidium-server-requirements.md)
+and [presidium-server.md](../design/presidium-server.md). The summary below is kept for history;
+the two design docs are now the authoritative source for exactly what gets built.
+
 **Builds on real, existing work — this is a transport skin, not a rewrite:**
 
 - Reuses `GovernedRuntime`'s existing composition (policy engine, registry, approval,
-  credentials, trust) as the implementation behind every endpoint — no new governance logic.
-- Reuses the existing `PolicyEvaluatorServer`/`RegistryServer` GenServer call protocol
-  (`{"action": "evaluate", ...}` / `{"action": "lookup", ...}`) as the internal shape a REST
-  facade translates to/from, rather than inventing a second evaluation path.
+  credentials, trust) as the implementation behind the one real endpoint — no new governance
+  logic.
+- **Finalized design decision, superseding this bullet's original framing**: does **not** recompose
+  `PolicyEvaluatorServer`/`RegistryServer`'s separate GenServer call protocols for `check_grant` —
+  that would mean re-deriving orchestration (lookup → evaluate → approval) that already exists,
+  correctly, as `GovernedRuntime`'s own object graph. Instead, a new, thin `PresidiumGatewayAgent`
+  wraps a `GovernedRuntime` directly. Those two GenServers remain valid for a later, genuinely
+  distributed deployment topology — not this one. See `presidium-server.md`'s own "Architecture"
+  section for the full reasoning.
 - Implements the AAA architecture already designed in
   [RFC-001](../rfcs/001-presidium-scope.md#aaa-architecture-holistic-view) and
   [`docs/research/aaa-patterns.md`](../research/aaa-patterns.md) — this milestone is "build the
@@ -392,17 +401,23 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   above. `GovernedRuntime.start()` now binds a real, persistent `AgentIdentity` per agent;
   `AgentRegistry` gained a real `verify_signature()`. **Still open, not done by this fix**: the
   actual mTLS wiring below (this item only unblocks it by making the underlying key real).
-- [ ] **(P0)** Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
-  reviewed before implementation (per this project's own documentation-driven-development
-  philosophy)
-- [ ] **(P0)** Real decision, not silently picked, **now including a third real option found this
-  session**: new standalone `presidium-server` package vs. a `presidium-contrib[server]` extra vs.
-  **a thin `presidium-contrib[civitas-gateway]` adapter that wires `PolicyEvaluatorServer`/
-  `RegistryServer` behind `civitas.gateway.HTTPGateway`** (see the finding directly above) —
-  record as an ADR either way, but evaluate the third option first given how much it reuses
-- [ ] **(P0)** REST endpoints for all `GovernedRuntime` operations: `PRE_TOOL`/`PRE_LLM`/
-  `PRE_MESSAGE`/`POST_TOOL`/`POST_LLM` evaluation, registry CRUD + grant management, approval
-  request/list/decide, credential resolution
+- [x] **(P0)** Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`.
+  **Done 2026-08-22** — full design walkthrough, real decisions recorded (Option A architecture
+  reusing `civitas.gateway.HTTPGateway`, the `check_grant()` action-mapping algorithm, the new
+  non-blocking `GovernedToolProvider.check_grant()` method, mTLS via a real private CA rather than
+  waiting on SPIRE, a minimal explicit `/health` route). Ready for implementation review.
+- [x] **(P0)** Package shape decided: **`presidium_contrib.server`**, a new module in
+  `presidium-contrib` (extra: `presidium-contrib[server]`, needs `civitas[http]`) — settles the
+  three-option decision below in favor of the `civitas-gateway`-reuse approach, formalized as a
+  real module rather than a separate standalone package.
+- [ ] **(P0)** Implement `PresidiumGatewayAgent` and `GovernedToolProvider.check_grant()` per the
+  now-finalized design docs. `POST /v1/check_grant` + `GET /health` only in this first cut —
+  registry CRUD, approval request/list/decide, and credential resolution remain designed (see
+  `presidium-server.md`'s own "Deferred" section) but explicitly out of scope for now.
+- [ ] **(deferred, tracked not forgotten)** Registry CRUD + grant management, approval
+  request/list/decide, credential resolution over the network — real, designed intents
+  (`presidium-server.md`'s own "Deferred" section sketches how each would extend the same
+  `PresidiumGatewayAgent` pattern), not built until something concretely needs them.
 - [ ] **(P0)** **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract
   exactly**: synchronous REST, `agent_id` + `action` + `scope` in,
   `GrantResult(decision, reason, approval_context)` out (confirmed directly against

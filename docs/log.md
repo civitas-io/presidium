@@ -957,3 +957,71 @@ change to core policy semantics, not silently assume it's already in place.
 - `docs/vision/roadmap.md` — the P1 item rewritten with the real attempt, its findings, and the
   concrete follow-up work needed before implementing
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] design | M7 design finalized — presidium-server-requirements.md + presidium-server.md
+
+**Trigger:** A full, interactive design walkthrough for M7 (Presidium Server), per this project's
+own "documentation-driven development" philosophy (design docs before implementation) and M7's
+own roadmap checklist item calling for exactly these two docs.
+
+**Real decisions made and recorded, each with its own rationale, not asserted flatly:**
+
+1. **Architecture: wrap `GovernedRuntime` as one agent (Option A), not a distributed GenServer
+   mesh (Option B).** `check_grant` needs registry lookup → policy evaluation → approval handling
+   *composed together* — `GovernedRuntime`'s own object graph already does this correctly,
+   in-process, tested. Recomposing it from the separately-deployed `PolicyEvaluatorServer`/
+   `RegistryServer` GenServers would mean re-deriving working orchestration for no immediate
+   benefit. Those GenServers remain valid for a genuinely distributed deployment later — not
+   blocked by this choice.
+2. **The `check_grant` action-mapping algorithm (Option 2, refined)**: `ActionRequest.resource =
+   action` verbatim (the whole original string, colon included), `ActionRequest.action = "invoke"`
+   fixed. Refined from an initial sketch that required a bespoke `"_run"`-suffix-stripping
+   transform for one example (`"skill_run:skill_name"`) that wouldn't generalize.
+3. **A real, new `GovernedToolProvider.check_grant()` method in `presidium` core** (not just
+   server-side glue) — shares lookup/evaluate/audit logic with the existing `check()` via a new
+   private helper, but returns immediately on `REQUIRE_APPROVAL` instead of blocking on
+   `ApprovalService`, matching Fabrica's own suspend/resume expectations rather than Presidium's
+   existing synchronous-approval assumption.
+4. **mTLS clarification, correcting an earlier framing**: Civitas's real `require_client_cert` is
+   X.509 subject-DN-allowlist based — a completely separate identity layer from `AgentRecord.
+   public_key`'s raw Ed25519 keys. mTLS does not need to wait on `presidium-contrib[spiffe]`; it
+   ships now with a simple, real private CA.
+5. **`GET /health` is minimal and explicit**, not Civitas's auto-registered 11-route topology
+   introspection surface — smallest attack surface consistent with the real job.
+6. **Package shape**: `presidium_contrib.server`, a new module (extra: `presidium-contrib[server]`,
+   needs `civitas[http]`).
+
+**A real, separate decision surfaced and explicitly deferred mid-walkthrough**: default-deny for
+`CelPolicyEngine`'s no-match case (see the immediately preceding log entry) — direction decided,
+implementation reverted after a real attempt broke 24 tests, tracked as its own dedicated future
+work. M7's design proceeds on today's real ALLOW-on-no-match behavior, documented as such (NFR-3),
+not silently assumed already fixed.
+
+**Real, pre-existing prior art found and reconciled, not duplicated**: `docs/design/http-gateway.md`
+— an older, "TBD"/deferred draft that had already correctly identified "Civitas has an HTTP
+Gateway, Presidium needs to extend it" but sat disconnected from any real milestone. Marked
+superseded (kept for historical accuracy, not deleted), and its real, still-useful endpoint
+sketches (approval queue, agent list/suspend, policy validate) folded into `presidium-server.md`'s
+own "Deferred" section rather than re-derived from scratch. Also carries the same stale
+`presidium-sdk` package-name issue already corrected elsewhere this session — left as written in
+this specific file for historical accuracy, with a note explaining why.
+
+**Pages added:**
+- `docs/design/presidium-server-requirements.md` — FR-1 through FR-5, NFR-1 through NFR-3, Design
+  Decisions table, Out of Scope
+- `docs/design/presidium-server.md` — Architecture (with diagram), Data Model (real code sketches
+  for `check_grant()`, `PresidiumGatewayAgent`, `GatewayConfig`), Deferred REST surface, Open
+  Questions
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — M7's design-docs checklist item and package-shape item marked done,
+  the stale "reuse PolicyEvaluatorServer/RegistryServer's call protocol" bullet corrected to match
+  the finalized Option A decision
+- `docs/design/http-gateway.md` — marked superseded, historical status preserved
+- `docs/index.md` — design docs table: two new rows, HTTP Gateway row updated
+- `docs/log.md` — this entry (and the immediately preceding default-deny entry)
+
+**Next real step**: implement `GovernedToolProvider.check_grant()` and `PresidiumGatewayAgent` per
+these now-finalized docs.

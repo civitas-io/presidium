@@ -57,7 +57,9 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |
 | [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
 | [Trust Scoring Requirements](design/trust-scoring-requirements.md) | `presidium` + `presidium-contrib` | M3-M6 | Draft |
-| [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Draft (deferred) |
+| [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Superseded by Presidium Server, 2026-08-22 |
+| [Presidium Server Requirements](design/presidium-server-requirements.md) | `presidium` (1 new method) + `presidium-contrib.server` | M7 | Draft (2026-08-22) |
+| [Presidium Server](design/presidium-server.md) | `presidium-contrib.server` (needs `civitas[http]`) | M7 | Draft (2026-08-22) |
 
 ## Research
 
