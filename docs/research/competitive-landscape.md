@@ -36,28 +36,68 @@ Work-Bench (NYC, $160M enterprise VC fund) published "The Rise of the Agent Runt
 
 ### Microsoft Agent Governance Toolkit
 
-**What it is:** Multi-language governance sidecar toolkit for AI agents. 9+ packages across
-Python, TypeScript, .NET, Rust, and Go. Covers policy enforcement, zero-trust identity,
-privilege rings, SLOs, compliance mapping (EU AI Act, NIST, HIPAA), and framework adapters.
+> **Re-verified directly against the real repo, 2026-08-22** (`microsoft/agent-governance-toolkit`,
+> v4.1.0, public preview) — cloned and read, not re-summarized from memory. Corrects and extends
+> the entries below; does not replace this section's own earlier real research.
+
+**What it is:** Multi-language governance toolkit for AI agents. Now 9 packages consolidated into
+**5 top-level PyPI distributions** (`-core`, `-runtime`, `-sre`, `-cli`, `[full]` meta-package) plus
+TypeScript/.NET/Rust/Go SDKs. Covers policy enforcement, zero-trust identity, privilege rings,
+SLOs, compliance mapping (OWASP Agentic Top 10, NIST AI RMF, EU AI Act, SOC 2), and framework
+adapters. **Real, substantial maturity confirmed directly**: 10 formal RFC 2119 specifications
+backed by **992 conformance tests**, 29 ADRs. The policy layer (**ACS — Agent Control
+Specification**) is a stateless, deterministic, fail-closed **Rust core** with a Python SDK built
+via maturin — not the pure-Python model Presidium's `CelPolicyEngine` uses.
 
 **Strengths:** Comprehensive scope. Microsoft backing and enterprise credibility. Multi-language
-SDKs. Framework-agnostic (LangChain, CrewAI, AutoGen, and others).
+SDKs. Framework-agnostic (LangChain, CrewAI, AutoGen, Semantic Kernel, Microsoft Agent Framework,
+Google ADK, and others). Own honest "Known Limitations" doc naming real gaps (a composability gap
+where two individually-permitted actions form an exfiltration path; audit logs record attempts,
+not outcomes; a knowledge-governance gap around RAG provenance) rather than overclaiming.
 
 **Gaps:**
-- No runtime — governance sidecar only. Enforcement depends on agents passing through the
-  gateway; direct API calls and inter-agent messages that bypass the gateway are not covered.
-- Significant complexity — 9+ packages, multi-language monorepo.
-- Privilege rings (`agent-runtime`) are partially unimplemented in the current release.
+- No runtime — governance middleware only, not an actor-model runtime. Their own README states
+  enforcement happens "at the application middleware layer, not the OS kernel level," and
+  explicitly recommends running each agent in a separate container for OS-level isolation —
+  something they don't build themselves. (`civitas-io/fabrica` already does, with real
+  hardware-validated tiers — see `projects/fabrica.md`.)
+- Significant complexity — 9 packages, 5 distributions, multi-language monorepo.
+- **"Privilege rings partially unimplemented" (prior entry): not re-verified this pass** —
+  don't treat as still-current without checking the real v4.1.0 source directly.
+
+**Two real, concrete gaps this comparison surfaced in Presidium itself, not just in AGT** (now
+tracked in `docs/vision/roadmap.md`'s Implementation Priority → P1): no trust ceiling propagation
+(AGT's `AGENTMESH-IDENTITY-TRUST-1.0` spec prevents "trust washing" — repeatedly spawning fresh
+identities to reset a degraded trust score — via a `trust_ceiling` enforced across delegation
+chains; Presidium has no equivalent), and no enforcement of monotonic capability narrowing on
+delegation/spawn (a child agent can currently end up with *more* grants than its parent).
 
 **Presidium's differentiators:**
 
 | Presidium | Microsoft AGT |
 |---|---|
-| Governance native to the runtime — supervisor constraints, not interceptors | External sidecar — wraps existing agents |
-| Transport-layer enforcement — every message, regardless of routing path | Gateway-only coverage |
-| OTP supervision as structural trust root | Policy-defined trust hierarchy |
+| Governance native to the runtime — supervisor constraints, not interceptors | Application middleware layer — wraps existing agents |
+| Transport-layer enforcement via `GovernedMessageBus` — every message routed through Civitas | Explicit whole-turn `input`/`output` intervention points bracket the full agent loop (a genuinely different, not strictly worse, model — see below) |
+| OTP supervision as structural trust root | Policy-defined trust hierarchy + a formal agent-to-agent trust handshake protocol (IATP) Presidium has no equivalent of |
 | Mid-flight behavioral correction via EvalLoop + CorrectionSignal | Post-hoc evaluation |
-| Single Python-native package | Multi-language, multi-package complexity |
+| Single Python-native package, pure-Python CEL engine (`cel-python`) | Multi-language, multi-package; Rust-core policy engine (ACS) |
+
+**Where AGT is genuinely more built out, worth learning from directly:**
+- MCP governance: message signing (HMAC + replay protection), session tokens with TTL, sliding-
+  window rate limiting, per-server TLS/auth enforcement, CVE feed integration via the OSV API,
+  cross-server confused-deputy detection — all real gaps versus Presidium's current `mcp_gateway`
+  (PII detection, tool-poisoning hash fingerprinting, credential redaction only).
+- ACS's `transform` verdict type unifies "decide" and "sanitize" into one policy output, instead
+  of Presidium's separate redaction/masking utilities layered on top of a decision.
+- Formal RFC 2119 specs paired with dedicated conformance test suites, as a distinct discipline
+  from test coverage percentage — worth considering as Presidium's own design docs mature.
+
+**Where Presidium/the broader civitas-io ecosystem may already be ahead — stated with real
+evidence, not assumed:** `civitas-io/tessera`'s agent-blind credential model (a secret never
+enters agent-observable memory at all) is arguably stronger than AGT's own admitted "Credential
+Persistence Gap" (AGT tracks and revokes at boundaries, but doesn't prevent exposure in the first
+place). `civitas-io/fabrica`'s three real, hardware-validated sandbox tiers directly answer the
+OS-level isolation gap AGT names as external to itself.
 
 ### Fiddler ($100M total funding, Series C Jan 2026)
 
