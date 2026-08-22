@@ -648,3 +648,36 @@ a parenthetical, now its own first-class item.
 **Pages updated:**
 - `docs/vision/roadmap.md` — M7 section, two explicit checklist items replacing one bundled bullet
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] design | New milestone M8: Performance Research — Rust vs. Python at the governance hot path
+
+**Trigger:** A direct question drawing on real, external precedent already cited in this repo's
+own `docs/design/llm-gateway.md` — AgentGateway (Rust) scales structurally differently than
+LiteLLM Proxy (pure Python), which is reportedly moving toward a Rust rewrite for that reason.
+Presidium's own policy-evaluation hot path has the identical shape: pure Python, synchronous,
+in the critical path of every governed action.
+
+**Real benchmarks run before writing anything down, not assumed:**
+- `CelPolicyEngine.evaluate()` (confirmed pure-Python `cel-python`/`celpy`, a `lark`-based
+  tree-walking interpreter — no Rust/C core): ~88μs/call, ~11,400 evals/sec on one core with 20
+  loaded rules, first-match-wins.
+- `InMemoryRegistry.lookup()`: ~9μs/call, ~112,000 lookups/sec on one core — not the bottleneck.
+- The real constraint is the GIL, not the per-call cost in isolation: this ceiling doesn't rise
+  with more cores within one process, only via horizontal replicas — the same structural shape
+  as AgentGateway's advantage over LiteLLM.
+
+**Decision:** Added M8 to `docs/vision/roadmap.md`, sequenced after M7 (this only becomes a real,
+load-bearing concern once Presidium is an externally-callable, multi-tenant service — library-mode
+usage today pays this cost once per call inside an agent's own loop, negligible next to LLM
+latencies). Scoped explicitly as a **research milestone, not a rewrite commitment** — four options
+listed (horizontal scaling only, free-threaded CPython/PEP 703, a Rust-backed CEL evaluator behind
+the existing `PolicyEngine` Protocol, or a fuller Rust rewrite of the M7 network layer
+specifically), deliverable is a design doc with real numbers and a recommendation, not code. Matches
+this project's own "ship the default, revisit only with evidence" discipline (same discipline that
+shipped `fabrica`'s retriever as pure Python v1 without pre-optimizing in Rust).
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — new M8 section, Timeline table row
+- `docs/log.md` — this entry

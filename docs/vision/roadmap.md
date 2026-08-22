@@ -237,6 +237,76 @@ unblocks Fabrica's `PresidiumClient` real implementation, and the technical foun
 
 ---
 
+## M8: Performance Research — Rust vs. Python at the governance hot path
+
+**Goal:** A research milestone, not a rewrite commitment. Answer, with real measured evidence,
+whether any part of Presidium's request-path hot loop needs to move off pure Python — and if so,
+which part, and how — before it becomes a real production bottleneck rather than after.
+
+**Trigger:** A direct, evidence-based comparison already exists one layer down: AgentGateway
+(Rust) vs. LiteLLM Proxy (pure Python) is cited in `docs/design/llm-gateway.md`'s own adapter
+table as a real, named trade-off (LiteLLM needs Postgres+Redis to scale where AgentGateway is a
+single binary) — and LiteLLM itself is reportedly moving toward a Rust rewrite for exactly this
+reason. Presidium's own policy-evaluation hot path has the same structural shape as LiteLLM's:
+pure Python, in the synchronous critical path of every governed action, GIL-bound within a
+process. Worth checking with real numbers before assuming either "it's fine" or "it needs Rust."
+
+**Real, measured baseline established while scoping this (not a guess):**
+
+- `CelPolicyEngine.evaluate()` (`cel-python`/`celpy`, confirmed pure Python — a `lark`-based
+  tree-walking interpreter, no Rust/C core): **~88µs per evaluation, ~11,400 evaluations/sec on
+  one core**, with 20 loaded rules, first-match-wins. This is the dominant cost in a `check()`
+  call — registry lookups are ~10x cheaper (see below) — and scales with rule count, since
+  first-match-wins means a request that matches no rule (the common ALLOW case) evaluates every
+  loaded rule for that stage.
+- `InMemoryRegistry.lookup()` (deep-copy snapshot semantics): **~9µs, ~112,000 lookups/sec on one
+  core.** Not the bottleneck; CEL evaluation is.
+- **The real constraint is the GIL, not raw per-call cost.** ~88µs in isolation is not
+  catastrophic — the problem is that Python's GIL means this ceiling does not rise with more CPU
+  cores *within a single process*; scaling past it today means horizontal replicas, not vertical
+  throughput. This is exactly the shape of AgentGateway's structural advantage over LiteLLM.
+
+**Why this isn't urgent yet, and why it will become real precisely at M7:** In today's
+library-mode usage, this cost is paid once per tool/LLM call inside an agent's own async loop —
+negligible next to LLM call latencies (milliseconds vs. seconds), and concurrency is naturally
+bounded by how many agents one Civitas runtime hosts. **It becomes a real, load-bearing question
+specifically once M7 exists** — a shared, multi-tenant, externally-callable service is the first
+place Presidium has the same concurrent-request profile AgentGateway/LiteLLM actually have.
+Sequenced after M7 for this reason, not because it's unimportant.
+
+**Research questions, not answers pre-decided:**
+
+- [ ] Benchmark realistic Presidium call paths (not isolated micro-benchmarks) under real
+  concurrent load against an actual M7 server, once it exists — rule-set sizes and concurrency
+  levels drawn from a real or realistic deployment, not synthetic worst cases
+- [ ] Option A — horizontal scaling only (multiple `presidium-server` OS processes/replicas
+  behind a load balancer), zero code changes, cheapest engineering cost. Does this alone clear a
+  realistic target QPS?
+- [ ] Option B — free-threaded CPython (PEP 703, the `3.13t`/`3.14t` builds). Presidium already
+  targets 3.12/3.13/3.14. Does removing the GIL alone close the gap without introducing Rust at
+  all? A real, current option that didn't exist when AgentGateway/LiteLLM made their original
+  language choices.
+- [ ] Option C — a Rust-backed CEL evaluator behind the same `PolicyEngine` Protocol (e.g. a
+  `cel-rust` + PyO3 binding), keeping the rest of `presidium` pure Python. Matches this
+  project's own interface-library discipline: swap the implementation, not the Protocol.
+- [ ] Option D — a fuller Rust rewrite of the M7 network-facing layer specifically (the part
+  structurally equivalent to AgentGateway), leaving `presidium`/`presidium-contrib` as pure-Python
+  libraries for embedded/library-mode use. Most invasive; only worth it if A-C don't clear the bar.
+- [ ] MCP governance's regex-based scanning (`PIIDetector`, `PoisoningDetector`, redaction) —
+  CPU-bound string processing over potentially large tool outputs, a second real GIL-bound cost
+  center worth benchmarking alongside policy evaluation, not assumed fine by proximity.
+
+**Deliberately not decided here, per this project's own "ship the default, revisit only with
+evidence" discipline** (the same discipline that shipped `fabrica`'s retriever as pure Python v1
+rather than pre-optimizing in Rust): no component gets rewritten in Rust as part of this
+milestone. The deliverable is a design doc with real numbers and a recommendation, not code.
+
+**Deliverable:** `docs/design/performance-research.md` — real benchmark results against an actual
+M7 deployment, a clear recommendation (which option, if any, and why), and either a follow-up
+implementation milestone or an explicit "pure Python is sufficient, revisit if X changes" call.
+
+---
+
 ## Future Investigation: Multi-Dimensional Evaluation
 
 > See [RFC-002](../rfcs/002-multi-dimensional-evaluation.md)
@@ -260,3 +330,4 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 | M5: SDK + CLI | Q1 2027 | Planning |
 | M6: Cloud | 2027+ | Future |
 | M7: Presidium Server | TBD | Planning |
+| M8: Performance Research (Rust vs. Python) | After M7 | Planning |
