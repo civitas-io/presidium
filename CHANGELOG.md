@@ -8,6 +8,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-22
+
+### Fixed
+
+#### presidium — A real, live packaging bug: `import presidium` failed without the `[sqlite]` extra
+
+- **`presidium/__init__.py` eagerly imports `SqliteRegistry`, and `presidium.registry.sqlite`
+  unconditionally `import`ed `aiosqlite` at module level** — meaning a plain `pip install
+  presidium` (the documented, base install) could not even `import presidium` at all. **Found by
+  actually verifying the real, just-published v0.2.0 wheel in a fresh venv, not assumed working**
+  — the exact verification step this project's own discipline calls for, which is precisely what
+  caught this before it went any further unnoticed.
+- Fixed with the same lazy-import + helpful-error pattern `civitas.security.identity` already
+  uses for `pynacl` (`"pip install 'civitas[security]'"`): `aiosqlite` is now only imported inside
+  `SqliteRegistry._conn()`, on first real use, raising a real, helpful `PresidiumError` ("Install
+  it with: pip install 'presidium[sqlite]'") if genuinely missing. Constructing a `SqliteRegistry`
+  instance no longer requires `aiosqlite` at all — only actually using it does.
+- **`presidium-contrib` does not have this bug** — its own `__init__.py` is empty and eagerly
+  imports nothing, confirmed by the same real, fresh-venv verification. No fix needed there.
+- 3 new tests, including a cheap, precise, direct regression guard (source-inspects
+  `presidium/registry/sqlite.py` for a reintroduced module-level `import aiosqlite`) so this exact
+  class of bug can't silently recur. All 380 tests pass, 3x stable.
+
 ## [0.2.0] - 2026-08-22
 
 **First real, published release** (`presidium`/`presidium-contrib` were never previously tagged

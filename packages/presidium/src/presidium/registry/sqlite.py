@@ -5,14 +5,39 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import aiosqlite
-
-from presidium.errors import AgentNotFoundError, GrantNotFoundError
+from presidium.errors import AgentNotFoundError, GrantNotFoundError, PresidiumError
 from presidium.identity import verify_agent_signature
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
 from presidium.trust import LinearTrustScore
+
+if TYPE_CHECKING:
+    # 2026-08-22 fix: a real, live packaging bug. `aiosqlite` was imported
+    # unconditionally at module level, and `presidium/__init__.py` eagerly
+    # imports `SqliteRegistry` -- meaning a plain `pip install presidium`
+    # (no extras) could not even `import presidium` at all, confirmed live
+    # against the real published v0.2.0 wheel in a fresh venv. `aiosqlite`
+    # is only needed for real, at runtime, inside `_conn()` below -- moved
+    # there as a lazy import with a helpful ConfigurationError, matching
+    # civitas.security.identity's own real "pip install 'X[extra]'" pattern
+    # exactly. This TYPE_CHECKING import keeps the type annotations below
+    # real for mypy without requiring aiosqlite at plain-import time (safe
+    # because `from __future__ import annotations` makes every annotation a
+    # lazily-evaluated string at runtime).
+    import aiosqlite
+
+
+def _require_aiosqlite() -> Any:
+    try:
+        import aiosqlite
+    except ImportError as exc:
+        raise PresidiumError(
+            "aiosqlite is required for SqliteRegistry. "
+            "Install it with: pip install 'presidium[sqlite]'"
+        ) from exc
+    return aiosqlite
+
 
 _CREATE_TABLES = """
 CREATE TABLE IF NOT EXISTS agent_records (
@@ -135,6 +160,7 @@ class SqliteRegistry:
 
     async def _conn(self) -> aiosqlite.Connection:
         if self._db is None:
+            aiosqlite = _require_aiosqlite()
             self._db = await aiosqlite.connect(self._db_path)
             self._db.row_factory = aiosqlite.Row
             await self._db.execute("PRAGMA journal_mode=WAL")

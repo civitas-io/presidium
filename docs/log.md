@@ -1203,3 +1203,50 @@ Cannot be done via API.
 - `packages/presidium/pyproject.toml`/`packages/presidium-contrib/pyproject.toml` — version +
   classifier bumps
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] fix | v0.2.1 — a real, live bug found only by actually verifying the published v0.2.0 wheel
+
+**Trigger:** After `presidium` v0.2.0 published successfully to PyPI, the release process's own
+final verification step (a fresh-venv `pip install` + real imports — the exact discipline this
+project has followed for every real release, not a formality) caught a genuine, live bug: `import
+presidium` failed entirely with `ModuleNotFoundError: No module named 'aiosqlite'`.
+
+**Root cause**: `presidium/__init__.py` eagerly imports `SqliteRegistry` (for a nicer, top-level
+public API), and `presidium/registry/sqlite.py` had an unconditional, module-level `import
+aiosqlite` — but `aiosqlite` is declared only as the optional `[sqlite]` extra, never a core
+dependency. A plain `pip install presidium` (the documented, base install — "`presidium` is the
+only required dependency") therefore could not even be imported at all. This had never been
+caught locally because every local dev/test environment already had `aiosqlite` installed via
+`--all-extras`.
+
+**Fixed** with the exact same lazy-import + helpful-error pattern `civitas.security.identity`
+already uses for `pynacl` — moved the real `import aiosqlite` into a new `_require_aiosqlite()`
+helper, called only inside `SqliteRegistry._conn()` (the one place it's genuinely needed, on first
+real use), raising a real `PresidiumError` with an install hint if genuinely missing. The
+type-only `aiosqlite.Row`/`aiosqlite.Connection` annotations moved into a `TYPE_CHECKING` guard —
+safe because `from __future__ import annotations` already makes every annotation a lazily-
+evaluated string at runtime, so mypy still sees the real types without requiring the import.
+
+**Checked, not assumed: `presidium-contrib` does not have this bug.** Its own `__init__.py` is
+empty and imports nothing eagerly — confirmed via the same real, fresh-venv verification. No fix
+needed or shipped for `presidium-contrib`; it stays at v0.2.0.
+
+**Verification, the real point of this whole entry**: a completely fresh venv, `pip install
+packages/presidium` with `aiosqlite` genuinely absent (confirmed via a real, separate `import
+aiosqlite` failing first) — `import presidium` and every real submodule import now succeed.
+Re-installed `aiosqlite` and confirmed `SqliteRegistry` itself still works end to end (register +
+lookup) once it's actually present. 3 new tests, including a cheap, precise, direct regression
+guard (source-inspects the file for a reintroduced module-level `import aiosqlite`). All 380 tests
+pass, 3x stable. `ruff`/`mypy --strict` clean.
+
+**Versioned `0.2.1`, a real patch release** — a genuine bug fix, not a feature, released
+immediately rather than left live and broken.
+
+**Pages updated:**
+- `packages/presidium/src/presidium/registry/sqlite.py` — the real fix
+- `packages/presidium/tests/unit/registry/test_sqlite_lazy_import.py` — new tests
+- `packages/presidium/pyproject.toml` — version bump
+- `CHANGELOG.md` — real `[0.2.1]` entry
+- `docs/log.md` — this entry
