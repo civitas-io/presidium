@@ -72,25 +72,35 @@ structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) 
 - [ ] **Build M7 (Presidium Server) itself.** Without it, Presidium cannot be reached by anything
   outside a single Civitas process — including Fabrica. This is the actual structural gap between
   "three separate pillars" and "one integrated platform." See the M7 section below.
-- [ ] **Wire `GovernedModelProvider`/`GovernedToolProvider` to actually call a backend, not just
-  check permission.** Today `check()`/`post_check()` return a decision and stop — there is no
-  `LLMGatewayBackend`/`ToolsGatewayBackend` implementation anywhere
-  (`presidium/providers/gateway.py` doesn't exist). **Correction to an earlier, slightly
-  overstated framing of this same gap**: this does *not* block Fabrica's `PresidiumClient` —
-  `check_grant()` only needs a decision, and Fabrica executes tool calls itself in its own
-  sandbox. It blocks something more fundamental: **`GovernedModelProvider`/`GovernedToolProvider`
-  cannot actually be used as a drop-in Civitas `ModelProvider`/`ToolProvider` today**, despite
-  that being their stated purpose in RFC-001 and the design docs' own code samples. Not tracked
-  in any single M-section before this — tracked here directly. Independent of M7 (this is a
-  library-mode gap, not a network-layer one), but naturally worth doing alongside M7 since both
-  draw on the same 2026-07-07 pluggable-backend design
-  (`docs/design/llm-gateway.md`/`mcp-gateway.md`).
+- [x] **Wire `GovernedModelProvider`/`GovernedToolProvider` to actually call a backend, not just
+  check permission.** **Done 2026-08-22.** New `presidium.providers.civitas_adapters` module:
+  `GovernedModelProviderAdapter`/`GovernedToolAdapter`, real structural implementations of
+  `civitas.plugins.model.ModelProvider`/`civitas.plugins.tools.ToolProvider`, each constructed
+  per-agent (`agent_name` bound at construction — the same, already-established pattern
+  `civitas.process.AgentProcess.connect_mcp()` uses for `civitas-io/fabrica`'s own `MCPTool`, not
+  a new one invented here). `GovernedRuntime` gained `model_for(agent_name, backend)`/
+  `tool_for(agent_name, backend)` factory methods, mirroring Civitas's own `model_for()` naming.
+  DENY still **raises** `PolicyDeniedError` (reusing `check()`'s existing behavior exactly) — a
+  real, deliberate difference from `check_grant()`'s non-raising HTTP-boundary design, correct
+  here because an in-process Python exception through the calling agent's own error boundary is
+  the idiomatic Civitas convention, not a limitation to work around. 13 new tests, both new/
+  touched modules at 100%/83% coverage (`runtime.py`'s remaining gap is pre-existing, unrelated).
+  **Scope note, precise not overclaimed**: this solves "can `GovernedModelProvider`/
+  `GovernedToolProvider` be a drop-in Civitas `ModelProvider`/`ToolProvider`" — it does **not**
+  build the separate, larger `LLMGatewayBackend`/`ToolsGatewayBackend` *pluggable-vendor*
+  abstraction from `docs/design/llm-gateway.md`/`mcp-gateway.md` (AgentGateway/LiteLLM/etc. as
+  swappable backends) — that remains real, designed, not built (P1 above). `backend:
+  ModelProvider`/`backend: ToolProvider` here can already be *any* object satisfying those real
+  Civitas Protocols, including a future pluggable-vendor adapter, without further changes to
+  these two new classes.
 
-**Recommended sequence** (cheapest/most urgent first, not milestone order): Ed25519 binding fix →
-`civitas` PyPI pin → `service/*` test coverage → M7 network layer → `GovernedModelProvider`/
-`GovernedToolProvider` backend wiring. Shipping a first real `presidium`/`presidium-contrib` PyPI
-release (see M5/P1 below) should wait until all five of these are true — releasing with a
-fictional cryptographic-identity claim would be worse than not releasing.
+**Recommended sequence** (cheapest/most urgent first, not milestone order): ~~Ed25519 binding fix~~
+→ ~~`civitas` PyPI pin~~ → ~~`service/*` test coverage~~ → ~~M7 network layer~~ →
+~~`GovernedModelProvider`/`GovernedToolProvider` backend wiring~~. **All five done as of
+2026-08-22.** Shipping a first real `presidium`/`presidium-contrib` PyPI release (see M5/P1 below)
+can now genuinely be considered — the fictional-cryptographic-identity-claim blocker that made
+releasing premature before is resolved. M5 itself (CLI, docs site, example applications) is still
+real, separate work, not automatically unblocked by this alone.
 
 ### P1 — real, designed, necessary for genuine production-readiness, not immediately blocking
 

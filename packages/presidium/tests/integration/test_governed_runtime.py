@@ -288,3 +288,72 @@ class TestRealIdentityBinding:
         assert (
             await rt.registry.verify_signature("researcher", b"different data", signature) is False
         )
+
+
+class TestModelForToolFor:
+    """GovernedRuntime.model_for()/tool_for() -- the real factory methods a
+    governed agent's own on_start() calls to get a policy-enforced drop-in
+    civitas ModelProvider/ToolProvider. See presidium.providers.
+    civitas_adapters for the adapters' own, more thorough unit tests -- these
+    confirm the factory methods themselves wire the real GovernedRuntime
+    state (self.model_provider/self.tool_provider) through correctly.
+    """
+
+    async def test_model_for_returns_a_real_civitas_model_provider(self) -> None:
+        from civitas.plugins.model import ModelResponse
+
+        class _FakeBackend:
+            async def chat(self, model, messages, tools=None):  # type: ignore[no-untyped-def]
+                return ModelResponse(content="ok", model=model, tokens_in=1, tokens_out=1)
+
+        rt = await _make_runtime_with_agent()
+        adapter = rt.model_for("researcher", _FakeBackend())
+
+        response = await adapter.chat("claude-sonnet", [{"role": "user", "content": "hi"}])
+        assert response.content == "ok"
+
+    async def test_model_for_enforces_the_real_runtime_policy_engine(self) -> None:
+        """Confirms model_for() wires the SAME engine/registry as the rest of
+        this GovernedRuntime instance, not a fresh, disconnected one."""
+        from civitas.plugins.model import ModelResponse
+
+        class _FakeBackend:
+            async def chat(self, model, messages, tools=None):  # type: ignore[no-untyped-def]
+                return ModelResponse(content="ok", model=model, tokens_in=1, tokens_out=1)
+
+        rt = await _make_runtime_with_agent()
+        adapter = rt.model_for("researcher", _FakeBackend())
+
+        with pytest.raises(PolicyDeniedError):
+            await adapter.chat("gpt-4", [])  # no grant for "llm:gpt-4" in the fixture
+
+    async def test_tool_for_returns_a_real_civitas_tool_provider(self) -> None:
+        class _FakeBackend:
+            name = "web_search"
+            schema = {"type": "object"}
+
+            async def execute(self, **kwargs):  # type: ignore[no-untyped-def]
+                return {"results": []}
+
+        rt = await _make_runtime_with_agent()
+        adapter = rt.tool_for("researcher", _FakeBackend())
+
+        assert adapter.name == "web_search"
+        assert adapter.schema == {"type": "object"}
+        assert await adapter.execute(query="hi") == {"results": []}
+
+    async def test_tool_for_enforces_the_real_runtime_policy_engine(self) -> None:
+        class _FakeBackend:
+            name = "database"  # no grant for "tool:database" write in the fixture
+            schema = {"type": "object"}
+
+            async def execute(self, **kwargs):  # type: ignore[no-untyped-def]
+                return {}
+
+        rt = await _make_runtime_with_agent()
+        adapter = rt.tool_for("researcher", _FakeBackend())
+
+        # The fixture's "researcher" only has a "read" grant on tool:database;
+        # check() defaults action to "invoke", which isn't granted.
+        with pytest.raises(PolicyDeniedError):
+            await adapter.execute()

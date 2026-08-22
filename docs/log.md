@@ -1081,3 +1081,64 @@ a real, separate, valuable addition tracked but not done here.
   the `scope` gap tracked as its own item
 - `CHANGELOG.md` — real entries
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] fix | Drop-in Civitas ModelProvider/ToolProvider adapters shipped — P0 sequence complete
+
+**Trigger:** The last item of the original five-item P0 sequence: make `GovernedModelProvider`/
+`GovernedToolProvider` usable as drop-in Civitas `ModelProvider`/`ToolProvider`s, per RFC-001's
+own stated purpose for them.
+
+**Real design constraint found before writing code, not assumed**: neither
+`civitas.plugins.model.ModelProvider.chat()` nor `civitas.plugins.tools.ToolProvider.execute()`
+carries agent identity in its own call signature — `self.llm`/`self.tools` are typically shared
+across a whole Supervisor tree (`agent.llm = self.llm` on spawn, per `civitas/supervisor.py`).
+Confirmed a real, already-established precedent solves this exact problem elsewhere in the same
+codebase: `civitas.process.AgentProcess.connect_mcp()` already constructs `MCPTool(client, schema,
+..., agent_name=self.name)` — a per-agent-bound `ToolProvider` instance, built fresh for each
+agent with its own identity closed over at construction time. Matched this pattern directly rather
+than inventing a new one.
+
+**Shipped**: `presidium.providers.civitas_adapters.GovernedModelProviderAdapter`/
+`GovernedToolAdapter` — real structural `ModelProvider`/`ToolProvider` implementations (confirmed
+via `mypy --strict`, neither Protocol is `@runtime_checkable` so structural typing is the only
+real conformance check available). `GovernedRuntime.model_for(agent_name, backend)`/
+`tool_for(agent_name, backend)` factory methods, mirroring Civitas's own `model_for()` naming.
+DENY raises `PolicyDeniedError` — reusing `check()`'s existing, unmodified behavior exactly,
+deliberately different from `check_grant()`'s non-raising design (an in-process exception through
+the calling agent's own error boundary/supervision is the correct, idiomatic convention here;
+there's no HTTP boundary to keep from raising across).
+
+**A real architectural principle stated directly during the design conversation, worth recording
+verbatim**: Civitas is generic and has no concept of governance; Presidium is the opinionated
+layer that wraps a real backend with governance, on top of it, never replacing it. This is exactly
+what these two adapters do — `backend: ModelProvider`/`backend: ToolProvider` is any real object
+satisfying Civitas's own Protocols, and the adapter is *also* a real `ModelProvider`/`ToolProvider`
+itself, so it can be dropped in anywhere the un-governed version could.
+
+**Verification**: 13 new tests (`test_civitas_adapters.py` using real, minimal fake backends that
+structurally satisfy Civitas's own Protocols — not mocks; plus `TestModelForToolFor` in
+`test_governed_runtime.py`, confirming the factory methods wire the real, shared
+`GovernedRuntime.model_provider`/`.tool_provider` state through correctly, not a fresh disconnected
+instance). `civitas_adapters.py` at 100% coverage. All 377 presidium tests + 153 presidium-contrib
+tests pass, 3x stable. `ruff`/`mypy --strict` clean.
+
+**Scope note, precise, not overclaimed**: this solves "can these be a drop-in Civitas
+`ModelProvider`/`ToolProvider`" — it does **not** build the separate, larger pluggable-vendor
+`LLMGatewayBackend`/`ToolsGatewayBackend` abstraction from `docs/design/llm-gateway.md`/
+`mcp-gateway.md` (AgentGateway/LiteLLM/etc. as swappable backends). That remains real, designed,
+not built. `backend:` here can already be any object satisfying Civitas's real Protocols,
+including a future pluggable-vendor adapter, without further changes to these two classes.
+
+**All five items of the original P0 sequence (Ed25519 binding, civitas PyPI pin, `service/*`
+coverage, M7/Presidium Server, this item) are now done.** A first real `presidium`/
+`presidium-contrib` PyPI release can genuinely be considered — the fictional-cryptographic-
+identity-claim blocker is resolved. M5 (CLI, docs site, examples) remains its own, separate,
+real work, not automatically unblocked by this alone.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — the P0 item marked done with full detail; the "Recommended sequence"
+  line updated to reflect all five items complete
+- `CHANGELOG.md` — real entries
+- `docs/log.md` — this entry

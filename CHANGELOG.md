@@ -10,6 +10,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ### Added
 
+#### presidium — Drop-in Civitas ModelProvider/ToolProvider adapters (2026-08-22)
+
+- **New `presidium.providers.civitas_adapters` module**: `GovernedModelProviderAdapter`/
+  `GovernedToolAdapter`, real structural implementations of
+  `civitas.plugins.model.ModelProvider`/`civitas.plugins.tools.ToolProvider`. Each wraps one real
+  backend + policy enforcement, constructed **per agent** (`agent_name` bound at construction) —
+  the same, already-established pattern `civitas.process.AgentProcess.connect_mcp()` uses for
+  `civitas-io/fabrica`'s own `MCPTool`.
+- **`GovernedRuntime` gained `model_for(agent_name, backend)`/`tool_for(agent_name, backend)`**
+  factory methods, mirroring Civitas's own `AgentProcess.model_for()` naming convention. A
+  governed agent's own `on_start()` sets `self.llm = governed_runtime.model_for(self.name,
+  backend=real_provider)` to make its LLM/tool calls governed, transparently.
+- `PolicyDeniedError` still **raises** on DENY here (reusing `check()`'s existing behavior
+  exactly) — a real, deliberate difference from `presidium_contrib.server`'s non-raising
+  `check_grant()` HTTP boundary; an in-process exception through the calling agent's own error
+  boundary is the correct, idiomatic Civitas convention for this use case.
+- 13 new tests, both new/touched modules at 100%/83% coverage.
+
 #### presidium + presidium-contrib — Presidium Server: check_grant() shipped (2026-08-22)
 
 - **`GovernedToolProvider.check_grant(agent_name, resource, action="invoke") -> PolicyResult`** —

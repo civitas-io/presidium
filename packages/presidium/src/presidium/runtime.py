@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 from civitas import Runtime
+from civitas.plugins.model import ModelProvider
+from civitas.plugins.tools import ToolProvider
 from civitas.process import AgentProcess
 from civitas.secrets.substitution import substitute_vars
 from civitas.security.identity import AgentIdentity
@@ -18,6 +20,7 @@ from presidium.credentials import CredentialProvider, EnvCredentialProvider
 from presidium.model import AgentRecord, EvaluationStage, Grant, PolicyDecision, PolicyRule
 from presidium.policy._base import PolicyEngine
 from presidium.policy.cel import CelPolicyEngine
+from presidium.providers.civitas_adapters import GovernedModelProviderAdapter, GovernedToolAdapter
 from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry._base import AgentRegistry
@@ -186,6 +189,30 @@ class GovernedRuntime:
         if self._runtime is None:
             raise RuntimeError("No Civitas runtime configured")
         await self._runtime.send(agent_name, payload, **kwargs)
+
+    def model_for(self, agent_name: str, backend: ModelProvider) -> GovernedModelProviderAdapter:
+        """Wrap a real civitas ModelProvider with policy enforcement, bound to
+        one agent. Mirrors civitas's own `AgentProcess.model_for()` naming
+        convention directly. Assign the result to that agent's own `self.llm`
+        (e.g. in its `on_start()`) to make its LLM calls governed,
+        transparently -- Civitas itself has no concept of governance;
+        Presidium is the opinionated layer that adds it, on top of a real
+        backend it never replaces.
+        """
+        return GovernedModelProviderAdapter(
+            backend=backend, model_provider=self.model_provider, agent_name=agent_name
+        )
+
+    def tool_for(self, agent_name: str, backend: ToolProvider) -> GovernedToolAdapter:
+        """Wrap a real civitas ToolProvider (one named tool) with policy
+        enforcement, bound to one agent. Register the result into that
+        agent's own `self.tools` in place of the real tool directly (the
+        same per-agent-construction pattern `civitas.process.AgentProcess.
+        connect_mcp()` already uses for civitas-io/fabrica's own MCPTool).
+        """
+        return GovernedToolAdapter(
+            backend=backend, tool_provider=self.tool_provider, agent_name=agent_name
+        )
 
 
 def _parse_policy_rules(configs: list[dict[str, Any]]) -> list[PolicyRule]:
