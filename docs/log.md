@@ -1142,3 +1142,64 @@ real work, not automatically unblocked by this alone.
   line updated to reflect all five items complete
 - `CHANGELOG.md` — real entries
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] release | v0.2.0 release prep — hardened CI, real README fixes, real bug found
+
+**Trigger:** All five P0 items shipped; time to plan and prepare the first real, public PyPI
+release for `presidium`/`presidium-contrib`.
+
+**Real facts established first, not assumed:** confirmed via PyPI's own JSON API that neither
+`presidium` nor `presidium-contrib` is taken (both 404). Checked Homebrew too (per direct request)
+— both names also available there, but genuinely not relevant yet: Presidium is a `pip install`
+library with no CLI/binary shipped (M5's CLI is designed, not built), and even `python-civitas`
+itself (which has a real CLI) has no Homebrew presence — no org precedent for this pattern.
+Decision: skip Homebrew now, revisit only if/when M5 ships and there's a real reason to want it.
+
+**`ci.yml`/`publish.yml` already existed** (not built from scratch, unlike Fabrica's own CI this
+session) — found real gaps versus the stricter convention already proven in `civitas-io/fabrica`'s
+own live release: mutable action version tags instead of pinned commit SHAs; no CycloneDX SBOM
+generation; `ci.yml`'s test matrix only covered Python 3.12/3.13 despite both packages' own
+classifiers claiming 3.14 support too (fixed, all three now tested for real).
+
+**A real, previously-untested bug found and fixed before trusting this workflow for a real
+release, not assumed working**: `uv build` run with a bare `working-directory:
+packages/presidium` (the pre-existing pattern) places its output in the *workspace root's*
+`dist/`, not `packages/presidium/dist/` — confirmed with a real local build, not guessed. This
+workflow had never actually run for a real tag push (no git tags existed before this session), so
+the bug had never been caught. Fixed with `uv build --package <name> -o packages/<name>/dist`
+from the workspace root.
+
+**Version bump: `0.1.0` → `0.2.0`, not `0.1.0`.** `CHANGELOG.md` already had a real `[0.1.0] -
+2026-06-14` entry documenting an earlier, never-published M2-completion snapshot — publishing the
+real first release as `0.1.0` would have collided with it. `0.2.0` is the honest choice given the
+real, substantial scope since that snapshot (M3 complete, M7 shipped end to end, drop-in adapters,
+the Ed25519 fix) — a real minor version's worth of new features. `Development Status` classifier
+bumped `2 - Pre-Alpha` → `3 - Alpha` to match, per `civitas-io/fabrica`'s own precedent.
+
+**Real README inaccuracies found and fixed before going public**: a broken Civitas link pointing
+at a personal GitHub account (`jerynmathew/python-civitas`) instead of the real org repo
+(`civitas-io/python-civitas`), appearing twice; a `presidium-contrib[litellm]` extra listed as
+installable in two places despite not existing in the real `pyproject.toml` — would have broken
+for anyone who actually tried it; a stale status line (test counts, missing M7/adapter mentions).
+
+**Real infrastructure created**: the `pypi` GitHub Environment on `civitas-io/presidium` (no
+protection rules, matching `python-civitas`'s and `fabrica`'s own shape).
+
+**Verification**: both packages build correctly with the corrected `uv build` invocation (real
+local build, `dist/` lands in the right place); CycloneDX SBOM generation verified locally for
+both; all 377 + 153 tests pass; `ruff`/`mypy --strict` clean; real GitHub Actions `CI` run
+confirmed green on this exact commit, including the new Python 3.14 matrix entry.
+
+**Still needed, tracked and not done here — requires a human with PyPI account access**: two real
+PyPI "pending publisher" registrations (`presidium` and `presidium-contrib` are separate PyPI
+projects) — owner `civitas-io`, repo `presidium`, workflow `publish.yml`, environment `pypi`.
+Cannot be done via API.
+
+**Pages updated:**
+- `.github/workflows/publish.yml`/`ci.yml` — hardened
+- `README.md`, `CHANGELOG.md` — real fixes and the new `[0.2.0]` entry
+- `packages/presidium/pyproject.toml`/`packages/presidium-contrib/pyproject.toml` — version +
+  classifier bumps
+- `docs/log.md` — this entry
