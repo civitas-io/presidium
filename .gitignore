@@ -43,3 +43,8 @@ site/
 
 # Session handoff
 HANDOFF.md
+
+# Presidium — real Ed25519 private keys (GovernedRuntime's default key_dir).
+# Real private key material must never be committed, even accidentally from
+# an interactive run without an explicit key_dir override.
+.presidium/

@@ -10,6 +10,7 @@ import yaml
 from civitas import Runtime
 from civitas.process import AgentProcess
 from civitas.secrets.substitution import substitute_vars
+from civitas.security.identity import AgentIdentity
 
 from presidium.approval import ApprovalService, CallbackApprovalProvider
 from presidium.audit import AuditSink, InProcessAuditEnricher
@@ -47,6 +48,7 @@ class GovernedRuntime:
         credentials: CredentialProvider | None = None,
         approval: ApprovalService | None = None,
         audit_sink: AuditSink | None = None,
+        key_dir: str | Path | None = None,
     ) -> None:
         self._runtime = civitas_runtime
         self.registry: AgentRegistry = registry or InMemoryRegistry()
@@ -74,6 +76,14 @@ class GovernedRuntime:
 
         self._pending_agents: dict[str, dict[str, Any]] = {}
         self._trust_domain = "local"
+        # Default: `.presidium/keys` under the current working directory --
+        # mirrors `civitas security init`'s own default layout so operators
+        # already familiar with Civitas's key tooling find keys in the
+        # expected place. Real per-agent Ed25519 keypairs are provisioned
+        # lazily in `start()` via `AgentIdentity.load_or_generate()`, not
+        # eagerly here (agent names aren't known until `_pending_agents` is
+        # populated by `from_config()` or set directly by a caller).
+        self._key_dir = Path(key_dir) if key_dir is not None else Path(".presidium/keys")
 
     @classmethod
     def from_config(
@@ -96,6 +106,7 @@ class GovernedRuntime:
 
         registry_cfg = presidium_config.get("registry", {})
         trust_domain = registry_cfg.get("trust_domain", "local")
+        key_dir = registry_cfg.get("key_dir")
 
         policies_cfg = presidium_config.get("policies", [])
         rules = _parse_policy_rules(policies_cfg)
@@ -107,6 +118,7 @@ class GovernedRuntime:
             civitas_runtime=civitas_runtime,
             registry=InMemoryRegistry(),
             engine=engine,
+            key_dir=key_dir,
         )
         governed._trust_domain = trust_domain
 
@@ -126,10 +138,18 @@ class GovernedRuntime:
                 )
                 for g in agent_cfg.get("grants", [])
             ]
+            # Real Ed25519 identity binding (2026-08-22 fix -- previously
+            # hardcoded to "", see docs/vision/roadmap.md's Implementation
+            # Priority section). `load_or_generate` persists the keypair to
+            # `{key_dir}/{agent_name}/id_ed25519{,.pub}` on first use and
+            # loads the same one on every subsequent start -- an agent's
+            # identity survives restarts, matching AgentRecord's own
+            # documented "persistent identity" contract.
+            identity = AgentIdentity.load_or_generate(agent_name, self._key_dir)
             record = AgentRecord(
                 agent_id=f"presidium://{self._trust_domain}/{agent_name}",
                 name=agent_name,
-                public_key="",
+                public_key=identity.public_key_b64(),
                 owner=agent_cfg.get("owner"),
                 grants=grants,
             )

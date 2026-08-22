@@ -26,7 +26,7 @@ from presidium.registry._base import AgentRegistry
 logger = logging.getLogger(__name__)
 
 
-class GovernedMessageBus(MessageBus):  # type: ignore[misc]  # civitas lacks py.typed
+class GovernedMessageBus(MessageBus):
     """MessageBus subclass that evaluates PRE_MESSAGE policies before routing.
 
     If the sender is registered in the governance registry, policies are

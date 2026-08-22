@@ -20,7 +20,7 @@ from presidium.model import (
 from presidium.policy.cel import CelPolicyEngine
 
 
-class PolicyEvaluatorServer(GenServer):  # type: ignore[misc]  # civitas lacks py.typed
+class PolicyEvaluatorServer(GenServer):
     """Exposes CelPolicyEngine as a Civitas GenServer for distributed evaluation.
 
     Call protocol:

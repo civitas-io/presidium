@@ -10,7 +10,7 @@ from presidium.model import AgentRecord, AgentStatus, Grant
 from presidium.registry.memory import InMemoryRegistry
 
 
-class RegistryServer(GenServer):  # type: ignore[misc]  # civitas lacks py.typed
+class RegistryServer(GenServer):
     """Exposes InMemoryRegistry as a Civitas GenServer for distributed lookups.
 
     Call protocol:
@@ -26,7 +26,7 @@ class RegistryServer(GenServer):  # type: ignore[misc]  # civitas lacks py.typed
 
     def __init__(self, name: str = "presidium.registry", **kwargs: Any) -> None:
         super().__init__(name, **kwargs)
-        self._registry = InMemoryRegistry()
+        self._agent_registry = InMemoryRegistry()
 
     async def init(self) -> None:
         pass
@@ -47,7 +47,7 @@ class RegistryServer(GenServer):  # type: ignore[misc]  # civitas lacks py.typed
 
     async def _handle_lookup(self, payload: dict[str, Any]) -> dict[str, Any]:
         name = payload["name"]
-        record = await self._registry.lookup(name)
+        record = await self._agent_registry.lookup(name)
         if record is None:
             return {"found": False}
         return {
@@ -79,11 +79,11 @@ class RegistryServer(GenServer):  # type: ignore[misc]  # civitas lacks py.typed
             grants=grants,
             status=AgentStatus(agent_data.get("status", "registered")),
         )
-        await self._registry.register(record)
+        await self._agent_registry.register(record)
         return {"registered": True, "agent_id": record.agent_id}
 
     async def _handle_list(self) -> dict[str, Any]:
-        agents = await self._registry.list_agents()
+        agents = await self._agent_registry.list_agents()
         return {
             "agents": [
                 {

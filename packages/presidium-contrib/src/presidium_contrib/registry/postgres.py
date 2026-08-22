@@ -10,6 +10,7 @@ from typing import Any
 import asyncpg
 
 from presidium.errors import AgentNotFoundError, GrantNotFoundError
+from presidium.identity import verify_agent_signature
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
 from presidium.trust import LinearTrustScore
 
@@ -348,6 +349,10 @@ class PostgresAgentRegistry:
             record.status = status
             await self._save(record)
             return await self._lookup_internal(name)
+
+    async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
+        record = await self.lookup(name)
+        return verify_agent_signature(record, data, signature)
 
     async def _lookup_or_raise(self, name: str) -> AgentRecord:
         record = await self.lookup(name)

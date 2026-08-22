@@ -815,3 +815,63 @@ assuming zero integration friction.
 **Pages updated:**
 - `docs/vision/roadmap.md` — M7 section, new finding + updated package-shape decision item
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] fix | Real Ed25519 identity binding + civitas PyPI pin (P0 items 1 & 2)
+
+**Trigger:** Executing the P0 sequence from "Implementation Priority" (added earlier this
+session): fix the Ed25519 identity binding, then pin `civitas` to a real PyPI release. Both are
+now done, tested, and committed — not just planned.
+
+**Ed25519 identity binding**: `GovernedRuntime.start()` now generates/loads a real, persistent
+`civitas.security.identity.AgentIdentity` per agent (`load_or_generate(name, key_dir)`, default
+`key_dir=.presidium/keys`, overridable via `presidium.registry.key_dir` in topology YAML or the
+constructor), and binds its real `public_key_b64()` into `AgentRecord.public_key` — no longer a
+hardcoded `""`. `AgentRegistry` gained a real `verify_signature(name, data, signature) -> bool`,
+backed by a new `presidium.identity.verify_agent_signature()` shared primitive (one crypto
+implementation, not duplicated per backend), implemented in `InMemoryRegistry`, `SqliteRegistry`,
+and `presidium-contrib`'s `PostgresAgentRegistry`. Fails closed as a plain boolean for every
+failure mode (unknown agent, empty/malformed public key, missing `pynacl`, invalid signature) —
+matches `has_grant()`'s own shape, never raises. 18 new tests using real Ed25519 keypairs, not
+mocked crypto. `pynacl>=1.5` is now a direct, required `presidium` dependency.
+
+**Real, concrete side effect caught during this work**: the first test run leaked real private
+key files into the repo's own working directory (`.presidium/keys/`), because two existing
+`GovernedRuntime.from_config()` integration tests didn't override `key_dir` and inherited the new
+default. Fixed by pointing those tests at `tmp_path`, and added `.presidium/` to `.gitignore` as
+defense in depth (real private key material must never be committable, even by accident from an
+interactive run).
+
+**`civitas` PyPI pin**: removed the workspace root's `[tool.uv.sources]` git override
+(`branch = "main"`); bumped `presidium`'s own dependency `civitas>=0.3` → `civitas>=0.11.0` (real,
+current, tested-against version, matching `civitas-io/fabrica`'s own precedent).
+
+**A real, separate bug found and fixed as a direct consequence of the pin fix, not searched for
+deliberately**: pinning to `civitas>=0.11.0` made `civitas`'s own real `py.typed` marker visible
+for the first time in this workspace (it didn't exist when `presidium` was floating on an older
+resolution). Three `# type: ignore[misc]  # civitas lacks py.typed` comments became genuinely
+unused; removing them surfaced a real, previously-hidden bug the broad ignore had been masking:
+`presidium_contrib.service.registry.RegistryServer` named its own governance registry
+`self._registry`, **colliding with `civitas.process.AgentProcess`'s own reserved `_registry`
+attribute** (used internally for `suspend()`/`resume()`, capability-based routing, and spawn-target
+resolution). Confirmed exploitable, not theoretical: `civitas/supervisor.py` sets
+`agent._registry = self._registry` when wiring any child into a real Supervisor tree — a
+`RegistryServer` added to a live tree would have had its own governance registry silently
+clobbered by Civitas's unrelated routing registry. Renamed to `self._agent_registry`. Also added
+two real tests for this class's `verify_signature()` (previously untested — this file remains
+part of the still-open, separate `service/*` 0%-coverage P0 item, not fully closed by this fix).
+
+Also fixed adjacent to this: missing `mypy` override entries for `hvac`/`asyncpg` (no published
+type stubs for either), found while re-running a clean `mypy` pass after the ignore-comment
+removals.
+
+**Verification**: all 462 tests (354 presidium core + 108 presidium-contrib) pass, 3x stable, zero
+leaked files. `ruff check`/`ruff format --check`/`mypy --strict` all clean on both packages.
+Coverage: presidium core 90.97% → 95.24%.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — both P0 items marked done with full detail, M7's own duplicate
+  Ed25519 checklist item marked done and clarified (mTLS wiring itself still open)
+- `CHANGELOG.md` — real entries under `[Unreleased]`
+- `docs/log.md` — this entry

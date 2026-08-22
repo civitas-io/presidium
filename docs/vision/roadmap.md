@@ -22,18 +22,40 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 These are either **correctness/trust gaps hiding behind claims of completeness**, or the single
 structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) working end to end.
 
-- [ ] **Fix the Ed25519 identity binding.** `GovernedRuntime.start()` hardcodes
-  `AgentRecord(public_key="", ...)`; `AgentRegistry` has no `verify_signature()` or equivalent.
-  Documented as delivered M2 behavior — it isn't. **Presidium currently has zero real
-  cryptographic verification of agent identity**, in a product whose entire value proposition is
-  governance/security. Wire up `civitas.security.identity.AgentIdentity.public_key_b64()`, which
-  already exists and is ready to call. Tracked under M7 below; called out here because it should
-  not wait for M7's other, larger pieces — it is small and urgent on its own.
-- [ ] **Pin `civitas` to a real PyPI release, not `git`/`branch = "main"`.** The workspace root
-  `pyproject.toml`'s `[tool.uv.sources]` currently floats on Civitas's `main` branch. A governance
-  product with an unpinned dependency on its own runtime is a real supply-chain/reproducibility
-  risk. `civitas>=0.11.0` is real and published on PyPI — `civitas-io/fabrica` already made this
-  exact fix; copy it. Not previously tracked anywhere in this roadmap — added here as its own item.
+- [x] **Fix the Ed25519 identity binding.** ~~`GovernedRuntime.start()` hardcodes
+  `AgentRecord(public_key="", ...)`~~ **Done 2026-08-22.** `GovernedRuntime` now generates/loads a
+  real, persistent `civitas.security.identity.AgentIdentity` per agent (`AgentIdentity.
+  load_or_generate(name, key_dir)`, default `key_dir=.presidium/keys`, overridable via
+  `presidium.registry.key_dir` in topology YAML or the constructor directly) and binds its real
+  `public_key_b64()` into `AgentRecord.public_key`. `AgentRegistry` gained a real
+  `verify_signature(name, data, signature) -> bool` method (shared implementation in the new
+  `presidium.identity` module, fail-closed-as-a-plain-return-value like `has_grant()` — never
+  raises), implemented in `InMemoryRegistry`, `SqliteRegistry`, and
+  `presidium-contrib`'s `PostgresAgentRegistry`. 18 new real tests (real Ed25519 keypairs, real
+  sign/verify round trips, persistence-across-restarts, tampered-data/wrong-key/malformed-key/
+  missing-pynacl failure paths). **Found and fixed a real, separate, pre-existing bug while doing
+  this work**: `presidium_contrib.service.registry.RegistryServer` named its own governance
+  registry attribute `self._registry`, colliding with `civitas.process.AgentProcess`'s own
+  reserved `_registry` attribute (Civitas's internal name-routing registry) — a real Supervisor
+  wiring a `RegistryServer` into a live tree would silently clobber one with the other. Renamed to
+  `self._agent_registry`; caught by mypy only after the `civitas` PyPI-pin fix below made
+  `civitas`'s real `py.typed` marker visible for the first time. `.gitignore` gained `.presidium/`
+  (real private key material must never be committable, even by accident). Coverage: presidium
+  core 90.97% → **95.24%**.
+- [x] **Pin `civitas` to a real PyPI release, not `git`/`branch = "main"`.** **Done 2026-08-22.**
+  Removed the `[tool.uv.sources]` git override from the workspace root; bumped
+  `presidium`'s own dependency from `civitas>=0.3` to `civitas>=0.11.0` (the real, current,
+  tested-against version — matches `civitas-io/fabrica`'s own precedent). Also added
+  `pynacl>=1.5` as a real, direct (not optional) dependency, since identity binding is now a core,
+  always-on capability, not an opt-in extra. **Real, unexpected side effect worth knowing**:
+  `civitas` only gained its own `py.typed` marker in a real, recent release — three
+  `# type: ignore[misc]  # civitas lacks py.typed` comments (on `GovernedMessageBus`,
+  `PolicyEvaluatorServer`, `RegistryServer`) were now genuinely unused and removed, which is what
+  surfaced the `RegistryServer` bug above (a broad class-level ignore had been silently
+  suppressing real attribute-type errors in the class body, not just the class definition line).
+  Also added missing `mypy` override entries for `hvac`/`asyncpg` (no published stubs), found
+  adjacent to this work. All 442+ tests (354 core + 108 contrib) pass, 3x stable, mypy and ruff
+  clean on both packages.
 - [ ] **Close the `presidium_contrib.service.policy`/`.registry` 0%-coverage gap** before anything
   is built on top of them (M7 wraps this code directly). Tracked under M7 below.
 - [ ] **Build M7 (Presidium Server) itself.** Without it, Presidium cannot be reached by anything
@@ -332,16 +354,11 @@ to it fully, but treat "build a new server" as the fallback, not the default.
 - [ ] **(P0, do first)** Close the existing test-coverage gap: `presidium_contrib.service.policy`/
   `.registry` (the GenServers this milestone wraps) currently have **0% test coverage** — a
   network-facing layer must not ship on top of untested internals
-- [ ] **(P0, do first)** **Wire up the Ed25519 identity binding that M2 already documents as done
-  but never actually implemented.** `GovernedRuntime.start()` hardcodes
-  `AgentRecord(public_key="", ...)` — confirmed by reading the real source, not assumed.
-  `AgentRegistry` has no `verify_signature()` or equivalent; `public_key` is a passthrough string
-  field, persisted by `SqliteRegistry`/`PostgresAgentRegistry` but never populated or checked
-  against anything real anywhere in the codebase. Civitas already has a real, ready class for this
-  (`civitas.security.identity.AgentIdentity`, with `public_key_b64()`) that the design docs
-  describe reusing — `GovernedRuntime.start()` needs to actually call it. **This blocks real
-  cryptographic identity verification even before SPIRE enters the picture** — a prerequisite
-  for M7's mTLS to mean anything, not an optional nice-to-have.
+- [x] **Wire up the Ed25519 identity binding that M2 already documents as done but never actually
+  implemented.** **Done 2026-08-22** — see the full write-up under "Implementation Priority" → P0
+  above. `GovernedRuntime.start()` now binds a real, persistent `AgentIdentity` per agent;
+  `AgentRegistry` gained a real `verify_signature()`. **Still open, not done by this fix**: the
+  actual mTLS wiring below (this item only unblocks it by making the underlying key real).
 - [ ] **(P0)** Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
   reviewed before implementation (per this project's own documentation-driven-development
   philosophy)

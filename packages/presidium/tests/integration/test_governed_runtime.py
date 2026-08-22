@@ -144,6 +144,7 @@ class TestFromConfig:
             presidium:
               registry:
                 trust_domain: acme.com
+                key_dir: {key_dir}
               policies:
                 - name: deny-all
                   stage: pre_tool
@@ -157,7 +158,7 @@ class TestFromConfig:
                   grants:
                     - resources: ["tool:web_search"]
                       actions: ["invoke"]
-        """)
+        """).format(key_dir=str(tmp_path / "keys"))
         )
         rt = GovernedRuntime.from_config(yaml_file)
         await rt.start()
@@ -167,6 +168,7 @@ class TestFromConfig:
         assert agent.agent_id == "presidium://acme.com/researcher"
         assert agent.owner == "alice@acme.com"
         assert len(agent.grants) == 1
+        assert agent.public_key != ""  # real Ed25519 identity binding, not the old hardcoded ""
 
     async def test_from_config_policies_compiled(self, tmp_path: Path) -> None:
         yaml_file = tmp_path / "topology.yaml"
@@ -176,6 +178,8 @@ class TestFromConfig:
               name: root
 
             presidium:
+              registry:
+                key_dir: {key_dir}
               policies:
                 - name: enforce-grants
                   stage: [pre_tool, pre_llm]
@@ -190,7 +194,7 @@ class TestFromConfig:
               agents:
                 worker:
                   owner: bob@acme.com
-        """)
+        """).format(key_dir=str(tmp_path / "keys"))
         )
         rt = GovernedRuntime.from_config(yaml_file)
         await rt.start()
@@ -209,3 +213,78 @@ class TestFromConfig:
         rt = GovernedRuntime.from_config(yaml_file)
         await rt.start()
         assert rt._trust_domain == "local"
+
+
+class TestRealIdentityBinding:
+    """2026-08-22 fix: GovernedRuntime.start() previously hardcoded
+    public_key="" -- these prove it now binds a real, persistent Ed25519
+    identity via civitas.security.identity.AgentIdentity.
+    """
+
+    async def test_start_binds_real_nonempty_public_key(self, tmp_path: Path) -> None:
+        rt = GovernedRuntime(key_dir=tmp_path / "keys")
+        rt._pending_agents = {"researcher": {"owner": "alice@acme.com"}}
+        await rt.start()
+
+        agent = await rt.registry.lookup("researcher")
+        assert agent is not None
+        assert agent.public_key != ""
+
+        import base64
+
+        assert len(base64.b64decode(agent.public_key)) == 32  # real Ed25519 verify key
+
+    async def test_identity_persists_across_separate_runtime_instances(
+        self, tmp_path: Path
+    ) -> None:
+        """Same key_dir, two separate GovernedRuntime instances -- same identity.
+
+        Matches AgentRecord's own documented "persistent identity, survives
+        restarts" contract (docs/rfcs/001-presidium-scope.md) -- a real restart
+        must not silently rotate an agent's cryptographic identity.
+        """
+        key_dir = tmp_path / "keys"
+
+        rt1 = GovernedRuntime(key_dir=key_dir)
+        rt1._pending_agents = {"researcher": {}}
+        await rt1.start()
+        first_key = (await rt1.registry.lookup("researcher")).public_key  # type: ignore[union-attr]
+
+        rt2 = GovernedRuntime(key_dir=key_dir)
+        rt2._pending_agents = {"researcher": {}}
+        await rt2.start()
+        second_key = (await rt2.registry.lookup("researcher")).public_key  # type: ignore[union-attr]
+
+        assert first_key == second_key
+
+    async def test_different_agents_get_different_identities(self, tmp_path: Path) -> None:
+        rt = GovernedRuntime(key_dir=tmp_path / "keys")
+        rt._pending_agents = {"researcher": {}, "writer": {}}
+        await rt.start()
+
+        researcher = await rt.registry.lookup("researcher")
+        writer = await rt.registry.lookup("writer")
+        assert researcher is not None
+        assert writer is not None
+        assert researcher.public_key != writer.public_key
+
+    async def test_registry_can_verify_a_real_signature_after_start(self, tmp_path: Path) -> None:
+        """End-to-end: start() binds a real identity, the registry can verify
+        a signature produced by that same agent's real private key."""
+        from civitas.security.identity import AgentIdentity
+
+        key_dir = tmp_path / "keys"
+        rt = GovernedRuntime(key_dir=key_dir)
+        rt._pending_agents = {"researcher": {}}
+        await rt.start()
+
+        # Load the same on-disk identity start() just created, to sign as
+        # that agent would (e.g. for a future approval-decision attestation).
+        identity = AgentIdentity.load("researcher", key_dir)
+        data = b"approve production deploy"
+        signature = identity.sign(data)
+
+        assert await rt.registry.verify_signature("researcher", data, signature) is True
+        assert (
+            await rt.registry.verify_signature("researcher", b"different data", signature) is False
+        )

@@ -42,3 +42,13 @@ class AgentRegistry(Protocol):
     async def set_trust(self, name: str, value: float, reason: str) -> AgentRecord: ...
 
     async def update_status(self, name: str, status: AgentStatus) -> AgentRecord: ...
+
+    async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
+        """Verify ``signature`` over ``data`` against ``name``'s stored public key.
+
+        Returns False -- never raises -- for an unknown agent, an unbound
+        (empty) public key, a malformed public key, or an invalid signature.
+        See ``presidium.identity.verify_agent_signature`` for the shared
+        implementation every backend delegates to.
+        """
+        ...

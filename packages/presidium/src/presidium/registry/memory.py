@@ -6,6 +6,7 @@ import copy
 from datetime import UTC, datetime
 
 from presidium.errors import AgentNotFoundError, GrantNotFoundError
+from presidium.identity import verify_agent_signature
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
 from presidium.trust import LinearTrustScore, TrustScorer, tier_for_value
 
@@ -205,3 +206,7 @@ class InMemoryRegistry:
         self._touch(record)
         self._sync_trust(record)
         return self._snapshot(record)
+
+    async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
+        record = self._agents.get(name)
+        return verify_agent_signature(record, data, signature)

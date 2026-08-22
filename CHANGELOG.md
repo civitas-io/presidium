@@ -10,6 +10,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ### Added
 
+#### presidium — Real Ed25519 identity binding (2026-08-22)
+
+- **`GovernedRuntime` now binds a real, persistent Ed25519 identity per agent** via
+  `civitas.security.identity.AgentIdentity.load_or_generate()` — previously hardcoded
+  `AgentRecord(public_key="", ...)` despite this being documented as delivered M2 behavior.
+  New `key_dir` constructor param (default `.presidium/keys`), configurable via
+  `presidium.registry.key_dir` in topology YAML.
+- **New `presidium.identity` module** with `verify_agent_signature()`, the shared, pure-function
+  verification primitive every `AgentRegistry` backend delegates to. Fails closed as a plain
+  `False` return (never raises) for every failure case: unknown agent, unbound/empty public key,
+  malformed public key, missing `pynacl`, or a genuinely invalid signature.
+- **`AgentRegistry` Protocol gained `verify_signature(name, data, signature) -> bool`**,
+  implemented in `InMemoryRegistry`, `SqliteRegistry`, and `presidium-contrib`'s
+  `PostgresAgentRegistry`.
+- `pynacl>=1.5` is now a direct, required dependency of `presidium` (identity binding is a core,
+  always-on capability, not opt-in).
+- 18 new tests (real Ed25519 keypairs and real sign/verify round trips, not mocked crypto).
+  Coverage: presidium core 90.97% → 95.24%.
+
+#### presidium — Dependency and type-checking cleanup (2026-08-22)
+
+- **`civitas` dependency bumped `>=0.3` → `>=0.11.0`, resolved from real PyPI** — removed the
+  workspace root's `[tool.uv.sources]` git override (`branch = "main"`), matching
+  `civitas-io/fabrica`'s own precedent. `civitas>=0.11.0` has been real and published on PyPI for
+  some time; there was no remaining reason to float on an unpinned branch.
+
+#### presidium-contrib — Real attribute-name collision in `RegistryServer` (2026-08-22)
+
+- **Fixed:** `RegistryServer` named its own governance registry `self._registry`, colliding with
+  `civitas.process.AgentProcess`'s own reserved `_registry` attribute (Civitas's internal
+  name-routing registry, used by `suspend()`/`resume()`/capability-based routing/spawn-target
+  resolution). A real `Supervisor` wiring a `RegistryServer` into a live tree
+  (`agent._registry = self._registry` in `civitas/supervisor.py`) would silently clobber one with
+  the other. Renamed to `self._agent_registry`. Found only after the `civitas` PyPI-pin fix above
+  made `civitas`'s own real `py.typed` marker visible for the first time, which surfaced this bug
+  through a previously-unused, overly-broad `# type: ignore[misc]` comment that had been
+  suppressing real type errors in the class body, not just the class definition line. The same
+  now-unused ignore comment was also removed from `GovernedMessageBus` and
+  `PolicyEvaluatorServer` (both clean without it).
+- Added missing `mypy` override entries for `hvac`/`asyncpg` (no published type stubs for
+  either) — found adjacent to the above while re-running a clean `mypy` pass.
+
 #### presidium — Remaining M3 Core Features
 
 - **PRE_MESSAGE evaluation stage**: `EvaluationStage.PRE_MESSAGE` for inter-agent message governance via Civitas MessageBus hook

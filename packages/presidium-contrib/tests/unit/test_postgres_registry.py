@@ -157,3 +157,34 @@ class TestPostgresAgentRegistryWithMock:
         await reg.close()
         pool.close.assert_called_once()
         assert reg._pool is None
+
+    async def test_verify_signature_with_real_identity(self) -> None:
+        """2026-08-22 fix: verify_signature() delegates to the same shared
+        presidium.identity.verify_agent_signature() every AgentRegistry
+        backend uses -- proven here with a real Ed25519 keypair, not a mock.
+        """
+        from civitas.security.identity import AgentIdentity
+
+        identity = AgentIdentity.generate("researcher")
+        record = _make_record()
+        record.public_key = identity.public_key_b64()
+        row = _make_row(record)
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = row
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        data = b"approve production deploy"
+        signature = identity.sign(data)
+
+        assert await reg.verify_signature("researcher", data, signature) is True
+        assert await reg.verify_signature("researcher", b"different data", signature) is False
+
+    async def test_verify_signature_unknown_agent_returns_false(self) -> None:
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = None
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        assert await reg.verify_signature("ghost", b"data", b"sig") is False
