@@ -309,6 +309,24 @@ later, not because it is architecturally dependent on M6.
   [`docs/research/aaa-patterns.md`](../research/aaa-patterns.md) — this milestone is "build the
   server RFC-001 already describes," not a new architecture decision.
 
+**Major real finding, 2026-08-22 — reuse `civitas.gateway.HTTPGateway` directly, don't build a new
+server framework.** A direct read of `python-civitas`'s own source (not assumed) found it already
+ships a mature, well-tested (91-100% coverage across its submodules), production-grade HTTP/gRPC/
+HTTP3 gateway with real mTLS (`GatewayConfig.tls_cert`/`tls_key`/`tls_ca_cert`/`client_cert_mode`,
+`civitas/gateway/mtls.py`, 98% covered) and real JWT bearer auth (`civitas/gateway/jwt_auth.py`,
+100% covered) already built in. Critically, `HTTPGateway` is **transport-agnostic and
+declarative**: a route is just `{"method": "POST", "path": "/v1/...", "agent": "<name>", "mode":
+"call"}`, dispatched onto the Civitas bus via `GatewayDispatcher` to *any* named agent — not
+limited to a fixed set of built-in routes. Since `PolicyEvaluatorServer`/`RegistryServer` are
+**already real `AgentProcess`/`GenServer` subclasses** (M3, shipped), most of M7's own "REST
+endpoints" and "mTLS" requirements below could be satisfied by **registering these agents behind
+an `HTTPGateway` with a routes/`GatewayConfig` manifest**, not by building a new REST+mTLS server
+from scratch. This substantially de-risks and likely de-scopes M7 — see `examples/http_gateway.py`
+and `examples/gateway_auth.py` in `python-civitas` for the exact reusable pattern. Re-verify this
+assumption early in implementation (confirm `HTTPGateway`'s auth middleware composes cleanly with
+Presidium's own grant/policy checks, not just transport-level authentication) before committing
+to it fully, but treat "build a new server" as the fallback, not the default.
+
 **Requirements:**
 
 - [ ] **(P0, do first)** Close the existing test-coverage gap: `presidium_contrib.service.policy`/
@@ -327,8 +345,11 @@ later, not because it is architecturally dependent on M6.
 - [ ] **(P0)** Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
   reviewed before implementation (per this project's own documentation-driven-development
   philosophy)
-- [ ] **(P0)** Real decision, not silently picked: new standalone `presidium-server` package (own
-  deployable process) vs. a `presidium-contrib[server]` extra — record as an ADR either way
+- [ ] **(P0)** Real decision, not silently picked, **now including a third real option found this
+  session**: new standalone `presidium-server` package vs. a `presidium-contrib[server]` extra vs.
+  **a thin `presidium-contrib[civitas-gateway]` adapter that wires `PolicyEvaluatorServer`/
+  `RegistryServer` behind `civitas.gateway.HTTPGateway`** (see the finding directly above) —
+  record as an ADR either way, but evaluate the third option first given how much it reuses
 - [ ] **(P0)** REST endpoints for all `GovernedRuntime` operations: `PRE_TOOL`/`PRE_LLM`/
   `PRE_MESSAGE`/`POST_TOOL`/`POST_LLM` evaluation, registry CRUD + grant management, approval
   request/list/decide, credential resolution

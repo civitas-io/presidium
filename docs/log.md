@@ -783,3 +783,35 @@ roadmap items** (see the two new bullets under "Implementation Priority" → P1)
 - `docs/vision/roadmap.md` — two new P1 items (trust ceiling, capability narrowing), MCP
   governance item enriched with real candidates
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] finding | M7 should reuse civitas.gateway.HTTPGateway, not build a new server
+
+**Trigger:** A cross-project completion review of `python-civitas` itself (part of the same
+effort covering `presidium` and `fabrica`) found that `python-civitas` already ships a mature,
+well-tested, production-grade HTTP/gRPC/HTTP3 gateway (`civitas.gateway`) with real mTLS
+(`gateway/mtls.py`, 98% covered) and real JWT bearer auth (`gateway/jwt_auth.py`, 100% covered) —
+confirmed by reading the real source and its own examples (`examples/http_gateway.py`,
+`examples/gateway_auth.py`), not assumed from the package name.
+
+**Finding:** `HTTPGateway` is transport-agnostic and fully declarative — a route is just
+`{"method": "POST", "path": "/v1/...", "agent": "<name>", "mode": "call"}`, dispatched onto the
+Civitas bus to *any* named agent via `GatewayDispatcher`. Since M7's own
+`PolicyEvaluatorServer`/`RegistryServer` are already real `AgentProcess`/`GenServer` subclasses
+(shipped in M3), most of M7's planned "REST endpoints" and "mTLS" work could be satisfied by
+registering these agents behind an `HTTPGateway` with a routes/`GatewayConfig` manifest, instead
+of building a new REST+mTLS server framework from scratch.
+
+**Decision:** Added this as a major finding directly in M7's own section of
+`docs/vision/roadmap.md`, and added a third real option to M7's own "package shape" decision item
+(`presidium-contrib[civitas-gateway]`, alongside the previously-listed standalone-package and
+`presidium-contrib[server]` options) — flagged as the option to evaluate first given how much
+existing, tested infrastructure it reuses. Not committed to blindly: the same note calls out
+re-verifying that `HTTPGateway`'s auth middleware composes cleanly with Presidium's own
+grant/policy checks (not just transport-level authentication) before fully committing, rather than
+assuming zero integration friction.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — M7 section, new finding + updated package-shape decision item
+- `docs/log.md` — this entry
