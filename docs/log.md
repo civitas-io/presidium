@@ -875,3 +875,50 @@ Coverage: presidium core 90.97% → 95.24%.
   Ed25519 checklist item marked done and clarified (mTLS wiring itself still open)
 - `CHANGELOG.md` — real entries under `[Unreleased]`
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] fix | Service Mode 0%-coverage gap closed (P0 item 3) — a second real bug found
+
+**Trigger:** Continuing the P0 execution sequence after items 1 (Ed25519 binding) and 2 (civitas
+PyPI pin): close `presidium_contrib.service.policy`/`.registry`'s 0% test coverage before M7
+builds a network layer on top of them.
+
+**What was added**: `tests/unit/test_service_policy.py` and `tests/unit/test_service_registry.py`
+(direct `handle_call()` invocation, fast and focused) plus
+`tests/integration/test_service_mode_real_runtime.py` (a real end-to-end suite through an actual
+`civitas.Runtime`/`Supervisor`, not a mock). The integration suite includes a dedicated regression
+test for the `RegistryServer._registry` collision fixed earlier this session — it asserts
+`civitas.process.AgentProcess`'s own real `_registry` (a `LocalRegistry` instance) survives real
+Supervisor wiring untouched, and that `RegistryServer`'s own `_agent_registry` is a distinct, real
+`InMemoryRegistry` — proving the fix holds structurally, not just that the attribute has a
+different name now.
+
+**A second real, previously-hidden bug found and fixed, not searched for deliberately**: the very
+first test exercising a non-default-ALLOW policy decision through `PolicyEvaluatorServer` crashed
+with `AttributeError: 'str' object has no attribute 'value'`. Root cause:
+`PolicyEvaluatorServer._handle_load()` passed the raw JSON string (`"deny"`) straight into
+`PolicyRule(decision=..., ...)` instead of converting it to the `PolicyDecision` enum first.
+`CelPolicyEngine.evaluate()` doesn't type-check `rule.decision` at that layer, so it silently
+returned the raw string on any DENY/REQUIRE_APPROVAL match; `PolicyEvaluatorServer`'s own
+`_handle_evaluate()` then crashed trying to call `.value` on it. Fixed to match
+`GovernedRuntime._parse_policy_rules()`'s own already-correct pattern
+(`PolicyDecision(r.get("decision", "deny"))`). 0% test coverage on this file had let this ship
+silently — this is exactly the class of bug closing a real coverage gap is meant to catch.
+
+**Also fixed, found adjacent to this work**: four now-unused `# type: ignore[arg-type]` comments
+in `test_postgres_registry.py` (a pre-existing file, not part of this session's earlier work) —
+not part of the CI-gated `mypy` scope (`Makefile`/`ci.yml` only check `src/`, not `tests/`), fixed
+anyway since it was found while re-running a clean `mypy` pass here. A separate, genuinely
+pre-existing, out-of-scope set of dict-invariance mypy nits in `test_agentgateway_client.py` was
+confirmed present in the baseline (before any of this session's changes) and left alone.
+
+**Verification**: `presidium_contrib.service.policy`/`.registry` both now at **100% coverage**
+(from 0%). `presidium-contrib` overall coverage: 71% → 82%. All 131 presidium-contrib tests pass,
+3x stable. `ruff`/`mypy --strict` clean on `src/` (the real, CI-gated scope) for both packages.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — P0 item 3 marked done with full detail, M7's own duplicate
+  checklist item updated to point at it
+- `CHANGELOG.md` — real entries
+- `docs/log.md` — this entry

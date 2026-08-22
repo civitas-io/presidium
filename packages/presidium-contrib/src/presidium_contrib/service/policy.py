@@ -14,6 +14,7 @@ from presidium.model import (
     EvaluationContext,
     EvaluationStage,
     Grant,
+    PolicyDecision,
     PolicyRule,
     TrustTier,
 )
@@ -109,7 +110,14 @@ class PolicyEvaluatorServer(GenServer):
                     name=r["name"],
                     stage=stage,
                     expression=r["expression"],
-                    decision=r.get("decision", "deny"),
+                    # 2026-08-22 fix: was a raw string, not a PolicyDecision enum member --
+                    # CelPolicyEngine.evaluate() happily stored it (rule.decision is untyped
+                    # at that layer), but PolicyEvaluatorServer._handle_evaluate()'s own
+                    # `result.decision.value` then crashed with a real AttributeError on
+                    # every non-default-ALLOW decision. Caught by real tests, not inspection
+                    # alone -- 0% coverage on this file had masked it entirely. Matches
+                    # GovernedRuntime._parse_policy_rules()'s own correct pattern.
+                    decision=PolicyDecision(r.get("decision", "deny")),
                     reason=r.get("reason"),
                     priority=r.get("priority", 0),
                     enabled=r.get("enabled", True),

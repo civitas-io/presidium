@@ -56,8 +56,19 @@ structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) 
   Also added missing `mypy` override entries for `hvac`/`asyncpg` (no published stubs), found
   adjacent to this work. All 442+ tests (354 core + 108 contrib) pass, 3x stable, mypy and ruff
   clean on both packages.
-- [ ] **Close the `presidium_contrib.service.policy`/`.registry` 0%-coverage gap** before anything
-  is built on top of them (M7 wraps this code directly). Tracked under M7 below.
+- [x] **Close the `presidium_contrib.service.policy`/`.registry` 0%-coverage gap.** **Done
+  2026-08-22.** Both files now at **100% coverage** (up from 0%) — 14 new tests: unit tests calling
+  `handle_call()` directly (`test_service_policy.py`, `test_service_registry.py`) plus a real
+  end-to-end integration suite through an actual `civitas.Runtime`/`Supervisor`
+  (`tests/integration/test_service_mode_real_runtime.py`), including a dedicated regression test
+  proving the `self._registry`/`AgentProcess._registry` collision fix (above) survives real
+  Supervisor wiring, not just a static rename. **Found and fixed a second real, previously-hidden
+  bug this same pass**: `PolicyEvaluatorServer._handle_load()` stored a raw string in
+  `PolicyRule.decision` instead of converting it to the `PolicyDecision` enum —
+  `CelPolicyEngine.evaluate()` accepted it silently, but `_handle_evaluate()`'s own
+  `result.decision.value` then crashed with a real `AttributeError` on every non-default-ALLOW
+  decision. 0% coverage had masked this entirely; caught immediately by the first real test that
+  exercised a non-trivial policy outcome. `presidium-contrib` coverage: 71% → **82%**.
 - [ ] **Build M7 (Presidium Server) itself.** Without it, Presidium cannot be reached by anything
   outside a single Civitas process — including Fabrica. This is the actual structural gap between
   "three separate pillars" and "one integrated platform." See the M7 section below.
@@ -351,9 +362,10 @@ to it fully, but treat "build a new server" as the fallback, not the default.
 
 **Requirements:**
 
-- [ ] **(P0, do first)** Close the existing test-coverage gap: `presidium_contrib.service.policy`/
-  `.registry` (the GenServers this milestone wraps) currently have **0% test coverage** — a
-  network-facing layer must not ship on top of untested internals
+- [x] Close the existing test-coverage gap: `presidium_contrib.service.policy`/`.registry` (the
+  GenServers this milestone wraps). **Done 2026-08-22** — see "Implementation Priority" → P0
+  above for the full write-up (both files now 100%, a real second bug found and fixed in the
+  process).
 - [x] **Wire up the Ed25519 identity binding that M2 already documents as done but never actually
   implemented.** **Done 2026-08-22** — see the full write-up under "Implementation Priority" → P0
   above. `GovernedRuntime.start()` now binds a real, persistent `AgentIdentity` per agent;

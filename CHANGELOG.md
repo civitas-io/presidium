@@ -36,6 +36,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
   `civitas-io/fabrica`'s own precedent. `civitas>=0.11.0` has been real and published on PyPI for
   some time; there was no remaining reason to float on an unpinned branch.
 
+#### presidium-contrib — Service Mode test coverage: 0% → 100%, a second real bug found (2026-08-22)
+
+- **`presidium_contrib.service.policy`/`.registry` now have real test coverage (0% → 100%)** —
+  14 new tests: direct `handle_call()` unit tests plus a real end-to-end suite through an actual
+  `civitas.Runtime`/`Supervisor` (`tests/integration/test_service_mode_real_runtime.py`),
+  including a dedicated regression test for the `RegistryServer` attribute-collision fix below.
+- **Fixed:** `PolicyEvaluatorServer._handle_load()` stored a raw string in `PolicyRule.decision`
+  instead of converting it to the `PolicyDecision` enum. `CelPolicyEngine.evaluate()` accepted it
+  silently, but `_handle_evaluate()`'s own `result.decision.value` then crashed with a real
+  `AttributeError` on every non-default-ALLOW decision. 0% test coverage had masked this entirely;
+  caught immediately by the first real test exercising a non-trivial policy outcome. Matches
+  `GovernedRuntime._parse_policy_rules()`'s own correct pattern.
+
 #### presidium-contrib — Real attribute-name collision in `RegistryServer` (2026-08-22)
 
 - **Fixed:** `RegistryServer` named its own governance registry `self._registry`, colliding with

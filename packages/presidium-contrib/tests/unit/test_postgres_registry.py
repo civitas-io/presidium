@@ -79,7 +79,7 @@ class TestGrantToDict:
 class TestRowToRecord:
     def test_converts_row_to_agent_record(self) -> None:
         row = _make_row()
-        record = _row_to_record(row)  # type: ignore[arg-type]
+        record = _row_to_record(row)
         assert record.name == "researcher"
         assert record.agent_id == "presidium://local/researcher"
         assert record.trust_tier == TrustTier.STANDARD
@@ -90,15 +90,15 @@ class TestRowToRecord:
         import json
 
         row = _make_row()
-        row["grants"] = json.dumps(row["grants"])  # type: ignore[arg-type]
-        record = _row_to_record(row)  # type: ignore[arg-type]
+        row["grants"] = json.dumps(row["grants"])
+        record = _row_to_record(row)
         assert len(record.grants) == 1
 
     def test_handles_string_timestamps(self) -> None:
         row = _make_row()
         row["created_at"] = "2026-06-14T12:00:00+00:00"
         row["updated_at"] = "2026-06-14T12:00:00+00:00"
-        record = _row_to_record(row)  # type: ignore[arg-type]
+        record = _row_to_record(row)
         assert isinstance(record.created_at, datetime)
 
 
