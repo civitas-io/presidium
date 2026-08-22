@@ -720,3 +720,66 @@ in the new Priority section.
 - `docs/vision/roadmap.md` — new Priority section, milestone priority tags, M7 requirement
   reordering/tagging
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] research | Comparison against Microsoft's Agent Governance Toolkit (AGT)
+
+**Trigger:** A direct request to review `microsoft/agent-governance-toolkit` (v4.1.0, MIT,
+public preview) and identify conceptual gaps or ideas worth adopting.
+
+**Scale context, stated honestly:** AGT is substantially more mature than Presidium today — 5
+language SDKs, 9 packages/5 PyPI distributions, 10 formal RFC 2119 specs backed by 992
+conformance tests, 29 ADRs, real compliance mappings (OWASP Agentic Top 10, NIST AI RMF, EU AI
+Act, SOC 2), and a Rust-core policy engine (Agent Control Specification / ACS) with a Python SDK
+built via maturin.
+
+**Two real, concrete security gaps found in Presidium via this comparison, now tracked as P1
+roadmap items** (see the two new bullets under "Implementation Priority" → P1):
+
+1. **No trust ceiling propagation.** AGT's `AGENTMESH-IDENTITY-TRUST-1.0` spec requires a
+   `trust_ceiling` on every agent, enforced at creation, on every score update, and across
+   delegation chains (`child ceiling <= parent ceiling`) — specifically to prevent "trust
+   washing" (an attacker repeatedly spawning fresh identities to reset a degraded trust score).
+   Presidium has no equivalent: cold-start values are independent of a parent's own trust.
+2. **No enforcement of monotonic capability narrowing on delegation/spawn.** AGT requires every
+   delegated capability set to be a strict subset of the delegator's own, hash-chained for
+   tamper-evidence, with a hard depth limit. Presidium's `parent_agent_id` records lineage but
+   enforces nothing about what a child is granted — a child can currently end up with *more*
+   grants than its parent.
+
+**Real architectural ideas noted, not committed to any specific implementation yet:**
+- ACS's `transform` verdict type (a policy decision can sanitize/redact as part of one unified
+  verdict, vs. Presidium's separate `redact_dict()`/`PIIDetector` utilities layered on top).
+- AGT's MCP Security Gateway is far more built out than Presidium's `mcp_gateway`: message
+  signing with replay protection, session tokens with TTL, sliding-window rate limiting (already
+  a P1 M7 item here independently), per-server TLS/auth enforcement, CVE feed integration (OSV
+  API), cross-server confused-deputy detection. Added as real candidates to the MCP-governance
+  P1 item, not committed wholesale.
+- Formal RFC 2119 specs + dedicated conformance suites as a distinct discipline from test
+  coverage % — worth considering as Presidium's own `docs/design/*.md` mature further.
+
+**Real, honest findings that don't require Presidium action, or point elsewhere in the org:**
+- AGT's own "Known Limitations" doc names a composability gap (two individually-permitted
+  actions forming a data-exfiltration path) that Presidium's per-action CEL evaluation shares
+  today, undocumented as such here.
+- AGT's "Knowledge Governance Gap" (provenance/freshness/classification of retrieved RAG
+  context) and a cited cross-session persistent-memory attack chain
+  (Dai et al., arXiv 2605.06158, 80-95% ASR) are directly relevant to `civitas-io/fabrica`'s
+  `Retriever`/`MemoryManager`, not Presidium — flagged for that project's own review, not acted
+  on here.
+- AGT's own published <0.1ms Rust policy-eval number is close to Presidium's own measured 88us
+  pure-Python number at comparable rule counts (see M8's own benchmarks) — a useful data point
+  that tempers, without eliminating, the case for M8's Rust research.
+- Where Presidium's own ecosystem may already be ahead, not behind: `civitas-io/fabrica`'s real,
+  hardware-validated OS-level execution isolation (AGT recommends per-agent containers as an
+  *external* mitigation, since AGT itself only governs at the application-middleware layer);
+  `civitas-io/tessera`'s agent-blind credential model is arguably stronger than AGT's own
+  admitted "Credential Persistence Gap."
+
+**Full comparison recorded in `civitas-io/context`'s `competitive-analysis.md`.**
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — two new P1 items (trust ceiling, capability narrowing), MCP
+  governance item enriched with real candidates
+- `docs/log.md` — this entry

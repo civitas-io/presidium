@@ -70,8 +70,33 @@ fictional cryptographic-identity claim would be worse than not releasing.
 - [ ] Add an explicit `strict`/fail-closed-on-no-match mode to `CelPolicyEngine`. Today, no rule
   matching a stage silently defaults to `ALLOW` — a real, currently-undecided security posture
   question, not just a style nit. Worth deciding on purpose rather than leaving implicit.
+- [ ] **Add trust ceiling propagation — a real, currently-exploitable "trust washing" gap.**
+  Surfaced by a direct comparison against Microsoft's Agent Governance Toolkit
+  (`microsoft/agent-governance-toolkit`), whose `AGENTMESH-IDENTITY-TRUST-1.0` spec requires
+  every spawned/delegated agent to carry a `trust_ceiling`, enforced at identity creation, on
+  every score update, and across the whole delegation chain (`child ceiling <= parent ceiling`).
+  Presidium has no equivalent today: a spawned child's cold-start trust value
+  (`OptimisticStart`/`NeutralStart`/`PessimisticStart`) is assigned independent of its parent's
+  own trust standing, so nothing stops an agent (or a compromised orchestrator) from repeatedly
+  spawning fresh children to reset a degraded trust score. Add an optional `trust_ceiling` field
+  to `AgentRecord`, enforce `min(computed_value, ceiling)` in `TrustScorer.value`, and propagate
+  `min(parent_ceiling, requested_ceiling)` at spawn time in whatever spawns children
+  (`CivitasBridge`-adjacent code, or `GovernedRuntime`).
+- [ ] **Enforce monotonic capability narrowing on delegation/spawn.** Same source comparison:
+  AGT requires every delegated/spawned agent's granted capabilities to be a strict subset of its
+  delegator's own, rejects wildcard delegation outright, and enforces a hard delegation-depth
+  limit (AGT's default: 10). Presidium's `AgentRecord.parent_agent_id` records *that* a spawn
+  happened but enforces nothing about what the child is granted — **a child agent can currently
+  end up with more grants than its parent, a real, open security hole, not a hypothetical one.**
+  Add subset-of-parent-grants validation wherever a child `AgentRecord`/its `Grant`s are
+  constructed, plus a depth counter with a configurable max.
 - [ ] Compose the three MCP governance primitives (`PIIDetector`, `PoisoningDetector`, redaction)
-  into one real pipeline — today callers must wire all three in themselves.
+  into one real pipeline — today callers must wire all three in themselves. **Real, richer
+  candidates found in the same AGT comparison**, worth evaluating alongside this: message signing
+  with replay protection, session tokens with TTL, sliding-window rate limiting (already flagged
+  above under M7), and CVE-feed integration (OSV API) against MCP servers in active use — AGT's
+  `MCP-SECURITY-GATEWAY-1.0` spec covers all of these; none are committed here yet, listed as
+  real candidates to evaluate, not a plan to copy wholesale.
 - [ ] Fix `AGENTS.md` documenting extras (`litellm`, `kong`, etc.) that don't exist in
   `pyproject.toml` yet — cheap doc fix once the adapters above land.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
