@@ -31,6 +31,11 @@ agentgateway = ["httpx>=0.27"]
 slack = ["slack-sdk>=3.27", "aiohttp>=3.9"]
 webhook = ["httpx>=0.27"]
 postgres = ["asyncpg>=0.29"]
+# Presidium Server (M7) -- civitas[http] for HTTPGateway/uvicorn/pydantic,
+# cryptography directly for mTLS client-cert DN extraction (civitas's own
+# civitas.gateway.mtls needs it independent of the jwt extra, which pulls in
+# unrelated JWT-signing machinery this milestone doesn't use).
+server = ["civitas[http]>=0.11.0", "cryptography>=41"]
 dev = [
     "pytest>=8",
     "pytest-asyncio>=0.23",

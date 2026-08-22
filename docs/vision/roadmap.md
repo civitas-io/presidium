@@ -410,24 +410,35 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   `presidium-contrib` (extra: `presidium-contrib[server]`, needs `civitas[http]`) — settles the
   three-option decision below in favor of the `civitas-gateway`-reuse approach, formalized as a
   real module rather than a separate standalone package.
-- [ ] **(P0)** Implement `PresidiumGatewayAgent` and `GovernedToolProvider.check_grant()` per the
-  now-finalized design docs. `POST /v1/check_grant` + `GET /health` only in this first cut —
-  registry CRUD, approval request/list/decide, and credential resolution remain designed (see
-  `presidium-server.md`'s own "Deferred" section) but explicitly out of scope for now.
+- [x] **(P0)** Implement `PresidiumGatewayAgent` and `GovernedToolProvider.check_grant()`.
+  **Done 2026-08-22.** `POST /v1/check_grant` + `GET /health` only in this first cut — registry
+  CRUD, approval request/list/decide, and credential resolution remain designed (see
+  `presidium-server.md`'s own "Deferred" section) but explicitly out of scope for now. **A real,
+  second implementation-time correction found and fixed**: the design's original
+  `payload_extra`-based single-agent dispatch doesn't work —
+  `civitas.gateway.router.RouteTable.from_config()` never populates `payload_extra` for ordinary,
+  user-declared routes (confirmed live: a real `GET /health` returned `400 {"error": "Unknown
+  operation: None"}`). Fixed with one real agent per route (`PresidiumGatewayAgent` for
+  `check_grant`, a new `HealthCheckAgent` for `/health`) instead — simpler, and correctly matches
+  the real API. 39 new tests (unit + a real end-to-end suite through an actual `HTTPGateway` and
+  real `httpx` requests over real HTTP), both new modules at 100% coverage.
 - [ ] **(deferred, tracked not forgotten)** Registry CRUD + grant management, approval
   request/list/decide, credential resolution over the network — real, designed intents
   (`presidium-server.md`'s own "Deferred" section sketches how each would extend the same
   `PresidiumGatewayAgent` pattern), not built until something concretely needs them.
-- [ ] **(P0)** **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract
+- [ ] **(real, honest gap, not silently claimed done)** `scope` (FR-1.4) is not yet threaded
+  through to `ActionRequest.parameters` — CEL policies cannot yet reference `request.parameters`
+  from a `check_grant` call. Small, real follow-up.
+- [x] **(P0)** **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract
   exactly**: synchronous REST, `agent_id` + `action` + `scope` in,
   `GrantResult(decision, reason, approval_context)` out (confirmed directly against
-  `civitas-io/fabrica/docs/contracts/managers.md`) — this is the first, most concrete consumer
-  to build against, not a hypothetical one
-- [ ] **(P0)** Preserve fail-closed semantics across the network boundary: an unreachable or
+  `civitas-io/fabrica/docs/contracts/managers.md`) — shipped, minus the `scope` gap noted directly
+  above.
+- [x] **(P0)** Preserve fail-closed semantics across the network boundary: an unreachable or
   erroring server must be something the *client* can safely treat as `deny` without the server
-  needing to do anything special — Fabrica's own contract already assumes this ("never raises for
-  a Presidium-unreachable condition"), so the server's only job is to be honest about its own
-  health, not paper over outages
+  needing to do anything special — confirmed shipped: `PresidiumGatewayAgent` never raises for a
+  missing field, an unresolvable agent, or any policy decision; a real end-to-end test proves a
+  `200` (never a `5xx`) for every one of these cases over real HTTP.
 - [ ] **(P0)** mTLS at the transport boundary, not bearer tokens/API keys as the primary
   mechanism — natural fit with `AgentRecord`'s existing SPIFFE-compatible `presidium://` identity
   model (once the Ed25519 item above is actually wired up — mTLS without a real key behind it is

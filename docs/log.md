@@ -1025,3 +1025,59 @@ this specific file for historical accuracy, with a note explaining why.
 
 **Next real step**: implement `GovernedToolProvider.check_grant()` and `PresidiumGatewayAgent` per
 these now-finalized docs.
+
+---
+
+## [2026-08-22] fix | Presidium Server implemented — check_grant() shipped, a real design gap found and fixed
+
+**Trigger:** Continuing the P0 sequence past design: implement `GovernedToolProvider.check_grant()`
+and `PresidiumGatewayAgent` per the just-finalized `presidium-server-requirements.md`/
+`presidium-server.md`.
+
+**`GovernedToolProvider.check_grant()`**: added as designed — shares lookup/evaluate/audit logic
+with `check()` via a renamed, generalized private helper. **A real bug found immediately by the
+first real test run, not by inspection**: the shared helper (then still named
+`_evaluate_pre_tool`) always prefixed its resource argument with `"tool:"`, inherited from `check()`'s
+own convention — silently breaking `check_grant()`'s own FR-1.3 "resource = action, verbatim"
+requirement. Fixed by renaming the helper to `_evaluate`, having it take a pre-built `resource`
+string directly, and having `check()` build `f"tool:{tool}"` itself before calling it —
+`check_grant()`'s own second parameter renamed from `tool` to `resource` to match, resolving the
+naming-mismatch open question from the design doc for real rather than leaving it as a comment.
+
+**`presidium_contrib.server`**: implemented, then found a second, more structural real gap the
+same session, this time via an actual running gateway, not a unit test. The design's original
+`PresidiumGatewayAgent` dispatched on `message.payload["__op__"]`, injected via each route's
+`payload_extra` — modeled directly on how Civitas's own auto-registered topology routes work.
+A real `GET /health` against this design returned `400 {"error": "Unknown operation: None"}`.
+Traced to the real, verified source: `civitas.gateway.router.RouteTable.from_config()` (the actual
+parser for user-declared `routes:` config) never reads `payload_extra` at all — it is exclusively
+populated by Civitas's own internal `_build_topology_routes()` construction, not a general-purpose
+mechanism exposed through `GatewayConfig.routes`'s public, list-of-dicts shape. **Fixed with one
+real agent per route** instead of one dispatching on a marker: `PresidiumGatewayAgent` now only
+ever handles `check_grant`; a new, separate, minimal `HealthCheckAgent` handles `/health`.
+Genuinely simpler than the original design, not just a workaround.
+
+**Verification**: 39 new tests across `presidium`/`presidium-contrib` — real unit tests calling
+`handle_call()` directly (fast, focused), plus a real end-to-end integration suite
+(`tests/integration/test_presidium_server_real_gateway.py`) standing up an actual
+`civitas.gateway.HTTPGateway` inside a real `civitas.Runtime`/`Supervisor` and hitting it with real
+`httpx` requests over real HTTP — `GET /health`, `POST /v1/check_grant` (allow/deny/unresolvable
+agent, all confirmed `200` never `5xx` per FR-1.2/NFR-1), and confirmed `/topology`/`/docs` return
+`404` (proving FR-4.2's minimal-surface requirement holds for real, not just in the config). Both
+new modules (`presidium.providers.tool` stays 100%; `presidium_contrib.server` reaches 100%) —
+517 tests total across both packages, 3x stable. `ruff`/`mypy --strict` clean on both.
+
+**Real, honest gaps not hidden**: `scope` (FR-1.4) is not yet threaded through to
+`ActionRequest.parameters` — a small, real, scoped follow-up, not claimed done. A full mTLS
+handshake integration test (real private CA + client cert) is not yet written — the current suite
+exercises `require_mtls=False` end to end and `require_mtls=True`'s config assembly in isolation,
+a real, separate, valuable addition tracked but not done here.
+
+**Pages updated:**
+- `docs/design/presidium-server.md` — the `PresidiumGatewayAgent`/`GatewayConfig` sketches
+  replaced with the real, shipped code shape; a new "Implementation status" section; the resolved
+  Open Questions updated
+- `docs/vision/roadmap.md` — the implementation checklist item marked done with the full story,
+  the `scope` gap tracked as its own item
+- `CHANGELOG.md` — real entries
+- `docs/log.md` — this entry

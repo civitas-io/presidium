@@ -11,11 +11,13 @@ from presidium.audit import AuditEvent, AuditSink
 from presidium.errors import PolicyDeniedError
 from presidium.model import (
     ActionRequest,
+    AgentRecord,
     ApprovalRequest,
     EnforcementMode,
     EvaluationContext,
     EvaluationStage,
     PolicyDecision,
+    PolicyResult,
 )
 from presidium.policy._base import PolicyEngine
 from presidium.registry._base import AgentRegistry
@@ -61,19 +63,75 @@ class GovernedToolProvider:
         }
         await self._audit_sink.emit(event)
 
-    async def check(self, agent_name: str, tool: str, action: str = "invoke") -> Any:
-        """Evaluate PRE_TOOL policies. Returns PolicyResult."""
+    async def _evaluate(
+        self, agent_name: str, resource: str, action: str
+    ) -> tuple[PolicyResult, AgentRecord | None]:
+        """Shared lookup + PRE_TOOL evaluation + audit emission.
+
+        Takes a fully-built ``resource`` string -- callers each construct
+        their own resource-naming convention before calling this (``check()``
+        prefixes with ``"tool:"``; ``check_grant()`` does not, per
+        presidium-server-requirements.md's FR-1.3 "Option 2, refined": the
+        whole caller-supplied action string, verbatim). This resolves a real
+        naming mismatch found during implementation -- an earlier version of
+        this method took a ``tool`` parameter and always prefixed it, which
+        silently broke ``check_grant()``'s own "verbatim" requirement.
+
+        Never raises. Returns (PolicyResult(DENY, reason="Agent not found in
+        registry"), None) for an unresolvable agent_name -- no audit event is
+        emitted in that case (there is no valid AgentRecord to attribute it
+        to). ``check()`` and ``check_grant()`` both build on this one
+        implementation so they can never drift on lookup/evaluation/audit
+        semantics -- only on what they each do with the result afterward.
+        """
         record = await self._registry.lookup(agent_name)
         if record is None:
-            raise PolicyDeniedError("Agent not found in registry", None)
+            return (
+                PolicyResult(
+                    decision=PolicyDecision.DENY,
+                    policy_name=None,
+                    reason="Agent not found in registry",
+                ),
+                None,
+            )
 
         context = EvaluationContext(
             agent=record,
-            request=ActionRequest(resource=f"tool:{tool}", action=action),
+            request=ActionRequest(resource=resource, action=action),
             time=datetime.now(UTC),
         )
         result = await self._engine.evaluate(EvaluationStage.PRE_TOOL, context)
         await self._emit_audit(result, context)
+        return result, record
+
+    async def check_grant(
+        self, agent_name: str, resource: str, action: str = "invoke"
+    ) -> PolicyResult:
+        """Like check(), but never blocks on approval and never raises.
+
+        ``resource`` is used exactly as given -- NOT prefixed with
+        ``"tool:"`` the way ``check()``'s ``tool`` parameter is. Callers
+        construct whatever resource-naming convention fits their own domain
+        (Presidium Server's ``check_grant`` HTTP endpoint passes the calling
+        system's whole action string verbatim, per FR-1.3).
+
+        REQUIRE_APPROVAL decisions are returned as a plain PolicyResult value
+        -- not resolved synchronously via ApprovalService -- for callers with
+        their own suspend/resume mechanism (e.g. Civitas's durable
+        suspension, which is how civitas-io/fabrica's PresidiumClient uses
+        this). DENY and an unresolvable agent_name are likewise returned as
+        values, never raised -- a caller building an HTTP response (or any
+        other fail-closed-as-a-return-value contract) never needs a
+        try/except here.
+        """
+        result, _record = await self._evaluate(agent_name, resource, action)
+        return result
+
+    async def check(self, agent_name: str, tool: str, action: str = "invoke") -> Any:
+        """Evaluate PRE_TOOL policies. Returns PolicyResult."""
+        result, record = await self._evaluate(agent_name, f"tool:{tool}", action)
+        if record is None:
+            raise PolicyDeniedError(result.reason, result.policy_name)
 
         if result.enforcement == EnforcementMode.ADVISORY:
             if result.decision != PolicyDecision.ALLOW:

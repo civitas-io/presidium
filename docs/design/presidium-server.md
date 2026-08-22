@@ -93,131 +93,137 @@ that's the moment to build the distributed version — not before.
 
 ## Data Model
 
+### Real, implemented (2026-08-22) — this section reflects the shipped code, not a sketch
+
+**A real design correction found during implementation, corrects the two subsections below as
+they originally read**: the original sketch had `PresidiumGatewayAgent` dispatch on a single
+`message.payload["__op__"]` marker injected via each route's `payload_extra` — modeled on how
+Civitas's own auto-registered topology routes work. Verified directly against
+`civitas.gateway.router.RouteTable.from_config()` (the real parser for user-declared `routes:`
+config, confirmed by reading the source and then confirming live against a real running gateway)
+that **`payload_extra` is never populated for ordinary, user-declared routes** — it is exclusively
+set by Civitas's own internal `_build_topology_routes()` construction, not a general-purpose
+mechanism exposed through `GatewayConfig.routes`'s public, list-of-dicts shape. A real `GET
+/health` against the original design returned `400 {"error": "Unknown operation: None"}` — the
+marker never arrived. **Fixed with one real agent per route** (`PresidiumGatewayAgent` for
+`check_grant`, a new, separate, minimal `HealthCheckAgent` for `/health`) instead of one agent
+dispatching on a marker — genuinely simpler, and correctly matches the real, verified API surface.
+
 ### The new `GovernedToolProvider.check_grant()` method (presidium core)
 
 ```python
 class GovernedToolProvider:
     async def check_grant(
-        self, agent_name: str, tool: str, action: str = "invoke"
+        self, agent_name: str, resource: str, action: str = "invoke"
     ) -> PolicyResult:
-        """Like check(), but never blocks on approval.
+        """Like check(), but never blocks on approval and never raises.
+
+        `resource` is used exactly as given -- NOT prefixed with "tool:" the
+        way check()'s `tool` parameter is (a real naming mismatch found and
+        fixed during implementation: an earlier draft shared check()'s own
+        "tool:"-prefixing helper, which silently broke FR-1.3's "verbatim"
+        requirement -- the shared helper was renamed from `_evaluate_pre_tool`
+        to `_evaluate` and now takes a pre-built `resource` string, with
+        check() building `f"tool:{tool}"` itself before calling it).
 
         REQUIRE_APPROVAL decisions are returned as a plain PolicyResult value,
         not resolved synchronously via ApprovalService. Callers with their own
         suspend/resume mechanism (e.g. Civitas's durable suspension, which is
         how civitas-io/fabrica handles this) use this instead of check().
-
-        Shares the same registry-lookup + policy-evaluation + audit-emission
-        logic as check() via a private helper -- this is not a parallel
-        reimplementation, and check()'s own blocking behavior is unchanged.
         """
 ```
 
-Internally, `check()` and `check_grant()` both call a new private `_evaluate(agent_name, tool,
-action) -> PolicyResult` helper (lookup → `ActionRequest` → `self._engine.evaluate(...)` →
-`self._emit_audit(...)`). `check()` keeps its existing post-evaluation branch (raise on `DENY`,
-block-and-resolve on `REQUIRE_APPROVAL`); `check_grant()` returns the raw `PolicyResult`
-immediately in every case.
+Internally, `check()` and `check_grant()` both call a new private `_evaluate(agent_name, resource,
+action) -> tuple[PolicyResult, AgentRecord | None]` helper (lookup → `ActionRequest` →
+`self._engine.evaluate(...)` → `self._emit_audit(...)`). `check()` keeps its existing
+post-evaluation branch (raise on `DENY`, block-and-resolve on `REQUIRE_APPROVAL`); `check_grant()`
+returns the raw `PolicyResult` immediately in every case, never raising.
 
-### `PresidiumGatewayAgent` (presidium-contrib, new)
+### `PresidiumGatewayAgent` + `HealthCheckAgent` (presidium-contrib, real, shipped)
 
 ```python
-class PresidiumGatewayAgent(AgentProcess):
-    """Thin HTTP-to-GovernedRuntime translation layer. No governance logic of
-    its own -- every real decision is GovernedRuntime's.
+class PresidiumGatewayAgent(GenServer):
+    """Exposes GovernedRuntime.tool_provider.check_grant() over HTTP.
+
+    Built on GenServer (not a plain AgentProcess, which needs self.reply()
+    called from inside a live dispatch context) -- the same base class
+    PolicyEvaluatorServer/RegistryServer already use, for the same reason: a
+    synchronous request/reply agent returning plain dicts is easy to
+    unit-test directly (handle_call(payload, "sender")) with no running
+    Runtime/Supervisor needed.
     """
 
-    def __init__(self, name: str, *, runtime: GovernedRuntime) -> None:
-        super().__init__(name)
+    def __init__(self, name: str = DEFAULT_AGENT_NAME, *, runtime: GovernedRuntime, **kwargs: Any) -> None:
+        super().__init__(name, **kwargs)
         self._runtime = runtime
 
-    async def handle(self, message: Message) -> Message | None:
-        op = message.payload.get("__op__")
-        if op == "check_grant":
-            return await self._handle_check_grant(message)
-        if op == "health":
-            return self.reply({"status": "ok"})
-        return self.reply({"error": f"Unknown operation: {op}"})
+    async def handle_call(self, payload: dict[str, Any], from_: str) -> dict[str, Any]:
+        agent_id = payload.get("agent_id")
+        action = payload.get("action")
 
-    async def _handle_check_grant(self, message: Message) -> Message:
-        agent_id = message.payload["agent_id"]
-        action = message.payload["action"]
-        scope = message.payload.get("scope", {})
+        if not agent_id or not action:
+            return {"decision": "deny",
+                    "reason": "Missing required field: 'agent_id' and 'action' are both required",
+                    "approval_context": None}
 
         record = await self._runtime.registry.lookup_by_id(agent_id)
         if record is None:
-            return self.reply(
-                {"decision": "deny", "reason": "Agent not found in registry",
-                 "approval_context": None}
-            )
+            return {"decision": "deny", "reason": "Agent not found in registry",
+                    "approval_context": None}
 
-        # FR-1.3 -- Option 2, refined: resource = action verbatim, action = "invoke" fixed.
+        # FR-1.3 ("Option 2, refined"): resource = action verbatim,
+        # Presidium's own `action` field is the fixed, generic verb "invoke".
         result = await self._runtime.tool_provider.check_grant(
-            record.name, action, action="invoke"
+            record.name, resource=action, action="invoke"
         )
-        # ActionRequest.parameters carries `scope` for CEL policies that want it (FR-1.4);
-        # see the real _evaluate() helper signature for exactly where this is threaded through.
 
         approval_context = None
         if result.decision == PolicyDecision.REQUIRE_APPROVAL:
-            approval_context = {
-                "policy_name": result.policy_name,
-                "reason": result.reason,
-                "approvers": result.approvers,
-            }
+            approval_context = {"policy_name": result.policy_name, "reason": result.reason,
+                                 "approvers": result.approvers}
 
-        return self.reply(
-            {
-                "decision": result.decision.value,
-                "reason": result.reason,
-                "approval_context": approval_context,
-            }
-        )
+        return {"decision": result.decision.value, "reason": result.reason,
+                "approval_context": approval_context}
+
+
+class HealthCheckAgent(GenServer):
+    """A real, minimal, always-{"status": "ok"} GenServer for /health."""
+
+    def __init__(self, name: str = DEFAULT_HEALTH_AGENT_NAME, **kwargs: Any) -> None:
+        super().__init__(name, **kwargs)
+
+    async def handle_call(self, payload: dict[str, Any], from_: str) -> dict[str, Any]:
+        return {"status": "ok"}
 ```
 
-**Real, honest note on the sketch above**: `tool_provider.check_grant(record.name, action,
-action="invoke")` calls `GovernedToolProvider.check_grant(agent_name, tool, action)` — the
-existing signature's second positional parameter is named `tool` for its original (tool-call)
-use case; here it carries the *whole, verbatim* `action` string as the resource identifier per
-FR-1.3. This naming mismatch (`tool` parameter, but carrying an arbitrary action string, not a
-literal tool name) is worth a real look during implementation — either a doc-comment clarifying
-the parameter's real meaning in this call path, or a small, additive alias parameter, decided at
-implementation time rather than guessed here.
+`scope` (FR-1.4) is designed to thread into `ActionRequest.parameters` via the shared `_evaluate()`
+helper's own construction — not yet wired through `PresidiumGatewayAgent.handle_call()`'s real,
+shipped code in this first cut (real, honest gap: `_evaluate()`'s current signature takes
+`resource`/`action` only, not `parameters`; extending it is a small, real follow-up, not done
+speculatively here).
 
-### `GatewayConfig` for the real, minimal route set
+### `GatewayConfig` for the real, minimal, shipped route set
 
 ```python
-config = GatewayConfig(
-    host="0.0.0.0",
+config = build_check_grant_gateway_config(
     port=8443,
     tls_cert="/etc/presidium/server.crt",
     tls_key="/etc/presidium/server.key",
     tls_ca_cert="/etc/presidium/ca.crt",       # a dedicated private CA -- see FR-3.3
-    client_cert_mode="required",
-    middleware=["civitas.gateway.mtls.require_client_cert"],
-    routes=[
-        {
-            "method": "POST",
-            "path": "/v1/check_grant",
-            "agent": "presidium.gateway",
-            "mode": "call",
-            "payload_extra": {"__op__": "check_grant"},
-        },
-        {
-            "method": "GET",
-            "path": "/health",
-            "agent": "presidium.gateway",
-            "mode": "call",
-            "payload_extra": {"__op__": "health"},
-        },
-    ],
-    docs_enabled=False,  # a security product's own API: no public Swagger UI by default
+    require_mtls=True,                          # the real default
 )
+# Real, resulting GatewayConfig -- two agents, two routes, no payload_extra
+# (see this section's own correction note above for why):
+#   routes=[
+#       {"method": "POST", "path": "/v1/check_grant", "agent": "presidium.gateway", "mode": "call"},
+#       {"method": "GET", "path": "/health", "agent": "presidium.gateway.health", "mode": "call"},
+#   ]
 ```
 
-`payload_extra` is Civitas's own, already-real, already-used mechanism (its auto-registered
-topology routes carry `{"__op__": ...}` the identical way) — reused here deliberately, not
-invented fresh.
+The caller constructs and registers real `PresidiumGatewayAgent`/`HealthCheckAgent` instances
+under the same `Supervisor` as the `HTTPGateway` itself — `build_check_grant_gateway_config()`
+only builds the routing config; it does not construct or register the agents (see the function's
+own docstring).
 
 ### Environment / configuration
 
@@ -270,13 +276,35 @@ The approval endpoints specifically are the real, concrete piece that would let 
 `require_approval` decision from `check_grant` actually get resolved over the network — worth
 prioritizing first among the deferred set when this milestone's scope expands.
 
+## Implementation status (2026-08-22)
+
+**Real, shipped**: `GovernedToolProvider.check_grant()` (presidium core), `PresidiumGatewayAgent` +
+`HealthCheckAgent` + `build_check_grant_gateway_config()` (`presidium_contrib.server`). 39 new
+tests across both packages — real Ed25519-free unit tests calling `handle_call()` directly, plus a
+real end-to-end suite through an actual `civitas.gateway.HTTPGateway` and real `httpx` requests
+over real HTTP (`tests/integration/test_presidium_server_real_gateway.py`). Both new modules at
+100% coverage. `ruff`/`mypy --strict` clean.
+
+**Real, honest gap in this first cut**: `scope` (FR-1.4) is not yet threaded through to
+`ActionRequest.parameters` — `_evaluate()`'s current signature only takes `resource`/`action`.
+CEL policies cannot yet reference `request.parameters` from a `check_grant` call. Small, real,
+not-yet-done follow-up, not silently claimed as complete.
+
+**Not yet done, tracked separately, not blocking this milestone's core delivery**: real mTLS
+handshake testing (a full private-CA + client-cert integration test) — the current test suite
+exercises `require_mtls=False` end to end and `require_mtls=True`'s config assembly in isolation,
+not a live handshake. A real, valuable addition, scoped as its own follow-up.
+
 ## Open Questions (Deferred)
 
 - Should `PresidiumGatewayAgent` own its `GovernedRuntime` instance, or be constructed with one
   passed in (supporting a deployment where the same `GovernedRuntime` also runs other, in-process
-  governed agents)? Leaning toward accepting one, matching `GovernedRuntime`'s own existing
-  dependency-injection style — not resolved here.
+  governed agents)? **Resolved as shipped**: accepts one via a required keyword-only `runtime=`
+  parameter, matching `GovernedRuntime`'s own existing dependency-injection style.
 - Real load/latency testing against this endpoint is M8's job (Performance Research), explicitly
   sequenced after this milestone ships, not before.
-- The `tool` parameter naming mismatch on `check_grant()` (see the code sketch above) — resolve at
-  implementation time.
+- ~~The `tool` parameter naming mismatch on `check_grant()`~~ — **resolved**: renamed to
+  `resource`, and the shared `_evaluate()` helper now takes a pre-built resource string rather than
+  auto-prefixing one (see "Real, implemented" above).
+- Wiring `scope` (FR-1.4) through to `ActionRequest.parameters` — real, scoped follow-up (see
+  "Implementation status" above), not resolved in this cut.

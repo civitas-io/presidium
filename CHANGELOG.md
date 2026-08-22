@@ -10,6 +10,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ### Added
 
+#### presidium + presidium-contrib — Presidium Server: check_grant() shipped (2026-08-22)
+
+- **`GovernedToolProvider.check_grant(agent_name, resource, action="invoke") -> PolicyResult`** —
+  a real, new, additive method in `presidium` core. Like `check()`, but never blocks on
+  `REQUIRE_APPROVAL` (returns it as a plain value) and never raises (an unresolvable
+  `agent_name` returns a `DENY` `PolicyResult`, not an exception). Shares lookup/evaluate/audit
+  logic with `check()` via a renamed, generalized private helper (`_evaluate_pre_tool` →
+  `_evaluate`, now takes a pre-built `resource` string instead of a `tool` name it silently
+  prefixed with `"tool:"`).
+- **New `presidium_contrib.server` module** (`presidium-contrib[server]` extra, needs
+  `civitas[http]` + `cryptography`): `PresidiumGatewayAgent` (exposes `check_grant()` over HTTP),
+  `HealthCheckAgent`, `build_check_grant_gateway_config()`. Satisfies `civitas-io/fabrica`'s
+  `PresidiumClient.check_grant()` contract exactly over real REST.
+- 39 new tests across both packages (real unit tests calling `handle_call()` directly, plus a
+  real end-to-end suite through an actual `civitas.gateway.HTTPGateway` and real `httpx` requests
+  over real HTTP). Both new modules at 100% coverage.
+
 #### presidium — Real Ed25519 identity binding (2026-08-22)
 
 - **`GovernedRuntime` now binds a real, persistent Ed25519 identity per agent** via
