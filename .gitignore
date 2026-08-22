@@ -41,8 +41,11 @@ site/
 .env
 .env.local
 
-# Session handoff
-HANDOFF.md
+# 2026-08-22: HANDOFF.md was previously treated as a local-only, uncommitted
+# scratch file here -- inconsistent with civitas-io/fabrica's own real,
+# tracked, committed HANDOFF.md convention. Since the whole point of this
+# file is to let a fresh session resume cold after a context compaction, it
+# must be a real, pushed file, not local-only. No longer ignored.
 
 # Presidium — real Ed25519 private keys (GovernedRuntime's default key_dir).
 # Real private key material must never be committed, even accidentally from
