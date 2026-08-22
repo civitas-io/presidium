@@ -204,10 +204,21 @@ later, not because it is architecturally dependent on M6.
   to build against, not a hypothetical one
 - [ ] mTLS at the transport boundary, not bearer tokens/API keys as the primary mechanism —
   natural fit with `AgentRecord`'s existing SPIFFE-compatible `presidium://` identity model.
-  **Real, pre-existing doc drift to resolve here, not before**: `docs/design/agent-registry.md`
-  already describes a `presidium-contrib[spiffe]` extra ("M3+ upgrade path", real X.509-SVIDs
-  via SPIRE) that **does not exist anywhere in the real codebase** — this milestone is where
-  that extra would actually need to get built, not just referenced
+- [ ] **Wire up the Ed25519 identity binding that M2 already documents as done but never
+  actually implemented.** `GovernedRuntime.start()` hardcodes `AgentRecord(public_key="", ...)`
+  — confirmed by reading the real source, not assumed. `AgentRegistry` has no
+  `verify_signature()` or equivalent; `public_key` is a passthrough string field, persisted by
+  `SqliteRegistry`/`PostgresAgentRegistry` but never populated or checked against anything real
+  anywhere in the codebase. Civitas already has a real, ready class for this
+  (`civitas.security.identity.AgentIdentity`, with `public_key_b64()`) that the design docs
+  describe reusing — `GovernedRuntime.start()` needs to actually call it. **This blocks real
+  cryptographic identity verification even before SPIRE enters the picture** — a prerequisite
+  for M7's mTLS to mean anything, not an optional nice-to-have.
+- [ ] Build `presidium-contrib[spiffe]` — real SPIRE-issued X.509-SVIDs, auto-rotation,
+  cross-deployment federation via trust domain bundles. **Real, pre-existing doc drift this
+  resolves**: `docs/design/agent-registry.md` already describes this extra as an "M3+ upgrade
+  path" but it **does not exist anywhere in the real codebase** — no module, no pyproject
+  extra, not even a stub. This milestone is where it would actually need to get built.
 - [ ] Preserve fail-closed semantics across the network boundary: an unreachable or erroring
   server must be something the *client* can safely treat as `deny` without the server needing
   to do anything special — Fabrica's own contract already assumes this ("never raises for a

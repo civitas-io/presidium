@@ -614,3 +614,37 @@ vs. `presidium-contrib[server]`) explicitly deferred to an ADR rather than picke
 - `docs/vision/roadmap.md` — new M7 section, Timeline table row
 - `docs/architecture/overview.md` — Cedar → CEL fix
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] finding | Ed25519 identity binding was never actually wired up (M2 documented as done, real code skips it)
+
+**Trigger:** A follow-up question during the M7 scoping work ("is SPIFFE/identity implementation
+complete?") prompted checking the real construction path, not just the design docs.
+
+**Finding:** `docs/design/agent-registry.md` states "each agent's identity is bound to its
+Ed25519 keypair... Civitas already provisions Ed25519 keypairs for message signing (M4.2a);
+Presidium reuses them for identity" as M2 behavior. The real code does not do this.
+`GovernedRuntime.start()` (`presidium/runtime.py`) constructs every `AgentRecord` with
+`public_key=""` — a hardcoded empty string. `AgentRegistry`'s Protocol has no
+`verify_signature()` or equivalent method. `public_key` is a plain passthrough field, persisted
+by `SqliteRegistry`/`PostgresAgentRegistry`'s schemas, but nothing in the codebase ever
+populates it with a real key or checks it against anything. Civitas's own
+`civitas.security.identity.AgentIdentity` (with a real `public_key_b64()`) already exists and is
+exactly what the design doc describes reusing — it is simply never called from Presidium.
+
+**Impact:** Presidium's own agent identity has no real cryptographic verification today, despite
+M2 (marked Complete) documenting this as delivered. The `presidium://` URI scheme is real; the
+"binding" half of "cryptographic binding" is not.
+
+**Not retroactively unmarking M2** — that would rewrite a shipped milestone's history. Instead,
+added two explicit, separately-tracked checklist items to the new M7 milestone
+(`docs/vision/roadmap.md`): (1) wire up the real Ed25519 binding via
+`civitas.security.identity.AgentIdentity`, named as a prerequisite for M7's mTLS meaning
+anything, not an optional nice-to-have; (2) build the still-undocumented-as-missing
+`presidium-contrib[spiffe]` extra (real SPIRE-issued X.509-SVIDs) — previously only mentioned as
+a parenthetical, now its own first-class item.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — M7 section, two explicit checklist items replacing one bundled bullet
+- `docs/log.md` — this entry
