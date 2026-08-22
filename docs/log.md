@@ -681,3 +681,42 @@ shipped `fabrica`'s retriever as pure Python v1 without pre-optimizing in Rust).
 **Pages updated:**
 - `docs/vision/roadmap.md` — new M8 section, Timeline table row
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] design | New "Implementation Priority (P0/P1/P2)" section in the roadmap
+
+**Trigger:** A direct request, as part of a wider cross-project completion push covering
+`python-civitas`, `presidium`, and `fabrica` together, to turn this session's accumulated real
+findings into an explicit, actionable priority order rather than leaving them scattered across
+individual milestone checklist items and chat history.
+
+**Decision:** Added a new "Implementation Priority (P0/P1/P2)" section to
+`docs/vision/roadmap.md`, positioned right after Philosophy and before M1 — deliberately
+orthogonal to the M-numbered milestones (which remain the source of truth for *scope*; this
+section is the source of truth for *sequencing and urgency*). Tagged M4/M5/M6/M7/M8 with their
+priority level inline. Reordered/tagged M7's own requirement list so its two P0 sub-items (the
+Ed25519 binding fix, the `service/*` coverage gap) read first, ahead of its P1 sub-items
+(`presidium-contrib[spiffe]`, rate limiting).
+
+**One real correction made while writing this down, not just a restatement**: an earlier framing
+(in conversation, not previously committed to any doc) said the missing
+`LLMGatewayBackend`/`ToolsGatewayBackend` wiring in `GovernedModelProvider`/`GovernedToolProvider`
+blocks Fabrica's `PresidiumClient`. On closer reading of `civitas-io/fabrica`'s own contract, this
+is not accurate — `PresidiumClient.check_grant()` only needs a decision; Fabrica executes tool
+calls itself in its own sandbox. The real, correct reason this gap is still P0: it blocks
+`GovernedModelProvider`/`GovernedToolProvider` from being usable as a drop-in Civitas
+`ModelProvider`/`ToolProvider`, which is their own stated purpose per RFC-001 and the design docs'
+own code samples — a different but equally real completeness gap. Recorded as its own explicit,
+previously-untracked item (not folded into any single M-section, since it's independent of M7's
+network-layer scope even though both draw on the same 2026-07-07 design work).
+
+**Also added, not previously tracked anywhere**: pinning `civitas` to a real PyPI release
+(`civitas>=0.11.0`) instead of `git`/`branch = "main"` in the workspace root `pyproject.toml` —
+found while compiling this list, has no natural home in any existing M-section, tracked directly
+in the new Priority section.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — new Priority section, milestone priority tags, M7 requirement
+  reordering/tagging
+- `docs/log.md` — this entry

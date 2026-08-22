@@ -8,6 +8,91 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ---
 
+## Implementation Priority (P0 / P1 / P2)
+
+> Added 2026-08-22, after a full cross-project completion review (part of a wider effort covering
+> `python-civitas`, `presidium`, and `fabrica` together — see `civitas-io/context`). This section
+> is orthogonal to the M-numbered milestones below: it says **what order to actually do things in**
+> to reach a genuinely complete, trustworthy Presidium, which cuts across several milestones at
+> once. The M-sections remain the source of truth for scope; this section is the source of truth
+> for sequencing and urgency.
+
+### P0 — blocks calling Presidium "complete." Fix before anything else.
+
+These are either **correctness/trust gaps hiding behind claims of completeness**, or the single
+structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) working end to end.
+
+- [ ] **Fix the Ed25519 identity binding.** `GovernedRuntime.start()` hardcodes
+  `AgentRecord(public_key="", ...)`; `AgentRegistry` has no `verify_signature()` or equivalent.
+  Documented as delivered M2 behavior — it isn't. **Presidium currently has zero real
+  cryptographic verification of agent identity**, in a product whose entire value proposition is
+  governance/security. Wire up `civitas.security.identity.AgentIdentity.public_key_b64()`, which
+  already exists and is ready to call. Tracked under M7 below; called out here because it should
+  not wait for M7's other, larger pieces — it is small and urgent on its own.
+- [ ] **Pin `civitas` to a real PyPI release, not `git`/`branch = "main"`.** The workspace root
+  `pyproject.toml`'s `[tool.uv.sources]` currently floats on Civitas's `main` branch. A governance
+  product with an unpinned dependency on its own runtime is a real supply-chain/reproducibility
+  risk. `civitas>=0.11.0` is real and published on PyPI — `civitas-io/fabrica` already made this
+  exact fix; copy it. Not previously tracked anywhere in this roadmap — added here as its own item.
+- [ ] **Close the `presidium_contrib.service.policy`/`.registry` 0%-coverage gap** before anything
+  is built on top of them (M7 wraps this code directly). Tracked under M7 below.
+- [ ] **Build M7 (Presidium Server) itself.** Without it, Presidium cannot be reached by anything
+  outside a single Civitas process — including Fabrica. This is the actual structural gap between
+  "three separate pillars" and "one integrated platform." See the M7 section below.
+- [ ] **Wire `GovernedModelProvider`/`GovernedToolProvider` to actually call a backend, not just
+  check permission.** Today `check()`/`post_check()` return a decision and stop — there is no
+  `LLMGatewayBackend`/`ToolsGatewayBackend` implementation anywhere
+  (`presidium/providers/gateway.py` doesn't exist). **Correction to an earlier, slightly
+  overstated framing of this same gap**: this does *not* block Fabrica's `PresidiumClient` —
+  `check_grant()` only needs a decision, and Fabrica executes tool calls itself in its own
+  sandbox. It blocks something more fundamental: **`GovernedModelProvider`/`GovernedToolProvider`
+  cannot actually be used as a drop-in Civitas `ModelProvider`/`ToolProvider` today**, despite
+  that being their stated purpose in RFC-001 and the design docs' own code samples. Not tracked
+  in any single M-section before this — tracked here directly. Independent of M7 (this is a
+  library-mode gap, not a network-layer one), but naturally worth doing alongside M7 since both
+  draw on the same 2026-07-07 pluggable-backend design
+  (`docs/design/llm-gateway.md`/`mcp-gateway.md`).
+
+**Recommended sequence** (cheapest/most urgent first, not milestone order): Ed25519 binding fix →
+`civitas` PyPI pin → `service/*` test coverage → M7 network layer → `GovernedModelProvider`/
+`GovernedToolProvider` backend wiring. Shipping a first real `presidium`/`presidium-contrib` PyPI
+release (see M5/P1 below) should wait until all five of these are true — releasing with a
+fictional cryptographic-identity claim would be worse than not releasing.
+
+### P1 — real, designed, necessary for genuine production-readiness, not immediately blocking
+
+- [ ] `AgentGatewayClient` missing `list_tools()`/`call_tool()` — MCP/A2A governance is designed but
+  not exercised end to end yet (LLM side works, tool side doesn't). Tracked under M7.
+- [ ] Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — the "full" version of the P0 Ed25519
+  item above, once the basic binding is fixed. Tracked under M7.
+- [ ] LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —
+  real market flexibility; AgentGateway already covers the reference path so this isn't urgent.
+- [ ] Add an explicit `strict`/fail-closed-on-no-match mode to `CelPolicyEngine`. Today, no rule
+  matching a stage silently defaults to `ALLOW` — a real, currently-undecided security posture
+  question, not just a style nit. Worth deciding on purpose rather than leaving implicit.
+- [ ] Compose the three MCP governance primitives (`PIIDetector`, `PoisoningDetector`, redaction)
+  into one real pipeline — today callers must wire all three in themselves.
+- [ ] Fix `AGENTS.md` documenting extras (`litellm`, `kong`, etc.) that don't exist in
+  `pyproject.toml` yet — cheap doc fix once the adapters above land.
+- [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
+  usable without it (trust tiers work fine statically in the meantime).
+- [ ] M5: SDK + CLI, and a real first PyPI release + git tag for `presidium`/`presidium-contrib`
+  (matches `fabrica`'s own real v0.1.0 precedent) — do this once every P0 item above is actually
+  true, not before.
+- [ ] M8: Performance Research — correctly sequenced after M7, not before (see M8 below).
+
+### P2 — deferred by design, commercial, or dependent on things outside our control
+
+- M6: Cloud — explicitly commercial, multi-tenant SaaS; not core-completeness.
+- Inbound A2A exposure — needs Civitas to gain an A2A *server* role first; a Civitas-side feature,
+  not Presidium's to unblock alone.
+- RFC-002 (multi-dimensional evaluation) — already labeled "Future Investigation," research-first,
+  no concrete plan yet.
+- Deferred adapters (`CedarPolicyEngine`, `TemporalApprovalService`) — no unique capability gap;
+  CEL+OPA and Slack/Webhook already cover the space.
+
+---
+
 ## M1: Foundation
 
 **Goal:** Establish project identity, architecture, and documentation.
@@ -99,6 +184,9 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ## M4: Autonomy Progression
 
+**Priority: P1** — real and well-specified, but Presidium is genuinely usable without it (trust
+tiers work fine statically in the meantime). See "Implementation Priority" above.
+
 ![Autonomy Progression](../assets/autonomy-progression.svg)
 
 **Goal:** Close the feedback loop. Agents earn autonomy through demonstrated reliability. Multi-dimensional trust scoring. Capability gating by tier. Decision journal for full auditability.
@@ -121,6 +209,10 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ## M5: SDK + CLI
 
+**Priority: P1** — do this once every P0 item in "Implementation Priority" above is actually
+true, not before. Releasing a first real PyPI package with a fictional cryptographic-identity
+claim (see the Ed25519 P0 item) would be worse than not releasing.
+
 **Goal:** One package, one install, complete experience. Trust CLI for operators.
 
 **Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-5.1–5.3)
@@ -138,6 +230,8 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 ---
 
 ## M6: Cloud
+
+**Priority: P2** — explicitly commercial, multi-tenant SaaS; not core-completeness.
 
 **Goal:** Managed service and enterprise features. Trust feedback loop measurement. Compliance reporting.
 
@@ -158,6 +252,9 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 ---
 
 ## M7: Presidium Server — self-hostable network governance service
+
+**Priority: P0** — the single structural blocker to the three-pillar platform working end to end.
+See "Implementation Priority" above for the full P0/P1 breakdown of this milestone's own items.
 
 **Goal:** Make Presidium's governance surface (policy evaluation, registry, approval,
 credentials, trust) callable over a real network boundary by any properly authenticated
@@ -189,45 +286,48 @@ later, not because it is architecturally dependent on M6.
 
 **Requirements:**
 
-- [ ] Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
-  reviewed before implementation (per this project's own documentation-driven-development
-  philosophy)
-- [ ] Real decision, not silently picked: new standalone `presidium-server` package (own
-  deployable process) vs. a `presidium-contrib[server]` extra — record as an ADR either way
-- [ ] REST endpoints for all `GovernedRuntime` operations: `PRE_TOOL`/`PRE_LLM`/`PRE_MESSAGE`/
-  `POST_TOOL`/`POST_LLM` evaluation, registry CRUD + grant management, approval
-  request/list/decide, credential resolution
-- [ ] **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract exactly**:
-  synchronous REST, `agent_id` + `action` + `scope` in,
-  `GrantResult(decision, reason, approval_context)` out (confirmed directly against
-  `civitas-io/fabrica/docs/contracts/managers.md`) — this is the first, most concrete consumer
-  to build against, not a hypothetical one
-- [ ] mTLS at the transport boundary, not bearer tokens/API keys as the primary mechanism —
-  natural fit with `AgentRecord`'s existing SPIFFE-compatible `presidium://` identity model.
-- [ ] **Wire up the Ed25519 identity binding that M2 already documents as done but never
-  actually implemented.** `GovernedRuntime.start()` hardcodes `AgentRecord(public_key="", ...)`
-  — confirmed by reading the real source, not assumed. `AgentRegistry` has no
-  `verify_signature()` or equivalent; `public_key` is a passthrough string field, persisted by
-  `SqliteRegistry`/`PostgresAgentRegistry` but never populated or checked against anything real
-  anywhere in the codebase. Civitas already has a real, ready class for this
+- [ ] **(P0, do first)** Close the existing test-coverage gap: `presidium_contrib.service.policy`/
+  `.registry` (the GenServers this milestone wraps) currently have **0% test coverage** — a
+  network-facing layer must not ship on top of untested internals
+- [ ] **(P0, do first)** **Wire up the Ed25519 identity binding that M2 already documents as done
+  but never actually implemented.** `GovernedRuntime.start()` hardcodes
+  `AgentRecord(public_key="", ...)` — confirmed by reading the real source, not assumed.
+  `AgentRegistry` has no `verify_signature()` or equivalent; `public_key` is a passthrough string
+  field, persisted by `SqliteRegistry`/`PostgresAgentRegistry` but never populated or checked
+  against anything real anywhere in the codebase. Civitas already has a real, ready class for this
   (`civitas.security.identity.AgentIdentity`, with `public_key_b64()`) that the design docs
   describe reusing — `GovernedRuntime.start()` needs to actually call it. **This blocks real
   cryptographic identity verification even before SPIRE enters the picture** — a prerequisite
   for M7's mTLS to mean anything, not an optional nice-to-have.
-- [ ] Build `presidium-contrib[spiffe]` — real SPIRE-issued X.509-SVIDs, auto-rotation,
+- [ ] **(P0)** Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
+  reviewed before implementation (per this project's own documentation-driven-development
+  philosophy)
+- [ ] **(P0)** Real decision, not silently picked: new standalone `presidium-server` package (own
+  deployable process) vs. a `presidium-contrib[server]` extra — record as an ADR either way
+- [ ] **(P0)** REST endpoints for all `GovernedRuntime` operations: `PRE_TOOL`/`PRE_LLM`/
+  `PRE_MESSAGE`/`POST_TOOL`/`POST_LLM` evaluation, registry CRUD + grant management, approval
+  request/list/decide, credential resolution
+- [ ] **(P0)** **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract
+  exactly**: synchronous REST, `agent_id` + `action` + `scope` in,
+  `GrantResult(decision, reason, approval_context)` out (confirmed directly against
+  `civitas-io/fabrica/docs/contracts/managers.md`) — this is the first, most concrete consumer
+  to build against, not a hypothetical one
+- [ ] **(P0)** Preserve fail-closed semantics across the network boundary: an unreachable or
+  erroring server must be something the *client* can safely treat as `deny` without the server
+  needing to do anything special — Fabrica's own contract already assumes this ("never raises for
+  a Presidium-unreachable condition"), so the server's only job is to be honest about its own
+  health, not paper over outages
+- [ ] **(P0)** mTLS at the transport boundary, not bearer tokens/API keys as the primary
+  mechanism — natural fit with `AgentRecord`'s existing SPIFFE-compatible `presidium://` identity
+  model (once the Ed25519 item above is actually wired up — mTLS without a real key behind it is
+  theater)
+- [ ] **(P1)** Build `presidium-contrib[spiffe]` — real SPIRE-issued X.509-SVIDs, auto-rotation,
   cross-deployment federation via trust domain bundles. **Real, pre-existing doc drift this
   resolves**: `docs/design/agent-registry.md` already describes this extra as an "M3+ upgrade
   path" but it **does not exist anywhere in the real codebase** — no module, no pyproject
-  extra, not even a stub. This milestone is where it would actually need to get built.
-- [ ] Preserve fail-closed semantics across the network boundary: an unreachable or erroring
-  server must be something the *client* can safely treat as `deny` without the server needing
-  to do anything special — Fabrica's own contract already assumes this ("never raises for a
-  Presidium-unreachable condition"), so the server's only job is to be honest about its own
-  health, not paper over outages
-- [ ] Close the existing test-coverage gap first: `presidium_contrib.service.policy`/`.registry`
-  (the GenServers this milestone wraps) currently have **0% test coverage** — a network-facing
-  layer must not ship on top of untested internals
-- [ ] Rate limiting / backpressure at the network boundary — a real concern for a shared
+  extra, not even a stub. This milestone is where it would actually need to get built. Sequenced
+  after the basic Ed25519 binding above, not instead of it.
+- [ ] **(P1)** Rate limiting / backpressure at the network boundary — a real concern for a shared
   network service that doesn't exist for an in-process library call
 
 **Deliverable:** A real, self-hostable Presidium server process, reachable over REST+mTLS by
@@ -238,6 +338,9 @@ unblocks Fabrica's `PresidiumClient` real implementation, and the technical foun
 ---
 
 ## M8: Performance Research — Rust vs. Python at the governance hot path
+
+**Priority: P1, and only after M7 ships** — this only becomes load-bearing once Presidium is a
+real multi-tenant network service. See "Implementation Priority" above.
 
 **Goal:** A research milestone, not a rewrite commitment. Answer, with real measured evidence,
 whether any part of Presidium's request-path hot loop needs to move off pure Python — and if so,
