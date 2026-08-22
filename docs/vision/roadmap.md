@@ -157,6 +157,75 @@ Documentation-driven development. Design docs and RFCs are written and reviewed 
 
 ---
 
+## M7: Presidium Server — self-hostable network governance service
+
+**Goal:** Make Presidium's governance surface (policy evaluation, registry, approval,
+credentials, trust) callable over a real network boundary by any properly authenticated
+client — not just other Civitas agents in the same runtime. Today, `presidium`'s governance
+components are only reachable in-process (as a library) or via Civitas's own actor-model
+transport (Service Mode's `PolicyEvaluatorServer`/`RegistryServer` GenServers, reachable only
+by other Civitas agents). **Neither of those is reachable by an external, non-Civitas system**,
+which is a real, concrete blocker: `civitas-io/fabrica`'s `PresidiumClient` Protocol
+(`check_grant()`) is fully specified and implementation-ready, but has nothing real to talk to.
+
+**Not the same thing as M6.** M6 ("Cloud") is the commercial, multi-tenant SaaS offering —
+Presidium Cloud, SSO, pricing tiers, SLAs. M7 is the underlying OSS building block: can
+Presidium run as its own addressable, self-hosted, single-tenant process at all, reachable by
+any authenticated caller. M6 would eventually run as a managed, multi-tenant deployment of
+what M7 builds — not the reverse. Sequenced after M6 in this document because it was scoped
+later, not because it is architecturally dependent on M6.
+
+**Builds on real, existing work — this is a transport skin, not a rewrite:**
+
+- Reuses `GovernedRuntime`'s existing composition (policy engine, registry, approval,
+  credentials, trust) as the implementation behind every endpoint — no new governance logic.
+- Reuses the existing `PolicyEvaluatorServer`/`RegistryServer` GenServer call protocol
+  (`{"action": "evaluate", ...}` / `{"action": "lookup", ...}`) as the internal shape a REST
+  facade translates to/from, rather than inventing a second evaluation path.
+- Implements the AAA architecture already designed in
+  [RFC-001](../rfcs/001-presidium-scope.md#aaa-architecture-holistic-view) and
+  [`docs/research/aaa-patterns.md`](../research/aaa-patterns.md) — this milestone is "build the
+  server RFC-001 already describes," not a new architecture decision.
+
+**Requirements:**
+
+- [ ] Design docs: `docs/design/presidium-server-requirements.md` + `presidium-server.md`,
+  reviewed before implementation (per this project's own documentation-driven-development
+  philosophy)
+- [ ] Real decision, not silently picked: new standalone `presidium-server` package (own
+  deployable process) vs. a `presidium-contrib[server]` extra — record as an ADR either way
+- [ ] REST endpoints for all `GovernedRuntime` operations: `PRE_TOOL`/`PRE_LLM`/`PRE_MESSAGE`/
+  `POST_TOOL`/`POST_LLM` evaluation, registry CRUD + grant management, approval
+  request/list/decide, credential resolution
+- [ ] **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract exactly**:
+  synchronous REST, `agent_id` + `action` + `scope` in,
+  `GrantResult(decision, reason, approval_context)` out (confirmed directly against
+  `civitas-io/fabrica/docs/contracts/managers.md`) — this is the first, most concrete consumer
+  to build against, not a hypothetical one
+- [ ] mTLS at the transport boundary, not bearer tokens/API keys as the primary mechanism —
+  natural fit with `AgentRecord`'s existing SPIFFE-compatible `presidium://` identity model.
+  **Real, pre-existing doc drift to resolve here, not before**: `docs/design/agent-registry.md`
+  already describes a `presidium-contrib[spiffe]` extra ("M3+ upgrade path", real X.509-SVIDs
+  via SPIRE) that **does not exist anywhere in the real codebase** — this milestone is where
+  that extra would actually need to get built, not just referenced
+- [ ] Preserve fail-closed semantics across the network boundary: an unreachable or erroring
+  server must be something the *client* can safely treat as `deny` without the server needing
+  to do anything special — Fabrica's own contract already assumes this ("never raises for a
+  Presidium-unreachable condition"), so the server's only job is to be honest about its own
+  health, not paper over outages
+- [ ] Close the existing test-coverage gap first: `presidium_contrib.service.policy`/`.registry`
+  (the GenServers this milestone wraps) currently have **0% test coverage** — a network-facing
+  layer must not ship on top of untested internals
+- [ ] Rate limiting / backpressure at the network boundary — a real concern for a shared
+  network service that doesn't exist for an in-process library call
+
+**Deliverable:** A real, self-hostable Presidium server process, reachable over REST+mTLS by
+any authenticated external client (Civitas-based or not) — the concrete prerequisite that
+unblocks Fabrica's `PresidiumClient` real implementation, and the technical foundation M6's
+"Presidium Cloud" would eventually run as a managed, multi-tenant version of.
+
+---
+
 ## Future Investigation: Multi-Dimensional Evaluation
 
 > See [RFC-002](../rfcs/002-multi-dimensional-evaluation.md)
@@ -179,3 +248,4 @@ These are aspirational, not commitments. Adjusted based on community feedback an
 | M4: Autonomy Progression | Q4 2026 | Planning |
 | M5: SDK + CLI | Q1 2027 | Planning |
 | M6: Cloud | 2027+ | Future |
+| M7: Presidium Server | TBD | Planning |

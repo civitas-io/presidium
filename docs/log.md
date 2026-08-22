@@ -573,3 +573,44 @@ a lock-in** — documented as such everywhere it's mentioned.
 - Adding `list_tools`/`call_tool` to `agentgateway/client.py` — same reason.
 - Resolving the grant shape for agent-targets (`agent:<name>:invoke`?) — flagged as an open question
   in `mcp-gateway.md`, not resolved here.
+
+---
+
+## [2026-08-22] design | New milestone M7: Presidium Server (self-hostable network governance service)
+
+**Trigger:** A cross-project deep dive (from the private `civitas-io/context` wiki) surfaced a
+real, concrete gap: `civitas-io/fabrica`'s `PresidiumClient` Protocol (`check_grant()`) is fully
+specified and implementation-ready, but has nothing real to talk to. Presidium's governance
+components are reachable in-process (as a library) or via Civitas's own actor transport (Service
+Mode's `PolicyEvaluatorServer`/`RegistryServer` GenServers, callable only by other Civitas
+agents) — neither is reachable by an external, non-Civitas system.
+
+**Decision:** Added **M7: Presidium Server** to `docs/vision/roadmap.md`, after M6. Scoped as the
+OSS, self-hostable building block distinct from M6's commercial "Presidium Cloud" — M6 would
+eventually run as a managed, multi-tenant deployment of what M7 builds, not the reverse.
+Deliberately scoped as "build the server RFC-001's AAA architecture already describes" plus "add
+a REST transport skin around `GovernedRuntime`'s existing composition," not a new architecture
+decision or a rewrite of governance logic.
+
+**Concrete, real requirements captured** (see the milestone itself for the full list):
+must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract exactly (confirmed
+directly against `civitas-io/fabrica/docs/contracts/managers.md` — synchronous REST, `agent_id` +
+`action` + `scope` in, `GrantResult` out); mTLS via the existing SPIFFE-compatible identity model,
+not bearer tokens; must close the `service/policy.py`/`service/registry.py` 0%-coverage gap before
+building a network-facing layer on top of them; a real package-shape decision (`presidium-server`
+vs. `presidium-contrib[server]`) explicitly deferred to an ADR rather than picked silently here.
+
+**Two small, real doc-drift fixes made in the same pass, found while grounding this milestone:**
+- `docs/architecture/overview.md` still said "Cedar policy engine" in one line, contradicting the
+  same file's own later "CEL as Default Policy Language" section — same class of staleness
+  already fixed elsewhere (RFC-001, 2026-07-07) but missed in this file. Fixed to say CEL.
+- `docs/design/agent-registry.md` describes a `presidium-contrib[spiffe]` extra ("M3+ upgrade
+  path") that does not exist anywhere in the real codebase (`pyproject.toml`, `AGENTS.md`'s own
+  extras table). Not fixed in this pass — instead pointed to explicitly as real, in-scope work
+  for M7 itself (mTLS needs exactly this), so the gap is now tracked rather than silently
+  left dangling or papered over with a doc correction that still leaves no real code behind it.
+
+**Pages updated:**
+- `docs/vision/roadmap.md` — new M7 section, Timeline table row
+- `docs/architecture/overview.md` — Cedar → CEL fix
+- `docs/log.md` — this entry

@@ -87,7 +87,7 @@ Civitas Runtime
 ```
 
 - **Civitas** handles transport-level security (mTLS between nodes) and emits audit events.
-- **Presidium** handles application-level authentication (token issuance, OBO exchange), authorization (Cedar policy engine, grant checks), and access control enforcement (at the gateway).
+- **Presidium** handles application-level authentication (token issuance, OBO exchange), authorization (CEL policy engine, grant checks), and access control enforcement (at the gateway).
 - **Enterprise IdPs** are integrated, not replaced. Presidium delegates identity issuance to Entra, Okta, Google IAM, or AWS IAM; it operates as the authorization server that wraps and enforces IdP-issued identities with agent-specific governance policy.
 
 For the full AAA architecture including HITL approval auth and the canonical credential flow, see [RFC-001](../rfcs/001-presidium-scope.md#aaa-architecture-holistic-view).
