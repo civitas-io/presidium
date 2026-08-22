@@ -13,6 +13,11 @@ Cedar is deferred to a later roadmap milestone (`docs/vision/roadmap.md` already
 `CedarPolicyEngine` under "Deferred adapters") for teams that need Cedar's formal-verification
 tooling or ecosystem. This revision brings RFC-001 in line with the roadmap and shipped code — no
 new decision is being made here, only a doc-drift fix.
+**Revised:** 2026-08-22 — Corrected two more stale package names from the original six-package
+era: `presidium-audit` (line ~112) and `presidium-sdk` (Open Questions) are not real, separate
+packages in the shipped structure — the real, current shape is two packages,
+`presidium`/`presidium-contrib` (see `docs/log.md`'s M3-completion entry). Audit/compliance is a
+module within these, not its own package. Doc-drift fix only, no new decision.
 
 ---
 
@@ -109,7 +114,7 @@ Civitas does **not** provide:
 - **LLM Gateway** (`GovernedModelProvider`) — wraps any Civitas `ModelProvider`; enforces per-agent rate limits, cost tracking, budget enforcement, grant-based provider routing
 - **MCP Gateway** (`GovernedToolProvider`) — wraps Civitas MCP client; enforces tool ACLs per agent grants, tool poisoning detection (snapshot hashes), credential redaction, audit logging
 - **HITL approval** — durable approval requests, signed payloads (LITL protection), approver authentication via org IdP
-- **Audit & compliance** (`presidium-audit`) — governance metrics (policy compliance rate, denial counts, trust drift, budget utilization), external platform export, compliance report generation
+- **Audit & compliance** (module within `presidium`/`presidium-contrib`, not a separate package — see the 2026-08-22 revision note below) — governance metrics (policy compliance rate, denial counts, trust drift, budget utilization), external platform export, compliance report generation
 
 Presidium does **not** provide:
 - The runtime itself (depends on Civitas)
@@ -288,7 +293,7 @@ Accept this RFC as the governing scope document for Presidium. All package propo
 
 - Should Presidium include a minimal TUI for local development? (Not a web UI — a `presidium status` terminal view of which agents are running, their trust scores, recent policy decisions.)
 - At what point does Presidium need its own CLI vs. extending `civitas` CLI? Proposal: `presidium` CLI for governance commands (`presidium policy validate`, `presidium registry list`, `presidium audit export`); the `civitas` CLI remains for runtime operations.
-- Should `presidium-sdk` re-export Civitas APIs or keep them as separate imports? Leaning toward separate — customers should know they're using both layers.
+- Should a future top-level `presidium` import re-export Civitas APIs or keep them as separate imports? Leaning toward separate — customers should know they're using both layers. (Note: the standalone `presidium-sdk` package named in this question when it was written no longer matches the real, shipped structure — see the 2026-08-22 revision note.)
 
 **Resolved (was: "Cedar vs. OPA as primary policy engine"):** CEL is primary, shipped in M2/M3.
 Cedar's formal-verification and ecosystem strengths are real, but CEL's zero-ops, embeddable,

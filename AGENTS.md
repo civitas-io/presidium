@@ -311,7 +311,7 @@ Before merging:
 | **Trust Score** | A numeric measure (0.0–1.0) of an agent's reliability/compliance history |
 | **Credential Vault** | Presidium store of OAuth tokens and API keys scoped per `(agent_id, user_id)` tuple |
 | **Gateway** | A governed wrapper over a Civitas plugin — `GovernedModelProvider` or `GovernedToolProvider` |
-| **Audit** | Governance metrics and compliance reporting (`presidium-audit`) — external accountability, not internal quality |
+| **Audit** | Governance metrics and compliance reporting (`AuditSink`/`AuditEnricher` in `presidium`, not a separate `presidium-audit` package) — external accountability, not internal quality |
 | **Supervisor** | Civitas component managing agent lifecycle and fault tolerance |
 | **Transport** | Civitas abstraction for message delivery (InProcess, ZMQ, NATS) |
 | **OBO** | On-Behalf-Of (RFC 8693) — token exchange pattern where agent acts on behalf of a specific user |
