@@ -8,6 +8,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ## [Unreleased]
 
+### Added
+
+#### presidium — Trust ceiling propagation and monotonic capability narrowing
+
+Two real, concrete security gaps found via a direct comparison against Microsoft's Agent
+Governance Toolkit (`microsoft/agent-governance-toolkit`), now closed:
+
+- **Trust ceiling propagation** — closes a real "trust washing" gap where an agent (or a
+  compromised orchestrator) could repeatedly spawn fresh children to reset a degraded trust score.
+  New `AgentRecord.trust_ceiling: float | None`; `LinearTrustScore` gained an optional `ceiling`
+  param clamping its `.value` getter (a hard boundary respected even by `HUMAN_OVERRIDE`/
+  `set_value()` — an admin who wants to grant more trust must explicitly raise `trust_ceiling`
+  itself, not smuggle it through an override). New `presidium.lineage.compute_child_ceiling()`.
+- **Monotonic capability narrowing on delegation/spawn** — closes a real, open security hole
+  where a spawned/delegated child could end up with *more* grants than its parent. New
+  `presidium.lineage.validate_grant_narrowing()` (subset-of-parent check on (resource, action)
+  pairs) and `presidium.lineage.compute_child_depth()` (a configurable, AGT-matching
+  `max_delegation_depth`, default 10). New `AgentRecord.depth`.
+- Both enforced inside `register()`/`add_grant()` on **all three registry backends**
+  (`InMemoryRegistry`, `SqliteRegistry`, `PostgresAgentRegistry`) — defense in depth at the
+  registry API itself, not an opt-in helper a caller could bypass. A dangling `parent_agent_id`
+  now fails closed with a new `UnresolvableParentError` rather than being silently ignored.
+- New errors: `UnresolvableParentError`, `GrantEscalationError`, `DelegationDepthExceededError`
+  (all `RegistryError` subclasses).
+- **Behavioral note for existing integrations**: registering or granting to an agent with
+  `parent_agent_id` set now performs real validation that didn't exist before — previously it was
+  pure, unvalidated metadata. No real caller in this codebase or its dependents currently
+  constructs a live spawn-and-register composition (confirmed: Civitas's `Runtime.spawn()` has no
+  Presidium awareness; Fabrica's `CivitasBridge.request_supervision()` is a pass-through, not
+  called by Fabrica's own managers in v1), so the practical blast radius today is zero — this
+  closes the hole before a real orchestrator is built on top of it, not after.
+- 60+ new tests (pure-function tests, registry-level integration tests across all three
+  backends). All 439 `presidium` + 158 `presidium-contrib` tests pass, 3x stable,
+  `ruff`/`mypy --strict` clean.
+
 ## [0.2.1] - 2026-08-22
 
 ### Fixed

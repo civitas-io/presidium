@@ -134,26 +134,42 @@ real, separate work, not automatically unblocked by this alone.
   (already drafted once: `reason="No policy rule matched this request (fail-closed default — no
   implicit allow)"`, worth reusing). Revisit as its own, dedicated piece of work — not bundled into
   M7 or any other milestone by default.
-- [ ] **Add trust ceiling propagation — a real, currently-exploitable "trust washing" gap.**
-  Surfaced by a direct comparison against Microsoft's Agent Governance Toolkit
-  (`microsoft/agent-governance-toolkit`), whose `AGENTMESH-IDENTITY-TRUST-1.0` spec requires
-  every spawned/delegated agent to carry a `trust_ceiling`, enforced at identity creation, on
-  every score update, and across the whole delegation chain (`child ceiling <= parent ceiling`).
-  Presidium has no equivalent today: a spawned child's cold-start trust value
-  (`OptimisticStart`/`NeutralStart`/`PessimisticStart`) is assigned independent of its parent's
-  own trust standing, so nothing stops an agent (or a compromised orchestrator) from repeatedly
-  spawning fresh children to reset a degraded trust score. Add an optional `trust_ceiling` field
-  to `AgentRecord`, enforce `min(computed_value, ceiling)` in `TrustScorer.value`, and propagate
-  `min(parent_ceiling, requested_ceiling)` at spawn time in whatever spawns children
-  (`CivitasBridge`-adjacent code, or `GovernedRuntime`).
-- [ ] **Enforce monotonic capability narrowing on delegation/spawn.** Same source comparison:
-  AGT requires every delegated/spawned agent's granted capabilities to be a strict subset of its
-  delegator's own, rejects wildcard delegation outright, and enforces a hard delegation-depth
-  limit (AGT's default: 10). Presidium's `AgentRecord.parent_agent_id` records *that* a spawn
-  happened but enforces nothing about what the child is granted — **a child agent can currently
-  end up with more grants than its parent, a real, open security hole, not a hypothetical one.**
-  Add subset-of-parent-grants validation wherever a child `AgentRecord`/its `Grant`s are
-  constructed, plus a depth counter with a configurable max.
+- [x] **Trust ceiling propagation — DONE, real, shipped (2026-08-22).** Was: a real,
+  currently-exploitable "trust washing" gap surfaced by a direct comparison against Microsoft's
+  Agent Governance Toolkit (`microsoft/agent-governance-toolkit`)'s `AGENTMESH-IDENTITY-TRUST-1.0`
+  spec. `AgentRecord.trust_ceiling: float | None` + `LinearTrustScore(ceiling=...)` (clamps
+  `.value`'s getter, `HUMAN_OVERRIDE`/`set_value()` deliberately still respects it — a hard
+  boundary, not a bypass; an admin who wants to grant more must explicitly raise
+  `trust_ceiling` itself). New `presidium.lineage.compute_child_ceiling()`
+  (`min(requested or 1.0, parent.trust_ceiling or 1.0, parent.trust_value)`, naturally transitive
+  across a multi-hop chain, a one-time snapshot at registration — not continuously re-derived).
+  Enforced inside `register()`/`add_grant()` on **all three registry backends**
+  (`InMemoryRegistry`, `SqliteRegistry`, `PostgresAgentRegistry`) — defense in depth, not an
+  opt-in helper a caller could skip. A dangling `parent_agent_id` now fails closed
+  (`UnresolvableParentError`) rather than being silently ignored, since silently ignoring it would
+  reopen the exact bypass this closes.
+- [x] **Monotonic capability narrowing on delegation/spawn — DONE, real, shipped (2026-08-22).**
+  Same source comparison. AGT requires every delegated/spawned agent's granted capabilities to be
+  a strict subset of its delegator's own, plus a hard delegation-depth limit (AGT's default: 10,
+  reused as-is). New `presidium.lineage.validate_grant_narrowing()` — checks the union of
+  (resource, action) pairs is a subset of the parent's (Presidium's grant model has no wildcard
+  concept, so AGT's "reject wildcard delegation" rule is moot here; deliberately does NOT compare
+  `scope`/`condition`/`expires_at` narrowing — proving a CEL condition string is "narrower" is
+  undecidable in general, a documented non-goal). Raises `GrantEscalationError` rather than
+  silently narrowing, since unlike trust, a grant is binary and can't be safely auto-clamped.
+  New `presidium.lineage.compute_child_depth()` + `AgentRecord.depth`, stored/inherited at
+  registration (not chain-walked), `max_delegation_depth` configurable per registry instance.
+  Enforced in `register()` **and** `add_grant()` (an escalation attempt can't just be deferred to
+  a later `add_grant()` call), across all three registry backends. 60+ new tests (pure-function
+  unit tests in `test_lineage.py`, registry-level integration tests parametrized over
+  `InMemoryRegistry`/`SqliteRegistry`, mock-based `PostgresAgentRegistry` tests proving the exact
+  same shared `presidium.lineage` functions are used, not a divergent reimplementation).
+  All 439 `presidium` + 158 `presidium-contrib` tests pass, 3x stable, `ruff`/`mypy --strict`
+  clean. **Real, deliberate scope note**: there is still no real "spawn" composition anywhere in
+  the whole system (Civitas's `Runtime.spawn()` doesn't call Presidium; Fabrica's
+  `CivitasBridge.request_supervision()` is a pass-through, not called by Fabrica's own managers in
+  v1) — this closes the registry-level hole so that whichever real orchestrator eventually gets
+  built inherits safety by default, not a live exploit against a running feature.
 - [ ] Compose the three MCP governance primitives (`PIIDetector`, `PoisoningDetector`, redaction)
   into one real pipeline — today callers must wire all three in themselves. **Real, richer
   candidates found in the same AGT comparison**, worth evaluating alongside this: message signing

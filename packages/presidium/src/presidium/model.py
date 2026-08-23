@@ -159,6 +159,20 @@ class AgentRecord:
     parent_agent_id: str | None = None
     """Parent agent ID if dynamically spawned."""
 
+    trust_ceiling: float | None = None
+    """Upper bound on this agent's effective trust value (0.0-1.0). None means
+    uncapped. When ``parent_agent_id`` resolves to a real, registered agent at
+    registration time, the registry computes and stores
+    ``min(requested_ceiling or 1.0, parent.trust_ceiling or 1.0, parent.trust_value)``
+    here -- a spawned/delegated agent can never out-trust its own lineage,
+    even after accumulating SUCCESS events. See ``presidium.lineage``."""
+
+    depth: int = 0
+    """Delegation depth: 0 for a top-level agent, ``parent.depth + 1`` for a
+    spawned/delegated one. Registries reject registration beyond a
+    configurable ``max_delegation_depth`` (default 10, matching AGT's own
+    precedent). See ``presidium.lineage``."""
+
     # Metadata
     description: str | None = None
     agent_version: str | None = None

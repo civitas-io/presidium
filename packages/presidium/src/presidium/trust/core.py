@@ -66,19 +66,29 @@ class LinearTrustScore:
         initial_value: float = 0.5,
         decay_rate: float = 0.01,
         *,
+        ceiling: float | None = None,
         _now: datetime | None = None,
     ) -> None:
         clamped = max(0.0, min(1.0, initial_value))
         now = _now or datetime.now(UTC)
         self._stored_value = clamped
         self._decay_rate = decay_rate
+        self._ceiling = ceiling
         self._last_positive_signal = now
         self._last_updated = now
 
     @property
+    def ceiling(self) -> float | None:
+        """Upper bound on ``value`` (see ``presidium.lineage``). None means uncapped."""
+        return self._ceiling
+
+    @property
     def value(self) -> float:
         elapsed_hours = (datetime.now(UTC) - self._last_positive_signal).total_seconds() / 3600.0
-        return max(0.0, self._stored_value - self._decay_rate * elapsed_hours)
+        decayed = max(0.0, self._stored_value - self._decay_rate * elapsed_hours)
+        if self._ceiling is not None:
+            return min(decayed, self._ceiling)
+        return decayed
 
     @property
     def tier(self) -> TrustTier:
@@ -106,7 +116,18 @@ class LinearTrustScore:
         self._last_updated = now
 
     def set_value(self, value: float) -> None:
-        """Directly set the trust value (for HUMAN_OVERRIDE events)."""
+        """Directly set the trust value (for HUMAN_OVERRIDE events).
+
+        ``ceiling``, when set, still applies to the read path (``value``)
+        even after a HUMAN_OVERRIDE -- a deliberate security choice: the
+        entire purpose of a lineage-derived ceiling is "no scorer's value
+        can rise above what its lineage permits," and a code path that
+        silently lets any override bypass that would undermine the
+        guarantee. An administrator who genuinely wants to grant a child
+        more trust than its lineage permits must explicitly raise or clear
+        ``AgentRecord.trust_ceiling`` itself -- a separate, deliberate
+        administrative action, not something that happens implicitly here.
+        """
         now = datetime.now(UTC)
         self._stored_value = max(0.0, min(1.0, value))
         self._last_positive_signal = now

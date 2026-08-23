@@ -210,3 +210,45 @@ class TestLinearTrustScoreTableDriven:
         for event in events:
             score.record_event(event)
         assert score.value == pytest.approx(expected_approx, abs=0.02)
+
+
+class TestLinearTrustScoreCeiling:
+    """Trust ceiling propagation (2026-08-22) -- see presidium.lineage."""
+
+    def test_no_ceiling_by_default(self) -> None:
+        score = LinearTrustScore(initial_value=0.5)
+        assert score.ceiling is None
+
+    def test_value_clamped_to_ceiling(self) -> None:
+        score = LinearTrustScore(initial_value=0.5, ceiling=0.3)
+        assert score.value == pytest.approx(0.3, abs=0.001)
+
+    def test_ceiling_holds_after_success_events(self) -> None:
+        score = LinearTrustScore(initial_value=0.2, ceiling=0.3)
+        for _ in range(20):
+            score.record_event(TrustEvent.SUCCESS)
+        # Without a ceiling this would reach 1.0 after enough SUCCESS events.
+        assert score.value == pytest.approx(0.3, abs=0.001)
+
+    def test_ceiling_does_not_raise_value_below_it(self) -> None:
+        score = LinearTrustScore(initial_value=0.1, ceiling=0.8)
+        assert score.value == pytest.approx(0.1, abs=0.001)
+
+    def test_set_value_still_clamped_by_ceiling(self) -> None:
+        """A deliberate security choice: the ceiling is a hard boundary even
+        for a HUMAN_OVERRIDE, so no code path can silently undermine the
+        'no scorer's value can rise above what its lineage permits'
+        guarantee. Raising a child's ceiling itself is a separate,
+        deliberate administrative action on AgentRecord.trust_ceiling."""
+        score = LinearTrustScore(initial_value=0.2, ceiling=0.3)
+        score.set_value(0.9)
+        assert score.value == pytest.approx(0.3, abs=0.001)
+
+    def test_set_value_below_ceiling_unaffected(self) -> None:
+        score = LinearTrustScore(initial_value=0.2, ceiling=0.8)
+        score.set_value(0.5)
+        assert score.value == pytest.approx(0.5, abs=0.001)
+
+    def test_ceiling_readable_after_construction(self) -> None:
+        score = LinearTrustScore(initial_value=0.5, ceiling=0.42)
+        assert score.ceiling == pytest.approx(0.42, abs=0.001)

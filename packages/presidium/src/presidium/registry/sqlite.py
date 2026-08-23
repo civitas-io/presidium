@@ -7,10 +7,21 @@ import json
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from presidium.errors import AgentNotFoundError, GrantNotFoundError, PresidiumError
+from presidium.errors import (
+    AgentNotFoundError,
+    GrantNotFoundError,
+    PresidiumError,
+    UnresolvableParentError,
+)
 from presidium.identity import verify_agent_signature
+from presidium.lineage import (
+    DEFAULT_MAX_DELEGATION_DEPTH,
+    compute_child_ceiling,
+    compute_child_depth,
+    validate_grant_narrowing,
+)
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
-from presidium.trust import LinearTrustScore
+from presidium.trust import LinearTrustScore, tier_for_value
 
 if TYPE_CHECKING:
     # 2026-08-22 fix: a real, live packaging bug. `aiosqlite` was imported
@@ -50,6 +61,8 @@ CREATE TABLE IF NOT EXISTS agent_records (
     status TEXT NOT NULL DEFAULT 'registered',
     owner TEXT,
     parent_agent_id TEXT,
+    trust_ceiling REAL,
+    depth INTEGER NOT NULL DEFAULT 0,
     description TEXT,
     agent_version TEXT,
     capabilities TEXT NOT NULL DEFAULT '[]',
@@ -87,6 +100,8 @@ def _record_to_row(r: AgentRecord) -> dict[str, Any]:
         "status": r.status.value,
         "owner": r.owner,
         "parent_agent_id": r.parent_agent_id,
+        "trust_ceiling": r.trust_ceiling,
+        "depth": r.depth,
         "description": r.description,
         "agent_version": r.agent_version,
         "capabilities": json.dumps(r.capabilities),
@@ -134,6 +149,8 @@ def _row_to_record(row: aiosqlite.Row) -> AgentRecord:
         status=AgentStatus(row["status"]),
         owner=row["owner"],
         parent_agent_id=row["parent_agent_id"],
+        trust_ceiling=row["trust_ceiling"],
+        depth=row["depth"],
         description=row["description"],
         agent_version=row["agent_version"],
         capabilities=json.loads(row["capabilities"]),
@@ -152,11 +169,23 @@ class SqliteRegistry:
     (scorers held in memory, rebuilt from stored values on lookup).
     """
 
-    def __init__(self, db_path: str = ":memory:") -> None:
+    def __init__(
+        self,
+        db_path: str = ":memory:",
+        *,
+        max_delegation_depth: int = DEFAULT_MAX_DELEGATION_DEPTH,
+    ) -> None:
         self._db_path = db_path
         self._db: aiosqlite.Connection | None = None
         self._scorers: dict[str, LinearTrustScore] = {}
         self._write_lock = asyncio.Lock()
+        self._max_delegation_depth = max_delegation_depth
+
+    async def _resolve_parent_or_raise(self, parent_agent_id: str) -> AgentRecord:
+        parent = await self.lookup_by_id(parent_agent_id)
+        if parent is None:
+            raise UnresolvableParentError(parent_agent_id)
+        return parent
 
     async def _conn(self) -> aiosqlite.Connection:
         if self._db is None:
@@ -173,14 +202,23 @@ class SqliteRegistry:
             await self._db.close()
             self._db = None
 
-    def _ensure_scorer(self, name: str, trust_value: float) -> LinearTrustScore:
+    def _ensure_scorer(
+        self, name: str, trust_value: float, ceiling: float | None = None
+    ) -> LinearTrustScore:
         scorer = self._scorers.get(name)
         if scorer is None:
-            scorer = LinearTrustScore(initial_value=trust_value)
+            scorer = LinearTrustScore(initial_value=trust_value, ceiling=ceiling)
             self._scorers[name] = scorer
         return scorer
 
     async def register(self, record: AgentRecord) -> AgentRecord:
+        if record.parent_agent_id is not None:
+            parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+            record.trust_ceiling = compute_child_ceiling(parent, record.trust_ceiling)
+            record.trust_value = min(record.trust_value, record.trust_ceiling)
+            record.trust_tier = tier_for_value(record.trust_value)
+            validate_grant_narrowing(parent, record.name, record.grants)
+            record.depth = compute_child_depth(parent, record.name, self._max_delegation_depth)
         async with self._write_lock:
             db = await self._conn()
             record.revision += 1
@@ -190,16 +228,18 @@ class SqliteRegistry:
             await db.execute(
                 """INSERT OR REPLACE INTO agent_records
                 (agent_id, name, public_key, grants, trust_value, trust_tier,
-                 status, owner, parent_agent_id, description, agent_version,
-                 capabilities, metadata, revision, created_at, updated_at)
+                 status, owner, parent_agent_id, trust_ceiling, depth,
+                 description, agent_version, capabilities, metadata,
+                 revision, created_at, updated_at)
                 VALUES (:agent_id, :name, :public_key, :grants, :trust_value,
                         :trust_tier, :status, :owner, :parent_agent_id,
-                        :description, :agent_version, :capabilities, :metadata,
-                        :revision, :created_at, :updated_at)""",
+                        :trust_ceiling, :depth, :description, :agent_version,
+                        :capabilities, :metadata, :revision, :created_at,
+                        :updated_at)""",
                 row,
             )
             await db.commit()
-            self._ensure_scorer(record.name, record.trust_value)
+            self._ensure_scorer(record.name, record.trust_value, record.trust_ceiling)
             return await self._lookup_or_raise_unlocked(record.name)
 
     async def deregister(self, name: str) -> None:
@@ -269,6 +309,14 @@ class SqliteRegistry:
     async def add_grant(self, name: str, grant: Grant) -> AgentRecord:
         async with self._write_lock:
             record = await self._lookup_or_raise_unlocked(name)
+            if record.parent_agent_id is not None:
+                # Safe to call while holding _write_lock: lookup_by_id() never
+                # tries to reacquire it (only mutation methods do), so this
+                # can't deadlock -- and holding the lock across the whole
+                # operation avoids a TOCTOU window between resolving the
+                # parent and appending the grant.
+                parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+                validate_grant_narrowing(parent, name, [grant])
             record.grants.append(grant)
             await self._save(record)
             return await self._lookup_or_raise_unlocked(name)
@@ -406,6 +454,7 @@ class SqliteRegistry:
             """UPDATE agent_records SET
                 grants=:grants, trust_value=:trust_value, trust_tier=:trust_tier,
                 status=:status, owner=:owner, parent_agent_id=:parent_agent_id,
+                trust_ceiling=:trust_ceiling, depth=:depth,
                 description=:description, agent_version=:agent_version,
                 capabilities=:capabilities, metadata=:metadata,
                 revision=:revision, updated_at=:updated_at

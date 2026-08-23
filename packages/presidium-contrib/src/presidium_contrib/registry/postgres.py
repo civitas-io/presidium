@@ -9,10 +9,16 @@ from typing import Any
 
 import asyncpg
 
-from presidium.errors import AgentNotFoundError, GrantNotFoundError
+from presidium.errors import AgentNotFoundError, GrantNotFoundError, UnresolvableParentError
 from presidium.identity import verify_agent_signature
+from presidium.lineage import (
+    DEFAULT_MAX_DELEGATION_DEPTH,
+    compute_child_ceiling,
+    compute_child_depth,
+    validate_grant_narrowing,
+)
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
-from presidium.trust import LinearTrustScore
+from presidium.trust import LinearTrustScore, tier_for_value
 
 _CREATE_TABLES = """
 CREATE TABLE IF NOT EXISTS agent_records (
@@ -25,6 +31,8 @@ CREATE TABLE IF NOT EXISTS agent_records (
     status TEXT NOT NULL DEFAULT 'registered',
     owner TEXT,
     parent_agent_id TEXT,
+    trust_ceiling DOUBLE PRECISION,
+    depth INTEGER NOT NULL DEFAULT 0,
     description TEXT,
     agent_version TEXT,
     capabilities JSONB NOT NULL DEFAULT '[]',
@@ -98,6 +106,8 @@ def _row_to_record(row: asyncpg.Record) -> AgentRecord:
         status=AgentStatus(row["status"]),
         owner=row["owner"],
         parent_agent_id=row["parent_agent_id"],
+        trust_ceiling=row["trust_ceiling"],
+        depth=row["depth"],
         description=row["description"],
         agent_version=row["agent_version"],
         capabilities=capabilities,
@@ -115,11 +125,20 @@ class PostgresAgentRegistry:
     consistency. Trust scoring delegated to in-memory LinearTrustScore.
     """
 
-    def __init__(self, dsn: str) -> None:
+    def __init__(
+        self, dsn: str, *, max_delegation_depth: int = DEFAULT_MAX_DELEGATION_DEPTH
+    ) -> None:
         self._dsn = dsn
         self._pool: asyncpg.Pool | None = None
         self._scorers: dict[str, LinearTrustScore] = {}
         self._write_lock = asyncio.Lock()
+        self._max_delegation_depth = max_delegation_depth
+
+    async def _resolve_parent_or_raise(self, parent_agent_id: str) -> AgentRecord:
+        parent = await self.lookup_by_id(parent_agent_id)
+        if parent is None:
+            raise UnresolvableParentError(parent_agent_id)
+        return parent
 
     async def connect(self) -> None:
         self._pool = await asyncpg.create_pool(self._dsn)
@@ -131,10 +150,12 @@ class PostgresAgentRegistry:
             await self._pool.close()
             self._pool = None
 
-    def _ensure_scorer(self, name: str, trust_value: float) -> LinearTrustScore:
+    def _ensure_scorer(
+        self, name: str, trust_value: float, ceiling: float | None = None
+    ) -> LinearTrustScore:
         scorer = self._scorers.get(name)
         if scorer is None:
-            scorer = LinearTrustScore(initial_value=trust_value)
+            scorer = LinearTrustScore(initial_value=trust_value, ceiling=ceiling)
             self._scorers[name] = scorer
         return scorer
 
@@ -150,6 +171,13 @@ class PostgresAgentRegistry:
         return self._pool
 
     async def register(self, record: AgentRecord) -> AgentRecord:
+        if record.parent_agent_id is not None:
+            parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+            record.trust_ceiling = compute_child_ceiling(parent, record.trust_ceiling)
+            record.trust_value = min(record.trust_value, record.trust_ceiling)
+            record.trust_tier = tier_for_value(record.trust_value)
+            validate_grant_narrowing(parent, record.name, record.grants)
+            record.depth = compute_child_depth(parent, record.name, self._max_delegation_depth)
         async with self._write_lock:
             pool = await self._pool_or_raise()
             record.revision += 1
@@ -162,14 +190,16 @@ class PostgresAgentRegistry:
                 await conn.execute(
                     """INSERT INTO agent_records
                     (agent_id, name, public_key, grants, trust_value, trust_tier,
-                     status, owner, parent_agent_id, description, agent_version,
-                     capabilities, metadata, revision, created_at, updated_at)
-                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+                     status, owner, parent_agent_id, trust_ceiling, depth,
+                     description, agent_version, capabilities, metadata,
+                     revision, created_at, updated_at)
+                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
                     ON CONFLICT (name) DO UPDATE SET
                      agent_id=$1, public_key=$3, grants=$4, trust_value=$5,
                      trust_tier=$6, status=$7, owner=$8, parent_agent_id=$9,
-                     description=$10, agent_version=$11, capabilities=$12,
-                     metadata=$13, revision=$14, updated_at=$16""",
+                     trust_ceiling=$10, depth=$11, description=$12,
+                     agent_version=$13, capabilities=$14, metadata=$15,
+                     revision=$16, updated_at=$18""",
                     record.agent_id,
                     record.name,
                     record.public_key,
@@ -179,6 +209,8 @@ class PostgresAgentRegistry:
                     record.status.value,
                     record.owner,
                     record.parent_agent_id,
+                    record.trust_ceiling,
+                    record.depth,
                     record.description,
                     record.agent_version,
                     caps_json,
@@ -187,7 +219,7 @@ class PostgresAgentRegistry:
                     record.created_at,
                     record.updated_at,
                 )
-            self._ensure_scorer(record.name, record.trust_value)
+            self._ensure_scorer(record.name, record.trust_value, record.trust_ceiling)
             return await self._lookup_internal(record.name)
 
     async def deregister(self, name: str) -> None:
@@ -261,6 +293,13 @@ class PostgresAgentRegistry:
     async def add_grant(self, name: str, grant: Grant) -> AgentRecord:
         async with self._write_lock:
             record = await self._lookup_or_raise(name)
+            if record.parent_agent_id is not None:
+                # Safe while holding _write_lock: lookup_by_id() never tries
+                # to reacquire it, and holding the lock across the whole
+                # operation avoids a TOCTOU window between resolving the
+                # parent and appending the grant.
+                parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+                validate_grant_narrowing(parent, name, [grant])
             record.grants.append(grant)
             await self._save(record)
             return await self._lookup_internal(name)
@@ -389,16 +428,18 @@ class PostgresAgentRegistry:
             await conn.execute(
                 """UPDATE agent_records SET
                     grants=$1, trust_value=$2, trust_tier=$3, status=$4,
-                    owner=$5, parent_agent_id=$6, description=$7,
-                    agent_version=$8, capabilities=$9, metadata=$10,
-                    revision=$11, updated_at=$12
-                WHERE name=$13""",
+                    owner=$5, parent_agent_id=$6, trust_ceiling=$7, depth=$8,
+                    description=$9, agent_version=$10, capabilities=$11,
+                    metadata=$12, revision=$13, updated_at=$14
+                WHERE name=$15""",
                 grants_json,
                 record.trust_value,
                 record.trust_tier.value,
                 record.status.value,
                 record.owner,
                 record.parent_agent_id,
+                record.trust_ceiling,
+                record.depth,
                 record.description,
                 record.agent_version,
                 caps_json,

@@ -5,8 +5,14 @@ from __future__ import annotations
 import copy
 from datetime import UTC, datetime
 
-from presidium.errors import AgentNotFoundError, GrantNotFoundError
+from presidium.errors import AgentNotFoundError, GrantNotFoundError, UnresolvableParentError
 from presidium.identity import verify_agent_signature
+from presidium.lineage import (
+    DEFAULT_MAX_DELEGATION_DEPTH,
+    compute_child_ceiling,
+    compute_child_depth,
+    validate_grant_narrowing,
+)
 from presidium.model import AgentRecord, AgentStatus, Grant, TrustEvent, TrustTier
 from presidium.trust import LinearTrustScore, TrustScorer, tier_for_value
 
@@ -52,10 +58,17 @@ class InMemoryRegistry:
     (default: LinearTrustScore).
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *, max_delegation_depth: int = DEFAULT_MAX_DELEGATION_DEPTH) -> None:
         self._agents: dict[str, AgentRecord] = {}
         self._scorers: dict[str, TrustScorer] = {}
         self._trust_events: list[_TrustEventRecord] = []
+        self._max_delegation_depth = max_delegation_depth
+
+    async def _resolve_parent_or_raise(self, parent_agent_id: str) -> AgentRecord:
+        parent = await self.lookup_by_id(parent_agent_id)
+        if parent is None:
+            raise UnresolvableParentError(parent_agent_id)
+        return parent
 
     def _get_or_raise(self, name: str) -> AgentRecord:
         record = self._agents.get(name)
@@ -77,8 +90,17 @@ class InMemoryRegistry:
             record.trust_tier = scorer.tier
 
     async def register(self, record: AgentRecord) -> AgentRecord:
+        if record.parent_agent_id is not None:
+            parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+            record.trust_ceiling = compute_child_ceiling(parent, record.trust_ceiling)
+            record.trust_value = min(record.trust_value, record.trust_ceiling)
+            record.trust_tier = tier_for_value(record.trust_value)
+            validate_grant_narrowing(parent, record.name, record.grants)
+            record.depth = compute_child_depth(parent, record.name, self._max_delegation_depth)
         self._agents[record.name] = record
-        self._scorers[record.name] = LinearTrustScore(initial_value=record.trust_value)
+        self._scorers[record.name] = LinearTrustScore(
+            initial_value=record.trust_value, ceiling=record.trust_ceiling
+        )
         self._touch(record)
         return self._snapshot(record)
 
@@ -121,6 +143,9 @@ class InMemoryRegistry:
 
     async def add_grant(self, name: str, grant: Grant) -> AgentRecord:
         record = self._get_or_raise(name)
+        if record.parent_agent_id is not None:
+            parent = await self._resolve_parent_or_raise(record.parent_agent_id)
+            validate_grant_narrowing(parent, name, [grant])
         record.grants.append(grant)
         self._touch(record)
         self._sync_trust(record)

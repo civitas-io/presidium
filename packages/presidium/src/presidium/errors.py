@@ -63,6 +63,51 @@ class GrantNotFoundError(RegistryError):
         super().__init__(f"Grant {grant_id!r} not found on agent {agent_name!r}")
 
 
+class UnresolvableParentError(RegistryError):
+    """Raised when ``AgentRecord.parent_agent_id`` is set but does not resolve
+    to a real, registered agent. Lineage-derived checks (trust ceiling,
+    capability narrowing, delegation depth) all require a real parent to
+    validate against — a dangling ``parent_agent_id`` is treated as invalid
+    input, not silently ignored, since silently ignoring it would reopen the
+    exact bypass these checks exist to close."""
+
+    def __init__(self, parent_agent_id: str) -> None:
+        self.parent_agent_id = parent_agent_id
+        super().__init__(
+            f"parent_agent_id {parent_agent_id!r} does not resolve to a registered agent"
+        )
+
+
+class GrantEscalationError(RegistryError):
+    """Raised when a child agent's grants are not a subset of its resolved
+    parent's grants (monotonic capability narrowing, AGT-comparison finding).
+    Unlike trust, a grant cannot be safely clamped to a valid value — it is
+    binary, so an escalation attempt is rejected outright rather than
+    silently narrowed."""
+
+    def __init__(self, agent_name: str, parent_name: str, excess: list[str]) -> None:
+        self.agent_name = agent_name
+        self.parent_name = parent_name
+        self.excess = excess
+        super().__init__(
+            f"Agent {agent_name!r} requests grants not held by parent {parent_name!r}: {excess}"
+        )
+
+
+class DelegationDepthExceededError(RegistryError):
+    """Raised when registering an agent would exceed the registry's
+    configured ``max_delegation_depth`` (default 10, matching AGT's own
+    precedent) — bounds how deep a spawn/delegation chain may go."""
+
+    def __init__(self, agent_name: str, depth: int, max_depth: int) -> None:
+        self.agent_name = agent_name
+        self.depth = depth
+        self.max_depth = max_depth
+        super().__init__(
+            f"Agent {agent_name!r} at depth {depth} exceeds max_delegation_depth={max_depth}"
+        )
+
+
 class CredentialAccessDenied(PresidiumError):
     """Raised when an agent lacks a grant for a credential."""
 

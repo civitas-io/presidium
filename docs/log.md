@@ -1250,3 +1250,73 @@ immediately rather than left live and broken.
 - `packages/presidium/pyproject.toml` — version bump
 - `CHANGELOG.md` — real `[0.2.1]` entry
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-22] feat | trust ceiling propagation + monotonic capability narrowing (AGT-comparison P1)
+
+**Trigger:** Two real, concrete security gaps recorded as P1 items during an earlier session's
+direct comparison against Microsoft's Agent Governance Toolkit (`microsoft/agent-governance-
+toolkit`) — walked through in full with the user before implementing (design questions: where the
+enforcement point lives, snapshot-vs-live-tracking, what "subset" means for a `Grant`, dangling-
+parent handling, depth-limit default) before writing any code.
+
+**Grounded in the real, current code first** — read all three `AgentRegistry` backends
+(`InMemoryRegistry`, `SqliteRegistry`, `PostgresAgentRegistry`) and confirmed `AgentRecord.
+parent_agent_id` was genuinely pure, unvalidated metadata; confirmed there is still no real
+"spawn" composition anywhere in the system (Civitas's `Runtime.spawn()` has no Presidium
+awareness; Fabrica's `CivitasBridge.request_supervision()` is a pass-through, not called by
+Fabrica's own managers in v1) — so this closes a registry-API-level hole pre-emptively, not a live
+exploit against a running feature.
+
+**Shipped:**
+- `AgentRecord.trust_ceiling: float | None` and `AgentRecord.depth: int` (new fields, additive).
+- `LinearTrustScore(ceiling=...)` clamps `.value`'s getter. Deliberate decision, corrected once
+  during implementation after a real test failure: `set_value()` (HUMAN_OVERRIDE) still respects
+  the ceiling — a hard boundary, not a bypass. An admin who wants to grant more trust than a
+  lineage permits must explicitly raise `AgentRecord.trust_ceiling` itself, a separate,
+  deliberate administrative action.
+- New `presidium.lineage` module: `compute_child_ceiling()`, `validate_grant_narrowing()`,
+  `compute_child_depth()`, `DEFAULT_MAX_DELEGATION_DEPTH = 10` (AGT's own default, reused).
+- New errors: `UnresolvableParentError`, `GrantEscalationError`, `DelegationDepthExceededError`.
+- Enforced inside `register()` **and** `add_grant()` on all three registry backends — defense in
+  depth at the registry API itself, not an opt-in helper a caller could skip. A dangling
+  `parent_agent_id` fails closed.
+- `max_delegation_depth` is a configurable, keyword-only constructor param on all three
+  registries, backward compatible (existing positional call sites unaffected).
+
+**Real bugs found and fixed during implementation, before landing:**
+- A TOCTOU race in the first draft of `SqliteRegistry.add_grant()`/`PostgresAgentRegistry.
+  add_grant()`: resolving the parent outside the write lock, then re-acquiring it to append the
+  grant, left a window for the record to change in between. Fixed by resolving the parent inside
+  the single lock scope for the whole operation (safe: `lookup_by_id()` never tries to reacquire
+  the same lock).
+- Duplicated tier-threshold logic inline in `SqliteRegistry.register()`/`PostgresAgentRegistry.
+  register()` instead of reusing the existing `presidium.trust.tier_for_value()` — caught before
+  committing, not after.
+- The `set_value()`/ceiling interaction above — my first design comment claimed HUMAN_OVERRIDE
+  bypasses the ceiling, but the actual `value` getter clamps unconditionally regardless of write
+  path. Caught by a real, failing test, not by re-reading my own docstring. Resolved by changing
+  the *design*, not silently patching the test to match unintended behavior: ceiling now
+  correctly, deliberately applies even to overrides.
+- An off-by-one in the delegation-depth-limit test itself (asserted rejection at exactly the
+  default limit, which correctly is *not* rejected — only *exceeding* it is).
+
+**Verification**: 60+ new tests — pure-function unit tests (`test_lineage.py`), registry-level
+integration tests parametrized over `InMemoryRegistry`/`SqliteRegistry` via the shared `registry`
+fixture, and mock-based `PostgresAgentRegistry` tests proving the exact same shared
+`presidium.lineage` functions are used (not a divergent reimplementation for that backend). All
+439 `presidium` + 158 `presidium-contrib` tests pass, 3x stable. `ruff`/`mypy --strict` clean on
+both packages' `src/`. Coverage: `presidium.lineage` 100%; new code paths in all three registries
+fully exercised — remaining coverage gaps in `postgres.py` are pre-existing (`connect()`,
+`deregister()`, etc.), confirmed via direct diff, not introduced by this change.
+
+**Pages updated:**
+- `packages/presidium/src/presidium/lineage.py` (new)
+- `packages/presidium/src/presidium/model.py`, `errors.py`, `trust/core.py`
+- `packages/presidium/src/presidium/registry/{memory,sqlite}.py`
+- `packages/presidium-contrib/src/presidium_contrib/registry/postgres.py`
+- New/updated tests across both packages
+- `docs/vision/roadmap.md` — both P1 items marked done with full detail
+- `CHANGELOG.md` — new `[Unreleased]` entry
+- `docs/log.md` — this entry

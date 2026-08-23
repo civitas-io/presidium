@@ -41,6 +41,8 @@ def _make_row(record: AgentRecord | None = None) -> dict[str, object]:
         "status": r.status.value,
         "owner": r.owner,
         "parent_agent_id": r.parent_agent_id,
+        "trust_ceiling": r.trust_ceiling,
+        "depth": r.depth,
         "description": r.description,
         "agent_version": r.agent_version,
         "capabilities": r.capabilities,
@@ -188,3 +190,115 @@ class TestPostgresAgentRegistryWithMock:
         reg._pool = _mock_pool(mock_conn)
 
         assert await reg.verify_signature("ghost", b"data", b"sig") is False
+
+
+class TestPostgresLineage:
+    """Trust ceiling propagation and monotonic capability narrowing
+    (2026-08-22), mocked at the asyncpg boundary like the rest of this file
+    -- verifies PostgresAgentRegistry follows the exact same real,
+    shared presidium.lineage functions as InMemoryRegistry/SqliteRegistry,
+    not a divergent reimplementation."""
+
+    async def test_register_computes_child_ceiling_from_parent(self) -> None:
+        parent = _make_record(name="orchestrator", trust_value=0.1)
+        parent_row = _make_row(parent)
+
+        child = _make_record(
+            name="fresh-replacement", agent_id="presidium://local/fresh-replacement"
+        )
+        child.parent_agent_id = parent.agent_id
+        child.trust_value = 0.7  # optimistic cold start, requested by the caller
+        child.trust_ceiling = 0.1  # what register() should have computed
+        child.depth = 1
+        child_row_after_insert = _make_row(child)
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.side_effect = [parent_row, child_row_after_insert]
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        to_register = _make_record(
+            name="fresh-replacement", agent_id="presidium://local/fresh-replacement"
+        )
+        to_register.parent_agent_id = parent.agent_id
+        to_register.trust_value = 0.7
+
+        result = await reg.register(to_register)
+
+        # register() mutates the record in place before persisting -- the
+        # real trust-washing attack this closes: a degraded parent (0.1)
+        # cannot produce a fresh, fully-trusted child.
+        assert to_register.trust_ceiling == pytest.approx(0.1)
+        assert to_register.trust_value <= 0.1 + 1e-9
+        assert to_register.depth == 1
+        assert result.name == "fresh-replacement"
+
+    async def test_register_rejects_dangling_parent(self) -> None:
+        from presidium.errors import UnresolvableParentError
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = None  # parent lookup finds nothing
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        child = _make_record()
+        child.parent_agent_id = "presidium://local/ghost"
+
+        with pytest.raises(UnresolvableParentError, match="presidium://local/ghost"):
+            await reg.register(child)
+
+    async def test_register_rejects_grant_escalation(self) -> None:
+        from presidium.errors import GrantEscalationError
+
+        parent = _make_record(name="orchestrator")
+        parent.grants = [Grant(resources=["tool:read_db"], actions=["read"], id="p1")]
+        parent_row = _make_row(parent)
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = parent_row
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        child = _make_record(name="rogue-child", agent_id="presidium://local/rogue-child")
+        child.parent_agent_id = parent.agent_id
+        child.grants = [
+            Grant(resources=["tool:admin_delete_everything"], actions=["invoke"], id="c1")
+        ]
+
+        with pytest.raises(GrantEscalationError, match="tool:admin_delete_everything"):
+            await reg.register(child)
+
+    async def test_add_grant_rejects_escalation_against_resolved_parent(self) -> None:
+        from presidium.errors import GrantEscalationError
+
+        parent = _make_record(name="orchestrator")
+        child = _make_record(name="child", agent_id="presidium://local/child")
+        child.parent_agent_id = parent.agent_id
+
+        mock_conn = AsyncMock()
+        # add_grant(): lookup(child) then, since parent_agent_id is set,
+        # lookup_by_id(parent) -- both go through the same fetchrow mock.
+        mock_conn.fetchrow.side_effect = [_make_row(child), _make_row(parent)]
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        with pytest.raises(GrantEscalationError):
+            await reg.add_grant("child", Grant(resources=["tool:admin"], actions=["invoke"]))
+
+    async def test_max_delegation_depth_configurable(self) -> None:
+        from presidium.errors import DelegationDepthExceededError
+
+        parent = _make_record(name="parent")
+        parent.depth = 1
+        parent_row = _make_row(parent)
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = parent_row
+        reg = PostgresAgentRegistry("postgresql://localhost/test", max_delegation_depth=1)
+        reg._pool = _mock_pool(mock_conn)
+
+        child = _make_record(name="child", agent_id="presidium://local/child")
+        child.parent_agent_id = parent.agent_id
+
+        with pytest.raises(DelegationDepthExceededError):
+            await reg.register(child)
