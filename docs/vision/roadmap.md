@@ -479,12 +479,14 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   editable install of the fixed `python-civitas` (all 4 handshake scenarios passed) — then
   reverted to the published dependency, since the fix isn't in a tagged `civitas` release yet.
   **Presidium's own test
-  (`packages/presidium-contrib/tests/integration/test_presidium_server_mtls.py`) marks the two
-  scenarios that need the fix `xfail(strict=True)`**, citing the upstream commit/design doc — CI
-  stays honest today, and `strict=True` forces the markers to be removed the moment Presidium
-  bumps to a `civitas` release containing the fix (the tests would otherwise unexpectedly start
-  passing, failing the xfail assertion itself). **Real, tracked follow-up, not forgotten**: bump
-  `civitas` once a release containing this fix ships, then remove the two `xfail` markers.
+  (`packages/presidium-contrib/tests/integration/test_presidium_server_mtls.py`) marked the two
+  scenarios that needed the fix `xfail(strict=True)`** until a real release existed. **Done for
+  real, 2026-08-23**: the fix shipped as `civitas` v0.11.2 (immediately followed by v0.11.3, a
+  same-day patch after v0.11.2's own release verification caught a real, live packaging bug —
+  `import civitas` failed entirely; see that repo's own CHANGELOG). Bumped this package's pin to
+  `civitas>=0.11.3`, removed both `xfail` markers — all 4 handshake scenarios now pass for real
+  against the real, published dependency, no local override, no workaround. 439 `presidium` + 162
+  `presidium-contrib` tests pass, 3x stable, `ruff`/`mypy --strict` clean.
 - [ ] **(P1)** Build `presidium-contrib[spiffe]` — real SPIRE-issued X.509-SVIDs, auto-rotation,
   cross-deployment federation via trust domain bundles. **Real, pre-existing doc drift this
   resolves**: `docs/design/agent-registry.md` already describes this extra as an "M3+ upgrade

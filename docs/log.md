@@ -1372,3 +1372,32 @@ remove the two `xfail` markers, confirm all 4 scenarios pass for real against Pr
   now honestly marked
 - `docs/vision/roadmap.md` — M7's mTLS item marked done with the full, real story
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-23] chore | civitas>=0.11.3 -- mTLS xfail markers removed, all 4 scenarios pass for real
+
+**Trigger:** `civitas` v0.11.2 (later v0.11.3, a same-day patch fix) shipped the real
+`mtls_source="direct"` fix this repo's own mTLS test found and reported upstream. Real, tracked
+follow-up from the previous entry, done the same day it became possible.
+
+**What changed**: `packages/presidium/pyproject.toml`'s pin bumped `civitas>=0.11.0` →
+`civitas>=0.11.3` (0.11.3 specifically, not 0.11.2 — 0.11.2 itself had a real, live packaging bug,
+`import civitas` failing entirely, fixed same-day in 0.11.3; see `civitas-io/python-civitas`'s own
+CHANGELOG). `uv.lock` re-resolved against the real, published dependency (confirmed:
+`civitas==0.11.3` from `source = { registry = "https://pypi.org/simple" }`, not editable/local).
+Removed both `@pytest.mark.xfail(strict=True, ...)` markers from
+`test_presidium_server_mtls.py` — exactly the signal `strict=True` was designed to force.
+
+**Verification**: all 4 real mTLS handshake scenarios now pass unconditionally against the real,
+published `civitas` — no local editable-install workaround, no xfail. 439 `presidium` + 162
+`presidium-contrib` tests (0 xfails, up from 160 passed + 2 xfailed) pass, 3x stable,
+`ruff`/`mypy --strict` clean.
+
+**Pages updated:**
+- `packages/presidium/pyproject.toml` — pin bump
+- `uv.lock` — re-resolved
+- `packages/presidium-contrib/tests/integration/test_presidium_server_mtls.py` — xfail markers
+  removed, module docstring updated to reflect the real, resolved state
+- `docs/vision/roadmap.md` — M7's mTLS item updated with the final, real outcome
+- `docs/log.md` — this entry

@@ -535,7 +535,7 @@ wheels = [
 
 [[package]]
 name = "civitas"
-version = "0.11.1"
+version = "0.11.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "msgpack" },
@@ -543,9 +543,9 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/96/29c2578c10db67565d82f0f7d35069a6ec89e0cf12e3eaf8bec183302dbe/civitas-0.11.1.tar.gz", hash = "sha256:44a9c73259eed8f42c73bdf5496ee718e2d5495a57e220c7b3b8db0f90b0a076", size = 1069421, upload-time = "2026-08-05T08:56:05.348Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/69/a5fa0186e6d327bb71da65e48e0562349b995952561f9f372e0e789642a2/civitas-0.11.3.tar.gz", hash = "sha256:fd3bea957f9bbd9ff626896dcdb6a6064d9e8d9a97facf3d1faabbc0af07f114", size = 1081756, upload-time = "2026-08-23T19:46:46.968Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/31/b144df0e01d7005f1f4a7bd82654bdf94535491dc70bdf30e238cf92516a/civitas-0.11.1-py3-none-any.whl", hash = "sha256:b92eae6af5e349a5e259fa19a76e889600bc5133eb99571f1364ab542cab58d8", size = 276055, upload-time = "2026-08-05T08:56:03.79Z" },
+    { url = "https://files.pythonhosted.org/packages/98/f1/e76f1a28f91dcd439f5ff7635a5eb044161dafa76de45c75a6ec9f209a20/civitas-0.11.3-py3-none-any.whl", hash = "sha256:5625726d66a973f8fdd4526bc6482d09bc7c89049000345698c7088bc74332cd", size = 278523, upload-time = "2026-08-23T19:46:45.078Z" },
 ]
 
 [package.optional-dependencies]
@@ -1427,7 +1427,7 @@ dev = [
 requires-dist = [
     { name = "aiosqlite", marker = "extra == 'sqlite'", specifier = ">=0.20" },
     { name = "cel-python", specifier = ">=0.1" },
-    { name = "civitas", specifier = ">=0.11.0" },
+    { name = "civitas", specifier = ">=0.11.3" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10" },
     { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.20" },
     { name = "pynacl", specifier = ">=1.5" },

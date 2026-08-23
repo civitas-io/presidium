@@ -12,19 +12,16 @@ build_check_grant_gateway_config's docstring claims, not just that the
 config object assembles correctly.
 
 **Real finding, this same session**: writing this test surfaced a genuine,
-much bigger gap than "test not written yet" -- the currently-published
-civitas (>=0.11.0) never actually delivers a real client certificate to
-the ASGI app at all (uvicorn never populates the ASGI TLS extension), so
-`require_client_cert` rejected every request, valid or not, with 401.
-This is a known, tracked, now-FIXED upstream issue
-(civitas-io/python-civitas#25, direct-mode half, R10 -- see that repo's
-docs/design/gateway-http-mtls-direct.md) -- fixed and verified end to end
-against THIS exact test suite via a local, uncommitted editable install of
-the fixed python-civitas, but not yet in a tagged civitas release
-Presidium can actually depend on. The two scenarios that need a real
-client certificate to reach the app layer are marked xfail(strict=True)
-below until that release exists; the two that only need the TLS-layer
-behavior (already correct, unaffected by the gap) pass today for real.
+much bigger gap than "test not written yet" -- civitas <0.11.3 never
+actually delivered a real client certificate to the ASGI app at all
+(uvicorn never populates the ASGI TLS extension), so `require_client_cert`
+rejected every request, valid or not, with 401. This was a known, tracked
+upstream issue (civitas-io/python-civitas#25, direct-mode half, R10 --
+see that repo's docs/design/gateway-http-mtls-direct.md) -- **now fixed
+and live in the real, published civitas>=0.11.3 (this package's own pin,
+bumped 2026-08-23 once the fix actually shipped)**. All four scenarios
+below pass for real against the real, published dependency -- no
+xfail markers, no local editable-install workaround needed anymore.
 
 Mirrors the certificate-generation pattern civitas's own
 tests/unit/test_gateway_ws_grpc_auth.py uses for its real gRPC mTLS tests
@@ -312,25 +309,11 @@ async def _running_mtls_gateway(
         await civitas_runtime.stop()
 
 
-_BLOCKED_ON_CIVITAS_25 = (
-    "Blocked on civitas-io/python-civitas#25 (direct-mode half, R10): the currently-published "
-    "civitas release (>=0.11.0) never populates the ASGI TLS extension, so a real client "
-    "certificate never reaches the app layer at all -- every request gets 401 regardless of "
-    "validity. Fixed in python-civitas main (commit 8d72084, docs/design/"
-    "gateway-http-mtls-direct.md) and verified end to end against THIS test suite via a local, "
-    "uncommitted editable install -- not yet in a tagged civitas release Presidium can depend "
-    "on. xfail(strict=True) so this stays honest: the moment Presidium bumps to a civitas "
-    "release containing the fix, this marker itself starts failing (test unexpectedly passes) "
-    "-- the correct, unmissable signal to remove it and graduate this to real coverage."
-)
-
-
 class TestMtlsRealHandshake:
     """Proves the actual TLS socket enforces what the config claims --
     not just that GatewayConfig/build_check_grant_gateway_config assemble
     the right fields (already covered by test_gateway_config.py)."""
 
-    @pytest.mark.xfail(strict=True, reason=_BLOCKED_ON_CIVITAS_25)
     async def test_trusted_client_cert_allowlisted_dn_reaches_the_app(
         self, _running_mtls_gateway: None, tls_certs: SimpleNamespace
     ) -> None:
@@ -351,7 +334,6 @@ class TestMtlsRealHandshake:
             assert resp.status_code == 200
             assert resp.json()["decision"] == "allow"
 
-    @pytest.mark.xfail(strict=True, reason=_BLOCKED_ON_CIVITAS_25)
     async def test_same_ca_but_dn_not_allowlisted_gets_403(
         self, _running_mtls_gateway: None, tls_certs: SimpleNamespace
     ) -> None:

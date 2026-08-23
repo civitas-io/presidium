@@ -22,7 +22,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "civitas>=0.11.0",
+    "civitas>=0.11.3",  # 0.11.3: HTTP mTLS in direct mode actually works (GH civitas-io/python-civitas#25 R10)
     "cel-python>=0.1",
     "pynacl>=1.5",
 ]
