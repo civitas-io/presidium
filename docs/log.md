@@ -1320,3 +1320,55 @@ fully exercised — remaining coverage gaps in `postgres.py` are pre-existing (`
 - `docs/vision/roadmap.md` — both P1 items marked done with full detail
 - `CHANGELOG.md` — new `[Unreleased]` entry
 - `docs/log.md` — this entry
+
+---
+
+## [2026-08-23] fix (real, upstream) | mTLS handshake test surfaces and closes a real python-civitas gap (GH #25 R10)
+
+**Trigger:** Writing the real mTLS handshake test the roadmap's last open M7 `(P0)` item called
+for — config-level wiring (`require_mtls=True`, `require_client_cert`) was already shipped and
+unit-tested, but no test had ever proven an actual TLS handshake against a real running gateway.
+
+**What the test found**: a genuinely bigger gap than "untested" — the currently-published
+`civitas` (>=0.11.0) never delivers a real client certificate to the ASGI app at all. uvicorn
+never populates the ASGI TLS extension `civitas.gateway.asgi._client_cert_from_scope()` reads.
+Confirmed with a real self-signed CA, a real server leaf, and a real, correctly-signed,
+allowlisted client leaf: the TLS handshake itself succeeds, but `require_client_cert` still
+returns `401 {"error": "client certificate required"}` — **mTLS in this mode currently locks out
+every legitimate client, not just illegitimate ones.**
+
+**This is a known, already-tracked upstream issue**: `civitas-io/python-civitas#25`'s `direct`-mode
+half, explicitly left non-functional by that repo's own earlier `proxy_header` fix (R9, v0.7.3).
+Reported and fixed upstream the same day, with the actual mechanism verified empirically (a
+minimal, real asyncio TLS server proving `ssl_object.getpeercert(binary_form=True)` returns the
+real peer certificate DER) before any implementation code was written — see
+`civitas-io/python-civitas`'s own `docs/design/gateway-http-mtls-direct.md` (commit `8d72084`,
+R10) for the full design and every real bug found along the way (a structural nesting bug in the
+fix itself, and a real httpx-client-library bug in the test harness — its deprecated `cert=`
+parameter has a genuine incompatibility with a plain string `verify=` path in httpx 0.28.1; the
+fix was switching to httpx's modern `verify=<ssl.SSLContext>` API).
+
+**Verified the fix actually closes the gap for real, from Presidium's own side**: a local,
+uncommitted `uv pip install -e <the fixed python-civitas>` into Presidium's venv, confirming all 4
+of this test's own scenarios pass with the fix present — then reverted back to the published
+dependency (the fix isn't in a tagged `civitas` release yet, so it can't be a real, committed
+Presidium dependency change today).
+
+**Honest handling of a real, currently-blocked test**: the two scenarios that need a real client
+certificate to reach the app layer are marked `xfail(strict=True)`, citing the exact upstream
+commit and design doc. This keeps CI green *honestly* (a real, tracked, not-yet-shipped-here gap,
+not a mysterious red) — and `strict=True` means the moment Presidium bumps to a `civitas` release
+containing the fix, these markers will themselves start failing (the tests would unexpectedly
+pass), forcing their removal as the correct, unmissable signal to graduate to real coverage. The
+two scenarios that only need TLS-layer behavior (already correct, unaffected by the gap) pass
+today for real, unconditionally.
+
+**Real, tracked follow-up, not forgotten**: bump `civitas` once a release containing R10 ships,
+remove the two `xfail` markers, confirm all 4 scenarios pass for real against Presidium's own CI
+(not just a local editable install).
+
+**Pages updated:**
+- `packages/presidium-contrib/tests/integration/test_presidium_server_mtls.py` — the real test,
+  now honestly marked
+- `docs/vision/roadmap.md` — M7's mTLS item marked done with the full, real story
+- `docs/log.md` — this entry
