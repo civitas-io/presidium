@@ -45,8 +45,8 @@ real CycloneDX SBOM assets attached.
    `tool_for()`, matching the real, already-established per-agent-construction precedent
    `civitas.process.AgentProcess.connect_mcp()` uses for `civitas-io/fabrica`'s own `MCPTool`.
 
-**Real, current numbers**: 380 `presidium` tests (95%+ coverage), 153 `presidium-contrib` tests
-(83% coverage), 3x stable, `ruff`/`mypy --strict` clean on both packages' `src/` (the real,
+**Real, current numbers**: 439 `presidium` tests (95%+ coverage), 158 `presidium-contrib` tests
+(87% coverage), 3x stable, `ruff`/`mypy --strict` clean on both packages' `src/` (the real,
 CI-gated scope).
 
 ---
@@ -79,6 +79,17 @@ install — never by inspection alone. Worth knowing the *pattern*, not just the
 
 ---
 
+## Update (2026-08-22, later same day): both AGT-comparison security gaps below are now DONE
+
+**Trust ceiling propagation and monotonic capability narrowing are shipped** — new
+`presidium.lineage` module, enforced inside `register()`/`add_grant()` on all three registry
+backends (defense in depth, not an opt-in helper). New `AgentRecord.trust_ceiling`/`depth` fields;
+`LinearTrustScore(ceiling=...)`; new `UnresolvableParentError`/`GrantEscalationError`/
+`DelegationDepthExceededError`. 60+ new tests, 439 `presidium` + 158 `presidium-contrib` tests
+pass 3x stable. See `docs/log.md`'s 2026-08-22 "trust ceiling propagation + monotonic capability
+narrowing" entry and `docs/vision/roadmap.md`'s own updated entries for full detail. Commit
+`ddcbe91`.
+
 ## Real, decided-but-not-implemented — don't assume these are done
 
 - **Default-deny for `CelPolicyEngine`'s no-rule-matched case.** Direction is explicitly decided
@@ -87,12 +98,6 @@ install — never by inspection alone. Worth knowing the *pattern*, not just the
   example/test policy assumes implicit allow-by-default; none declare an explicit terminal ALLOW
   rule. This needs its own dedicated design pass (see `docs/vision/roadmap.md`'s own entry for the
   exact scoped follow-up list) before touching it again.
-- **Two real, concrete security gaps found via a direct comparison against Microsoft's Agent
-  Governance Toolkit** (`microsoft/agent-governance-toolkit`) — tracked as P1 items, not yet built:
-  - **No trust ceiling propagation** — nothing stops an agent (or a compromised orchestrator)
-    repeatedly spawning fresh children to reset a degraded trust score ("trust washing").
-  - **No enforcement of monotonic capability narrowing on delegation/spawn** — a spawned child can
-    currently end up with *more* grants than its parent. A real, open security hole.
 
 ---
 
