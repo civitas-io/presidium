@@ -6,11 +6,99 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
-## [Unreleased]
+## [0.3.0] - 2026-08-24
+
+**Real, current numbers**: 469 `presidium` tests (96.16% coverage), 198 `presidium-contrib` tests
+(87% coverage, 4 real hardware-gated skips), 3x stable, `ruff`/`ruff format --check`/
+`mypy --strict` clean on both packages.
+
+### Changed
+
+#### presidium — `CelPolicyEngine` now fails closed on no policy match (breaking behavioral change)
+
+**Read this before upgrading if you author CEL policies.** Previously, when no policy rule
+matched a request for a given stage, `CelPolicyEngine.evaluate()` returned an implicit `ALLOW`
+("All policies passed"). It now returns `DENY` (`"No policy rule matched this request
+(fail-closed default -- no implicit allow)"`) by default -- the well-established "fail-safe
+defaults" principle (Saltzer & Schroeder), matching AWS IAM/Kubernetes RBAC/firewalls, and
+consistent with every other `allow_*`-gated fail-closed default already in this codebase.
+
+- **Every policy set now needs an explicit, terminal `ALLOW` rule** if it relies on "nothing
+  else objected -> allow" -- this was previously an unwritten, implicit behavior; it must now be
+  written down. See the updated `docs/guides/getting-started.md` for a real, working example and
+  its own new "Default-deny -- read this before writing your own policies" section.
+- **Two explicit, named opt-out knobs** on `CelPolicyEngine.__init__` (and forwarded through
+  `presidium_contrib.service.policy.PolicyEvaluatorServer`): `allow_unmatched_requests: bool =
+  False` (restores the old always-ALLOW behavior outright) and `unmatched_enforcement:
+  EnforcementMode = EnforcementMode.HARD` (run the new DENY decision in `ADVISORY` mode first --
+  logged, not blocking -- for a gradual migration).
+- Full reasoning: `docs/design/policy-engine.md`'s corrected P5 decision.
 
 ### Added
 
-#### presidium — Trust ceiling propagation and monotonic capability narrowing
+#### presidium + presidium-contrib -- `AgentGatewayClient`: real MCP tool-side and A2A delegation
+
+Real vendor research first (`docs/design/agentgateway-vendor-research-2026-08.md`,
+`docs/design/a2a-delegation-vendor-research-2026-08.md`), then implementation:
+
+- **New `presidium.providers.gateway` module**: `LLMGatewayBackend`/`ToolsGatewayBackend`
+  Protocols, `GatewayModelProvider`/`GatewayToolProvider` -- a third composition pattern
+  (wraps a real, separate, network-reachable gateway process) alongside pure-authorization
+  `GovernedModelProvider`/`GovernedToolProvider` and `civitas_adapters.py`'s direct in-process
+  Civitas provider wrapping.
+- `GovernedToolProvider` gained `check_resource()`/`post_check_resource()` (verbatim-resource
+  variants of `check()`/`post_check()`, needed for the new `agent:<name>` grant namespace
+  alongside `tool:<name>`).
+- **`AgentGatewayClient.list_tools()`/`call_tool()`** -- real MCP `tools/list`/`tools/call` over
+  Streamable HTTP, the exact transport `civitas-io/python-civitas` GH #26 shipped. Verified end
+  to end against a real running MCP server, not mocked.
+- **`AgentGatewayClient.delegate_to_agent()`** -- real A2A delegation using the official `a2a-sdk`
+  (new dependency, `>=1.1.2`, on the `[agentgateway]` extra). `AgentGatewayClient` gained
+  `a2a_routes: dict[str, str] | None` (an explicit target-agent-name -> gateway-route-URL map,
+  since AgentGateway's A2A proxy routes per-upstream-agent, unlike MCP's single federated
+  endpoint). Maps `arguments["text"]` onto a real A2A text message or the whole dict onto a
+  structured data message. New `AgentGatewayDelegationError`. Verified end to end against a real
+  running A2A server (a faithful port of the official `a2a-samples` Hello World reference agent).
+- Any `AgentGateway` pin must be `>=1.4.0` -- `GHSA-mvgg-jvj2-4frq` (HIGH severity, session/authz
+  confusion across routes) is fixed exactly there.
+
+#### presidium-contrib -- `[spiffe]`: real SPIRE-issued X.509-SVID identity
+
+- **New `presidium_contrib.spiffe` module** (`SpiffeIdentitySource`, `bind_identity_to_registry()`
+  -- new `[spiffe]` extra, `spiffe>=0.3.1`): a real async bridge over the official `spiffe` SDK's
+  Workload API client (a blocking, thread-based API, bridged correctly via `asyncio.to_thread()`/
+  `asyncio.run_coroutine_threadsafe()`).
+- **`AgentRecord` gained `public_key_algorithm: Literal["ed25519", "ec_p256"] = "ed25519"`** --
+  additive, default unchanged for every existing caller. `presidium.identity.verify_agent_signature()`
+  dispatches on it; the Ed25519 path is completely untouched. `cryptography>=41` is now a real,
+  hard core `presidium` dependency (same lazy-import-but-hard-dependency precedent as `pynacl`).
+- **New `AgentRegistry.update_identity(name, public_key, public_key_algorithm)`** across all
+  three backends -- real identity rotation support.
+- Verified end to end against an actual running SPIRE v1.15.3 server + agent on real hardware,
+  confirming a genuine EC P-256 X.509-SVID with the SPIFFE ID as its SAN URI.
+
+#### presidium-contrib -- `GovernedMcpToolPipeline`: composes the three MCP governance primitives
+
+**New `presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline`.** `PIIDetector`/
+`PoisoningDetector`/`redact_dict` were real, tested, shipped primitives with zero real
+composition until now. The new pipeline runs, per tool call: a poisoning check (fail-closed by
+default, `allow_unapproved_tools` opt-out) -> `redact_dict()` of arguments into
+`ActionRequest.parameters` for policy/audit visibility -> real `PRE_TOOL` authorization -> the
+real, unredacted backend call -> optional `PIIDetector.scan_dict()` enrichment of the result with
+`contains_pii`/`pii_pattern_names` (opt-in by `pii_detector` presence) -> real `POST_TOOL`
+authorization (a CEL policy can now genuinely reference `result.contains_pii`) -> optional
+`PIIDetector.mask_dict()` of the value actually returned to the agent (`mask_pii_in_results`, on
+by default).
+
+#### presidium -- `scope` (FR-1.4) threaded through `check_grant()`/`check()`/`check_resource()`
+
+`GovernedToolProvider.check_grant()`/`check()`/`check_resource()` gained an additive, optional
+`parameters: dict[str, Any] | None = None`. `presidium_contrib.server`'s `PresidiumGatewayAgent`
+now actually reads the HTTP request body's `scope` field and passes it through -- previously
+silently discarded despite being part of the documented request shape from the start. A CEL
+policy can now genuinely reference `request.parameters.<key>` from a `check_grant` call.
+
+#### presidium -- Trust ceiling propagation and monotonic capability narrowing
 
 Two real, concrete security gaps found via a direct comparison against Microsoft's Agent
 Governance Toolkit (`microsoft/agent-governance-toolkit`), now closed:
@@ -42,6 +130,30 @@ Governance Toolkit (`microsoft/agent-governance-toolkit`), now closed:
 - 60+ new tests (pure-function tests, registry-level integration tests across all three
   backends). All 439 `presidium` + 158 `presidium-contrib` tests pass, 3x stable,
   `ruff`/`mypy --strict` clean.
+
+### Fixed
+
+#### presidium-contrib -- real mTLS handshake test now passes for real, not `xfail`
+
+`civitas>=0.11.3` (`civitas-io/python-civitas` GH #25 R10) fixed a real, upstream gap where
+`mtls_source="direct"` HTTP mTLS never actually exposed the client certificate to the ASGI app.
+The two previously-`xfail(strict=True)`-marked scenarios in `presidium-contrib`'s own real mTLS
+handshake test now pass for real against the published dependency -- markers removed, not
+loosened.
+
+### Developer Experience
+
+- **Real, working pre-commit hooks -- installed and verified, not just configured.** A
+  `.pre-commit-config.yaml` existed since June but was never actually installed
+  (`.git/hooks/pre-commit` didn't exist). Now real: ruff/ruff-format/gitleaks on every commit,
+  `mypy --strict` + the full test suite on every push. `pre-commit>=3.7` added as a dev
+  dependency; `CONTRIBUTING.md` corrected (it had drifted to describe the project as
+  pre-implementation despite substantial real, published, tested code).
+- `AGENTS.md` corrected -- no longer claims `litellm`/`kong`/`portkey`/`cloudflare_ai_gateway`/
+  `helicone`/`truefoundry` extras/modules exist (they don't); fixed stale module names
+  (`presidium.protocols`/`presidium.models` -> the real, distributed Protocols + singular
+  `presidium.model`), a stale "Pre-alpha" status line, and a monorepo tree missing
+  `presidium.identity`/`presidium.lineage`/`presidium_contrib.spiffe`/`presidium_contrib.server`.
 
 ## [0.2.1] - 2026-08-22
 

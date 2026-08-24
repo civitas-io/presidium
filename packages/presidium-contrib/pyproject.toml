@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "presidium-contrib"
-version = "0.2.0"
+version = "0.3.0"
 description = "Adapters and reference implementations for Presidium governance"
 readme = "README.md"
 license = "Apache-2.0"
@@ -21,7 +21,8 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "presidium>=0.1",
+    "presidium>=0.3.0",  # 0.3.0: presidium.providers.gateway (ToolsGatewayBackend), needed by
+    # presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline and agentgateway/client.py.
 ]
 
 [project.optional-dependencies]

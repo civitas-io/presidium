@@ -1716,7 +1716,7 @@ wheels = [
 
 [[package]]
 name = "presidium"
-version = "0.2.1"
+version = "0.3.0"
 source = { editable = "packages/presidium" }
 dependencies = [
     { name = "cel-python" },
@@ -1768,7 +1768,7 @@ dev = [{ name = "types-pyyaml", specifier = ">=6.0.12.20260518" }]
 
 [[package]]
 name = "presidium-contrib"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "packages/presidium-contrib" }
 dependencies = [
     { name = "presidium" },
