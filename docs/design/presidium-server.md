@@ -277,11 +277,31 @@ territory) -- confirmed serialized correctly on read when set in-process.
 end-to-end HTTP), 100% coverage on all three new/changed files, `ruff`/`ruff format --check`/
 `mypy --strict` clean.
 
-- **Approval request/list/decide** is the real piece that would let a `REQUIRE_APPROVAL` decision
-  from `check_grant` actually get resolved over the network — genuinely useful work, deferred
-  because `check_grant` returning the decision as a value (FR-1.5) is useful on its own even
-  before a network-reachable resolution path exists (a caller can still route it through its own,
-  local human-approval mechanism in the meantime).
+- **Approval list/decide -- DONE, 2026-08-24, real, shipped, with a real, honest scope
+  boundary.** `presidium_contrib.server.approval_agent`: `ListApprovalsGatewayAgent`
+  (`GET /v1/approvals`), `ApproveGatewayAgent` (`POST /v1/approvals/{id}/approve`),
+  `DenyGatewayAgent` (`POST /v1/approvals/{id}/deny`) -- exposing `ApprovalService.
+  list_pending()`/`decide()` directly. **Deliberately does NOT include a `POST /v1/approvals`**
+  to originate a request -- approval requests are created in-process by `GovernedToolProvider.
+  check()`/`GovernedModelProvider.check()` calling `request_approval()`, never by an external
+  network caller (that would let a remote caller inject an arbitrary fake approval). **Real,
+  honest, load-bearing scope boundary, confirmed by reading the source, not assumed**:
+  `check_grant()` (the one real, existing consumer via `PresidiumGatewayAgent`) does NOT call
+  `ApprovalService.request_approval()` at all (confirmed directly in `providers/tool.py`) -- it
+  returns `REQUIRE_APPROVAL` as a plain value for the caller's own suspend/resume mechanism
+  (FR-1.5), by design. This means an approval surfaced by `check_grant()` over
+  `/v1/check_grant` is NOT tracked here and NOT resolvable through these new endpoints -- only
+  approvals from the BLOCKING `check()` path are. Wiring `check_grant()`'s own REQUIRE_APPROVAL
+  path into a real `ApprovalService` for durable, cross-network resolution is a real, separate,
+  bigger integration (it would need to compose with Civitas's own durable suspension mechanism
+  on the calling side, e.g. Fabrica) -- explicitly out of scope here, not silently glossed over.
+  Also honest about `ApprovalService.decide()`'s own real contract: it has no way to report "no
+  such pending request" (confirmed against `CallbackApprovalProvider`'s own implementation, a
+  silent no-op for an unknown/already-resolved id) -- these endpoints reply `{"status":
+  "decided", ...}` honestly rather than inventing a false-confidence 404 the underlying Protocol
+  can't actually back up. Same "one real GenServer per HTTP route" pattern and `"reason"`-not-
+  `"error"` reply-key convention as `registry_agent.py`. 13 new tests (unit + real end-to-end
+  HTTP), 100% coverage on the new file, `ruff`/`ruff format --check`/`mypy --strict` clean.
 - **Credential resolution** would need its own real design pass on what's safe to expose over a
   network at all — deliberately not sketched here to avoid a design that looks more resolved than
   it is.
@@ -299,9 +319,9 @@ POST   /v1/agents/{name}/suspend     # Suspend an agent -- still real, not built
 GET    /v1/policies                  # List policies
 POST   /v1/policies/validate         # Validate policy YAML
 
-GET    /v1/approvals                 # Pending approval queue
-POST   /v1/approvals/{id}/approve    # Approve an action
-POST   /v1/approvals/{id}/deny       # Deny an action
+GET    /v1/approvals                 # Pending approval queue -- DONE, 2026-08-24
+POST   /v1/approvals/{id}/approve    # Approve an action -- DONE, 2026-08-24
+POST   /v1/approvals/{id}/deny       # Deny an action -- DONE, 2026-08-24
 ```
 
 The approval endpoints specifically are the real, concrete piece that would let a

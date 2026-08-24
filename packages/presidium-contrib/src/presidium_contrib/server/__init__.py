@@ -5,6 +5,12 @@ the repo root for the full design. `presidium_contrib.server` requires the
 `presidium-contrib[server]` extra (`civitas[http]` + `cryptography`).
 """
 
+from presidium_contrib.server.approval_agent import (
+    ApproveGatewayAgent,
+    DenyGatewayAgent,
+    ListApprovalsGatewayAgent,
+    build_approval_gateway_config,
+)
 from presidium_contrib.server.gateway_agent import (
     RATE_LIMITER_AGENT_NAME,
     HealthCheckAgent,
@@ -22,12 +28,16 @@ from presidium_contrib.server.registry_agent import (
 
 __all__ = [
     "RATE_LIMITER_AGENT_NAME",
+    "ApproveGatewayAgent",
+    "DenyGatewayAgent",
     "DeregisterAgentGatewayAgent",
     "GetAgentGatewayAgent",
     "HealthCheckAgent",
     "ListAgentsGatewayAgent",
+    "ListApprovalsGatewayAgent",
     "PresidiumGatewayAgent",
     "RegisterAgentGatewayAgent",
+    "build_approval_gateway_config",
     "build_check_grant_gateway_config",
     "build_rate_limiter",
     "build_registry_gateway_config",

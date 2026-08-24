@@ -153,6 +153,42 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## Approval list/decide over the network -- DONE, 2026-08-24, with an explicit scope boundary
+
+Closes the second of `presidium-server.md`'s "Deferred: the fuller REST surface" items (registry
+CRUD shipped first, same day). New `presidium_contrib.server.approval_agent`:
+`ListApprovalsGatewayAgent` (`GET /v1/approvals`), `ApproveGatewayAgent`
+(`POST /v1/approvals/{id}/approve`), `DenyGatewayAgent` (`POST /v1/approvals/{id}/deny`) --
+exposing `ApprovalService.list_pending()`/`decide()` directly.
+
+- **Deliberately no `POST /v1/approvals`** -- approval requests are created in-process by
+  `GovernedToolProvider.check()`/`GovernedModelProvider.check()` calling `request_approval()`
+  when a policy returns `REQUIRE_APPROVAL`, never by an external network caller (that would let
+  a remote caller inject an arbitrary fake approval).
+- **Real, honest, load-bearing scope boundary, confirmed by reading the source, not assumed**:
+  `check_grant()` (the one real, existing HTTP-facing consumer via `PresidiumGatewayAgent`)
+  does NOT call `ApprovalService.request_approval()` at all -- confirmed directly in
+  `providers/tool.py`. It returns `REQUIRE_APPROVAL` as a plain value for the caller's own
+  suspend/resume mechanism (FR-1.5), by design. This means an approval surfaced by
+  `check_grant()` over `/v1/check_grant` is NOT tracked here and NOT resolvable through these
+  new endpoints -- only approvals from the BLOCKING `check()` path (which does call
+  `request_approval()`) are. Wiring `check_grant()`'s own `REQUIRE_APPROVAL` path into this is
+  a real, separate, bigger integration (it would need to compose with Civitas's own durable
+  suspension mechanism on the calling side, e.g. Fabrica) -- explicitly named as out of scope,
+  not silently glossed over.
+- **Also honest about `ApprovalService.decide()`'s own real contract**: it has no way to report
+  "no such pending request" (confirmed against `CallbackApprovalProvider`'s own implementation
+  -- a silent no-op for an unknown/already-resolved id) -- these endpoints reply
+  `{"status": "decided", ...}` honestly rather than inventing a false-confidence 404 the
+  underlying Protocol can't actually back up.
+- Same "one real GenServer per HTTP route" pattern and `"reason"`-not-`"error"` reply-key
+  convention as `registry_agent.py` (the real framework constraint found while building that
+  one -- `civitas.gateway.dispatch.py` maps any reply with a top-level `"error"` key to a real
+  HTTP 400).
+- 13 new tests (`test_approval_agent.py` unit + `test_approval_gateway_real_http.py` real
+  end-to-end HTTP), 100% coverage on the new file, `ruff`/`ruff format --check`/
+  `mypy --strict` clean. Real fresh-venv install verified.
+
 ## Registry CRUD over the network -- DONE, 2026-08-24
 
 Closes the design doc's own long-standing "Deferred: the fuller REST surface" item. New

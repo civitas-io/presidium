@@ -560,8 +560,24 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   grant-management endpoint); register is upsert, matching `AgentRegistry.register()`'s own real
   behavior, not inventing new duplicate-detection. 15 new tests (unit + real end-to-end HTTP),
   100% coverage on all three new/changed files, `ruff`/`ruff format --check`/`mypy --strict`
-  clean. Approval request/list/decide and credential resolution remain real, designed intents,
-  not built until something concretely needs them.
+  clean.
+- [x] **Approval list/decide over the network -- DONE, 2026-08-24, real, shipped, with an
+  explicit scope boundary.** `presidium_contrib.server.approval_agent`:
+  `ListApprovalsGatewayAgent` (`GET /v1/approvals`), `ApproveGatewayAgent`
+  (`POST /v1/approvals/{id}/approve`), `DenyGatewayAgent` (`POST /v1/approvals/{id}/deny`) --
+  exposing `ApprovalService.list_pending()`/`decide()`. Deliberately no `POST /v1/approvals` --
+  approval requests are created in-process by `check()`, never by an external caller. **Real,
+  honest scope boundary, confirmed by reading the source, not assumed**: `check_grant()` does
+  NOT call `ApprovalService.request_approval()` at all (by design, per FR-1.5) -- only approvals
+  from the blocking `check()` path are tracked and resolvable here; wiring `check_grant()`'s own
+  `REQUIRE_APPROVAL` path into this is a real, separate, bigger integration needing the calling
+  side's own durable suspension mechanism (e.g. Fabrica), explicitly out of scope for this pass.
+  Also honest about `ApprovalService.decide()`'s own real contract (no "not found" signal --
+  confirmed against `CallbackApprovalProvider`'s own silent-no-op implementation) -- these
+  endpoints reply honestly, not inventing a false-confidence 404. 13 new tests (unit + real
+  end-to-end HTTP), 100% coverage on the new file, `ruff`/`ruff format --check`/`mypy --strict`
+  clean. Credential resolution remains a real, designed intent, not built until something
+  concretely needs it.
 - [x] **DONE, 2026-08-24.** `scope` (FR-1.4) is now threaded through to `ActionRequest.parameters`
   — `GovernedToolProvider.check_grant()`/`check()`/`check_resource()` gained an additive,
   optional `parameters: dict[str, Any] | None = None`, and `PresidiumGatewayAgent.handle_call()`

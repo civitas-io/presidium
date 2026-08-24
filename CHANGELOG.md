@@ -6,6 +6,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [0.6.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
+
+### Added
+
+#### presidium-contrib -- Approval list/decide over the network
+
+Closes the second of `presidium-server.md`'s "Deferred: the fuller REST surface" items
+(registry CRUD shipped first, same day). New `presidium_contrib.server.approval_agent`:
+`ListApprovalsGatewayAgent` (`GET /v1/approvals`), `ApproveGatewayAgent`
+(`POST /v1/approvals/{id}/approve`), `DenyGatewayAgent` (`POST /v1/approvals/{id}/deny`) --
+exposing `ApprovalService.list_pending()`/`decide()` directly.
+
+- Deliberately no `POST /v1/approvals` -- approval requests are created in-process by
+  `check()`, never by an external caller.
+- **Real, honest scope boundary, confirmed by reading the source**: `check_grant()` does NOT
+  call `ApprovalService.request_approval()` at all (by design, per FR-1.5) -- only approvals
+  from the blocking `check()` path are tracked and resolvable here. Wiring `check_grant()`'s own
+  `REQUIRE_APPROVAL` path into this is a real, separate, bigger integration needing the calling
+  side's own durable suspension mechanism (e.g. Fabrica), explicitly out of scope for this pass.
+- Honest about `ApprovalService.decide()`'s own real contract (no "not found" signal) -- these
+  endpoints reply honestly, not inventing a false-confidence 404.
+- 13 new tests, 100% coverage on the new file.
+
 ## [0.5.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
 
 ### Added

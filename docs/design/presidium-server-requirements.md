@@ -184,10 +184,23 @@ previously undocumented as a *reason*) convention.
 status/trust_tier/owner filters -- `civitas.gateway`'s dispatch never forwards a route's query
 string into a `mode: "call"` route's payload. A real, named follow-up, not silently missing.
 
-**FR-5.2 (Deferred to a later milestone)**: Approval request/list/decide and credential
-resolution are designed conceptually (per the original M7 scope) but **not built** — nothing
-concretely calls them over a network yet, matching "ship the default, revisit if forced." Real,
-scoped follow-up, not abandoned.
+**FR-5.2 (DONE, 2026-08-24, real, shipped, with an explicit scope boundary): Approval
+list/decide.** `presidium_contrib.server.approval_agent`: `GET /v1/approvals`,
+`POST /v1/approvals/{id}/approve`, `POST /v1/approvals/{id}/deny` -- exposing `ApprovalService.
+list_pending()`/`decide()`. Deliberately no `POST /v1/approvals` (approval requests are created
+in-process by `check()`, never by an external caller). **Real, honest scope boundary confirmed
+by reading the source**: `check_grant()` does NOT call `ApprovalService.request_approval()` at
+all (by design, per FR-1.5) -- only approvals from the blocking `check()` path are tracked and
+resolvable here; wiring `check_grant()`'s own REQUIRE_APPROVAL path into this is a real, separate
+integration needing the calling side's own durable suspension mechanism (e.g. Fabrica), out of
+scope for this pass. `ApprovalService.decide()`'s own real contract has no "not found" signal --
+these endpoints reply honestly, not inventing a false-confidence 404. 13 new tests, 100%
+coverage.
+
+**FR-5.3 (Deferred to a later milestone)**: Credential resolution is designed conceptually (per
+the original M7 scope) but **not built** — needs its own real design pass on what's safe to
+expose over a network at all, matching "ship the default, revisit if forced." Real, scoped
+follow-up, not abandoned.
 
 ---
 
