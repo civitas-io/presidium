@@ -269,10 +269,11 @@ real, separate work, not automatically unblocked by this alone.
   — order matters given the new floor.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
-- [ ] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git tag"
-  half of this item is DONE** (`presidium` v0.2.1, `presidium-contrib` v0.2.0, both live on PyPI,
-  real git tags/GitHub Releases) — the CLI/docs-site/examples half remains, now genuinely
-  unblocked since every P0 item above is true.
+- [~] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git
+  tag" half is DONE** (`presidium` v0.4.0, `presidium-contrib` v0.7.0, both live on PyPI, real
+  git tags/GitHub Releases). **The CLI half started, 2026-08-24** -- see the full M5 section
+  below for real detail (`presidium version`/`registry list`/`policy validate`/`trust replay`
+  shipped; docs site/examples/v1.0.0/`presidium run`/live-server CLI mode remain).
 - [ ] M8: Performance Research — correctly sequenced after M7, not before (see M8 below).
 
 ### P2 — deferred by design, commercial, or dependent on things outside our control
@@ -779,7 +780,7 @@ M-section itself, not just this table, if in doubt.
 | M2: Core Interfaces + CEL Policy | Q3 2026 | Complete |
 | M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Complete |
 | M4: Autonomy Progression | Q4 2026 | Planning -- not started |
-| M5: SDK + CLI | Q1 2027 | Planning -- not started; genuinely unblocked (P0 gate cleared v0.2.1, real releases now through v0.6.0) |
+| M5: SDK + CLI | Q1 2027 | **Started 2026-08-24** -- the first real `presidium` CLI shipped (version/registry list/policy validate/trust replay); docs site, examples, v1.0.0 remain |
 | M6: Cloud | 2027+ | Future -- not started, explicitly commercial |
 | M7: Presidium Server | TBD | **Complete for its P0 scope + 3 of 4 "Deferred" extensions** (check_grant, registry CRUD, rate limiting, approval list/decide -- real, shipped, released as of 2026-08-24). Only credential resolution remains, deliberately unsketched |
 | M8: Performance Research (Rust vs. Python) | After M7 | Planning -- not started; now genuinely unblocked, M7 exists to benchmark against |

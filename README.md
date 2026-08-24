@@ -112,6 +112,7 @@ presidium-contrib[spiffe]        # Real SPIRE-issued X.509-SVID identity (opt-in
 presidium-contrib[slack]         # Slack-based human-in-the-loop
 presidium-contrib[webhook]       # Webhook-based approval provider
 presidium-contrib[postgres]      # PostgreSQL agent registry backend
+presidium-contrib[sqlite]        # presidium CLI's `registry list` command (forwards to presidium[sqlite])
 ```
 
 **Real, current gap, not hidden**: a `LLMGatewayBackend`/`ToolsGatewayBackend` *pluggable-vendor*

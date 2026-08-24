@@ -15,10 +15,13 @@ natively integrated into the Civitas agent runtime.
 - **License:** Apache 2.0
 - **Python:** ≥3.12
 - **Status:** Real, live, public PyPI packages —
-  [`presidium`](https://pypi.org/project/presidium/) and
-  [`presidium-contrib`](https://pypi.org/project/presidium-contrib/), 452+ and 179+ real tests
-  respectively. See [`HANDOFF.md`](HANDOFF.md) for the current, dated status; this file describes
-  structure and conventions, not point-in-time progress.
+  [`presidium`](https://pypi.org/project/presidium/) (v0.4.0) and
+  [`presidium-contrib`](https://pypi.org/project/presidium-contrib/) (v0.7.0), 469 and 256 real
+  tests respectively, including a real CLI (`presidium version`/`registry list`/`policy
+  validate`/`trust replay`). See [`HANDOFF.md`](HANDOFF.md) for the current, dated status; this
+  file describes structure and conventions, not point-in-time progress -- exact test counts and
+  versions will drift again as work continues; treat these as "as of 2026-08-24," not a promise
+  to keep updating on every single commit.
 
 ### The One-Line Separation
 
@@ -76,22 +79,27 @@ presidium/
 │   │       └── runtime.py           # GovernedRuntime (from_config, reload_policies)
 │   └── presidium-contrib/           # Adapters + reference implementations
 │       └── src/presidium_contrib/
+│           ├── cli/                 # presidium CLI (Typer + Rich) -- version, registry list,
+│           │                        #   policy validate, trust replay ([project.scripts])
 │           ├── opa/                 # OPA adapter (presidium-contrib[opa])
 │           ├── openbao/             # OpenBao credential backend (presidium-contrib[openbao])
 │           ├── agentgateway/        # AgentGateway adapter (presidium-contrib[agentgateway]) --
-│           │                        #   real MCP tool-side (list_tools/call_tool, Streamable
-│           │                        #   HTTP); delegate_to_agent() (A2A) explicitly raises
-│           │                        #   NotImplementedError, not yet built (see roadmap.md P1)
+│           │                        #   real MCP tool-side (list_tools/call_tool) AND real A2A
+│           │                        #   delegation (delegate_to_agent()), both over Streamable
+│           │                        #   HTTP / a2a-sdk
 │           ├── spiffe/              # SPIRE Workload API bridge (presidium-contrib[spiffe]) --
 │           │                        #   real X.509-SVID identity, sync + rotation
 │           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
 │           ├── webhook/             # Webhook approval adapter (presidium-contrib[webhook])
 │           ├── registry/            # Reference impl: PostgresAgentRegistry (presidium-contrib[postgres])
-│           ├── mcp_gateway/         # Reference impl: tool poisoning, credential redaction, PII masking
+│           ├── mcp_gateway/         # Reference impl: tool poisoning, credential redaction, PII
+│           │                        #   masking, plus GovernedMcpToolPipeline composing all three
+│           │                        #   into one real, invokable pipeline
 │           ├── trust/               # Reference impl: LearningTrustScorer
 │           ├── server/              # M7 Presidium Server (presidium-contrib[server]) -- real
-│           │                        #   REST+mTLS governance gateway (PresidiumGatewayAgent,
-│           │                        #   HealthCheckAgent) over an actual civitas.gateway.HTTPGateway
+│           │                        #   REST+mTLS governance gateway: check_grant, registry CRUD
+│           │                        #   (register/list/get/deregister), approval list/decide,
+│           │                        #   rate limiting, over an actual civitas.gateway.HTTPGateway
 │           └── service/             # Service mode: PolicyEvaluatorServer, RegistryServer (GenServer)
 ├── docs/                            # All documentation
 │   ├── vision/                      # Why — manifesto, positioning, roadmap
@@ -216,7 +224,12 @@ Install: `pip install presidium`
 
 ### `presidium-contrib` — Adapters and Reference Implementations
 
-All concrete implementations. Organized into two categories:
+All concrete implementations. Organized into three categories: adapters, reference
+implementations, and `presidium_contrib.cli` (the `presidium` command-line tool -- `[project.
+scripts] presidium = "presidium_contrib.cli:main"`, Typer + Rich, mirroring `civitas.cli`'s own
+package structure exactly). Not a wrapped product or a reference implementation of a protocol --
+a real, separate, operational surface. See its own module docstring for the current, honest
+command list and scope boundaries (`trust show`/`trust events` are deliberately not built yet).
 
 **Adapters** (wrapping existing products):
 
@@ -224,12 +237,13 @@ All concrete implementations. Organized into two categories:
 |---|---|---|
 | `[opa]` | `presidium_contrib.opa` | Open Policy Agent — for teams already running OPA |
 | `[openbao]` | `presidium_contrib.openbao` | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) — credential management |
-| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — reference `LLMGatewayBackend` + `ToolsGatewayBackend`. **Real, shipped: MCP tool-side** (`list_tools()`/`call_tool()` over Streamable HTTP). **Not yet built: A2A delegation** — `delegate_to_agent()` explicitly raises `NotImplementedError` (needs a new `a2a-sdk` dependency; tracked as a P1 roadmap item, not a silent gap) |
+| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — reference `LLMGatewayBackend` + `ToolsGatewayBackend`. **Real, shipped: LLM chat/list_models, MCP tool-side** (`list_tools()`/`call_tool()` over Streamable HTTP), **and A2A delegation** (`delegate_to_agent()`, real `a2a-sdk` client) |
 | `[spiffe]` | `presidium_contrib.spiffe` | SPIRE Workload API (`spiffe` SDK) — real X.509-SVID identity sync + rotation into an `AgentRegistry`, opt-in alongside the Ed25519 default |
 | `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
 | `[webhook]` | `presidium_contrib.webhook` | Generic webhook — human-in-the-loop approvals |
 | `[postgres]` | `presidium_contrib.registry` | `PostgresAgentRegistry` — a durable `AgentRegistry` backend |
-| `[server]` | `presidium_contrib.server` | M7 Presidium Server — real REST+mTLS governance gateway over an actual `civitas.gateway.HTTPGateway` (wraps `civitas[http]`, not a third-party product, but genuinely optional) |
+| `[server]` | `presidium_contrib.server` | M7 Presidium Server — real REST+mTLS governance gateway (check_grant, registry CRUD, approval list/decide, rate limiting) over an actual `civitas.gateway.HTTPGateway` (wraps `civitas[http]`, not a third-party product, but genuinely optional) |
+| `[sqlite]` | -- | Forwards to `presidium[sqlite]` (`aiosqlite`) -- needed by the `presidium` CLI's `registry list` command, not a `presidium-contrib`-owned module of its own |
 
 **Not yet built, despite earlier documentation implying otherwise — corrected 2026-08-24**: no
 `litellm`/`kong`/`portkey`/`cloudflare_ai_gateway`/`helicone`/`truefoundry` modules or extras
@@ -242,7 +256,7 @@ the one real, shipped `LLMGatewayBackend`, and covers the reference path for now
 | Module | Implements | Why here |
 |---|---|---|
 | `presidium_contrib.registry` | `AgentRegistry` | Agent Registry with grants + trust scores — prior art exists (Google Gemini, AGT) but not as a swappable library |
-| `presidium_contrib.mcp_gateway` | MCP governance | Tool poisoning detection, credential redaction, PII masking — existing gateways (incl. AGT) aren't standalone libraries to wrap |
+| `presidium_contrib.mcp_gateway` | MCP governance | Tool poisoning detection, credential redaction, PII masking, plus `GovernedMcpToolPipeline` composing all three into one real, invokable pipeline — existing gateways (incl. AGT) aren't standalone libraries to wrap |
 | `presidium_contrib.trust` | `TrustScorer` | Trust scoring engine (`LearningTrustScorer`) — mature models exist (e.g. AGT) but none ship as a reusable library |
 
 Install: `pip install presidium-contrib[opa,openbao]` (mix and match extras)

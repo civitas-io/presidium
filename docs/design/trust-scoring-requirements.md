@@ -79,6 +79,18 @@
 
 ## M5 Requirements — SDK + CLI
 
+**Status, 2026-08-24**: the first real `presidium` CLI shipped this day (`presidium_contrib.cli`,
+`presidium` v0.4.0 / `presidium-contrib` v0.7.0). FR-5.3 is real and shipped as `presidium trust
+replay --events <file> --spec <file>`. FR-5.1/FR-5.2 as originally specified below (querying a
+*live agent's* history) are **not built, with a real, honest, confirmed reason, not an
+oversight**: no registry backend today persists a durable, queryable trust-event history --
+`LinearTrustScore` (the scorer every registry backend actually uses) keeps no event log at all;
+`WindowedTrustScorer` (which does use the real `presidium.scoring` event-based model this FR
+assumes) is pure in-memory and wired as no backend's default. Building `trust show`/`trust
+events`/`trust spec <agent_id>` for real needs a durable event store first -- see
+`docs/vision/roadmap.md`'s own M5 section for the full detail, and FR-4.5 (decision journal)
+above for where that durability arguably belongs.
+
 **FR-5.1 (CLI Trust Surface)** —
 - `presidium trust show <agent_id>` → score, tier, dimensions, last 10 events
 - `presidium trust events <agent_id> --since <date> --limit N`
@@ -87,7 +99,7 @@
 
 **FR-5.2 (Event Export)** — `export_events(agent_id, format, since)` supports JSON Lines, CSV. Output embeds `spec_hash`.
 
-**FR-5.3 (Deterministic Replay)** — `replay_score(events, spec) -> float` reproduces scores. For deterministic scorers, replayed scores match originals within 1e-9.
+**FR-5.3 (Deterministic Replay)** — `replay_score(events, spec) -> float` reproduces scores. For deterministic scorers, replayed scores match originals within 1e-9. **DONE, 2026-08-24** as `presidium trust replay --events <file> --spec <file>`, wrapping the real, pure, already-100%-tested `presidium.scoring.functions.replay()` directly (a real, honest re-scoping from `<agent_id>`-based to caller-supplied-file-based, for the same reason FR-5.1 above isn't built).
 
 ---
 
