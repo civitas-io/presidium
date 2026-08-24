@@ -6,6 +6,55 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [presidium 0.4.0 / presidium-contrib 0.7.0] - 2026-08-24
+
+Start of M5 (SDK + CLI) -- the first real CLI, `presidium`, mirroring `civitas-io/python-civitas`'s
+own `civitas.cli` package structure exactly (Typer + Rich, one module per command group).
+
+### Added
+
+#### presidium -- `parse_policy_rules()` promoted to public API
+
+Previously a private helper (`_parse_policy_rules`) inside `presidium.runtime`, used internally
+by `GovernedRuntime.from_config()`/`reload_policies()`. Promoted to public so
+`presidium-contrib`'s new `presidium policy validate` command can reuse the exact same YAML
+parsing, not a second implementation that could silently drift out of sync with what a real
+topology file actually accepts. No behavioral change for any existing caller.
+
+#### presidium-contrib -- the first real `presidium` CLI (`presidium_contrib.cli`)
+
+New `[project.scripts] presidium = "presidium_contrib.cli:main"`. `typer`/`rich` are core
+dependencies (not extra-gated), matching `civitas` itself doing the same for its own CLI.
+
+- **`presidium version`** -- shows both `presidium` and `presidium-contrib` versions (they can
+  genuinely drift apart, as this same release proves).
+- **`presidium registry list --db <path>`** -- lists agents from a local `SqliteRegistry`
+  database file (new `presidium-contrib[sqlite]` extra, forwarding to `presidium[sqlite]`).
+  Deliberately does not talk to a live `presidium-server`'s HTTP registry-CRUD endpoint yet --
+  a real, separate follow-up.
+- **`presidium policy validate <file>`** -- validates a CEL policy YAML file (standalone or
+  topology-embedded), reporting every real structural and CEL-compilation error found, not just
+  the first, exit code 1 on any failure. Reuses `parse_policy_rules()` and the real
+  `CelPolicyEngine`, not a reimplementation.
+- **`presidium trust replay --events <file> --spec <file>`** -- deterministic score replay
+  (FR-5.3) from caller-supplied event/spec JSON files, wrapping the real, pure
+  `presidium.scoring.functions.replay()` directly. **Real, honest re-scoping from the original
+  FR-5.1 design** (`trust replay <agent_id>`, querying a live agent's history): no registry
+  backend today persists a durable, queryable trust-event history (`LinearTrustScore`, the
+  scorer every registry actually uses, keeps no event log at all; `WindowedTrustScorer`, which
+  does use the real event-based scoring model, is pure in-memory and unused as any default) --
+  `trust show`/`trust events` are deliberately not built yet for the same reason, not silently
+  dropped.
+- **Two real bugs caught and fixed before shipping**: (1) `SqliteRegistry`'s connection was
+  never closed after `registry list`, leaving aiosqlite's background thread trying to call back
+  into a closed event loop -- a real, ugly traceback printed after otherwise-correct output. (2)
+  `trust replay`'s `--as-of` timestamp was parsed outside the command's own error-handling
+  block, so an invalid value raised an unhandled exception instead of a clean error message.
+- 18 new tests (`presidium-contrib` gained 18 across `tests/unit/cli/`), 86-100% coverage per
+  file (remaining gaps are genuinely hard-to-trigger defensive branches -- missing package
+  metadata, missing `aiosqlite` -- matching this codebase's own established precedent for
+  accepting those honestly rather than contriving artificial tests).
+
 ## [0.6.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
 
 ### Added

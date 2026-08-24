@@ -190,6 +190,47 @@ exposing `ApprovalService.list_pending()`/`decide()` directly.
   end-to-end HTTP), 100% coverage on the new file, `ruff`/`ruff format --check`/
   `mypy --strict` clean. Real fresh-venv install verified.
 
+## M5 started: the first real `presidium` CLI -- DONE, 2026-08-24
+
+Mirrors `civitas-io/python-civitas`'s own `civitas.cli` package structure exactly (Typer + Rich,
+one module per command group, always-core not extra-gated typer/rich dependency). New
+`presidium_contrib.cli` (`[project.scripts] presidium = "presidium_contrib.cli:main"`).
+
+- **`presidium version`** -- shows both package versions (they genuinely drift apart, as this
+  release proves: `presidium` 0.4.0, `presidium-contrib` 0.7.0).
+- **`presidium registry list --db <path>`** -- lists agents from a local `SqliteRegistry` file
+  (new `presidium-contrib[sqlite]` extra, forwarding to `presidium[sqlite]`). Deliberately not
+  wired to a live `presidium-server`'s HTTP registry-CRUD endpoint yet -- a real, separate,
+  named follow-up (`--server-url` mode).
+- **`presidium policy validate <file>`** -- validates a CEL policy YAML file (standalone or
+  topology-embedded), reporting every real error found (structural AND CEL compilation), not
+  just the first, mirroring `civitas topology validate`'s own "show everything" UX. Reuses
+  `presidium.runtime.parse_policy_rules()` (promoted from private to public specifically for
+  this, so the CLI can't silently drift from what `GovernedRuntime.from_config()` actually
+  accepts) and the real `CelPolicyEngine` for real compilation checking.
+- **`presidium trust replay --events <file> --spec <file>`** (FR-5.3) -- wraps the real, pure,
+  already-100%-tested `presidium.scoring.functions.replay()` directly.
+- **Real, honest re-scoping, confirmed by reading the source first, not assumed**: FR-5.1's
+  `trust show`/`trust events` (querying a LIVE agent's real history) are deliberately not built.
+  No registry backend today persists a durable, queryable trust-event history --
+  `LinearTrustScore` (the scorer every backend actually uses) keeps no event log at all;
+  `WindowedTrustScorer` (which does use the real event-based scoring model) is pure in-memory
+  and unused as any default. Building those two commands for real needs a durable event store
+  first -- arguably M4's own job (FR-4.5, decision journal), not a CLI gap.
+- **Two real bugs caught and fixed before shipping**: `SqliteRegistry`'s connection was never
+  closed after `registry list` -- aiosqlite's background thread tried to call back into a
+  closed event loop, a real, ugly traceback printed after otherwise-correct output. `trust
+  replay`'s `--as-of` parsing sat OUTSIDE the command's own try/except, so an invalid value
+  raised an unhandled exception instead of the same clean error every other malformed-input
+  case gets.
+- 18 new tests (`typer.testing.CliRunner`, real SqliteRegistry/YAML/JSON files, not mocked),
+  86-100% coverage per file (remaining gaps are genuinely hard-to-trigger defensive branches --
+  missing package metadata, missing `aiosqlite` -- matching this codebase's own established
+  precedent for accepting those honestly). **Real, useful lesson re-confirmed**: never assert
+  CLI tests on full Rich-rendered text substrings -- a long agent ID/file path wraps across
+  table cells depending on terminal width, caught by a real, failing first test run, not
+  assumed from `civitas.cli`'s own documented warning alone.
+
 ## Registry CRUD over the network -- DONE, 2026-08-24
 
 Closes the design doc's own long-standing "Deferred: the fuller REST surface" item. New

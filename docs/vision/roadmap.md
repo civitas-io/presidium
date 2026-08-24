@@ -404,19 +404,48 @@ tiers work fine statically in the meantime). See "Implementation Priority" above
 ## M5: SDK + CLI
 
 **Priority: P1.** The gating condition (every P0 item true, no fictional cryptographic-identity
-claim) is now genuinely met -- `presidium` v0.2.1/`presidium-contrib` v0.2.0 are real, live PyPI
-releases with a real Ed25519 identity binding and a real, proven mTLS handshake behind them. What
-remains here is the CLI/docs-site/examples work specifically, not the release itself.
+claim) is now genuinely met -- `presidium` v0.4.0/`presidium-contrib` v0.7.0 are real, live PyPI
+releases with a real Ed25519 identity binding and a real, proven mTLS handshake behind them. The
+first real CLI shipped 2026-08-24 (see below); what remains here is docs-site/examples/`presidium
+run`/the live-server registry-CRUD CLI mode, not the release itself.
 
 **Goal:** One package, one install, complete experience. Trust CLI for operators.
 
 **Requirements:** [trust-scoring-requirements.md](../design/trust-scoring-requirements.md) (FR-5.1–5.3)
 
-- [ ] CLI: `presidium trust show`, `presidium trust events`, `presidium trust spec`, `presidium trust replay` (FR-5.1)
-- [ ] Event export — JSON Lines, CSV with embedded `spec_hash` (FR-5.2)
-- [ ] Deterministic replay — reproduce scores from historical events + spec (FR-5.3)
-- [ ] CLI: `presidium run`, `presidium policy validate`, `presidium registry list`
-- [ ] Comprehensive documentation site (MkDocs)
+- [x] **The first real `presidium` CLI -- DONE, 2026-08-24** (`presidium_contrib.cli`,
+  `presidium` v0.4.0 / `presidium-contrib` v0.7.0). Mirrors `civitas-io/python-civitas`'s own
+  `civitas.cli` package structure exactly (Typer + Rich, one module per command group,
+  always-core not extra-gated dependency). Real, honest scope confirmed by reading the
+  registry/scoring source first, not assumed:
+  - [x] `presidium version`, `presidium registry list --db <path>` (local `SqliteRegistry`
+    file, new `presidium-contrib[sqlite]` extra), `presidium policy validate <file>` (reuses
+    `presidium.runtime.parse_policy_rules()`, promoted from private to public for this).
+  - [x] `presidium trust replay --events <file> --spec <file>` (FR-5.3) -- wraps the real,
+    pure, already-100%-tested `presidium.scoring.functions.replay()` directly.
+  - [ ] **Real, honest re-scoping, not silently dropped**: `presidium trust show`/`trust events`
+    (FR-5.1's two commands that query a LIVE agent's history) and `presidium run` remain
+    unbuilt. Confirmed directly: no registry backend today persists a durable, queryable
+    trust-event history (`LinearTrustScore`, the scorer every backend actually uses, keeps no
+    event log; `WindowedTrustScorer`, which does use the real event-based scoring model, is
+    pure in-memory and unused as any default) -- building those two commands for real needs a
+    durable event store first, arguably M4's own job (FR-4.5, decision journal), not a CLI gap.
+  - [x] Event export (FR-5.2) -- `ScoringSpec.spec_hash` already existed, real and tested,
+    before this work started; `trust replay` surfaces it directly. A dedicated
+    `export_events()` JSON Lines/CSV command remains a real, separate, smaller follow-up.
+  - Two real bugs caught and fixed before shipping: `SqliteRegistry`'s connection was never
+    closed after `registry list` (a real, ugly aiosqlite traceback after otherwise-correct
+    output); `trust replay`'s `--as-of` parsing sat outside the command's own error handling,
+    so an invalid value raised an unhandled exception instead of a clean error.
+  - 18 new tests, 86-100% coverage per file, `ruff`/`ruff format --check`/`mypy --strict` clean.
+- [ ] `presidium run` (bootstrap a `GovernedRuntime` from a topology YAML, mirroring
+  `civitas run`) -- not built yet, real follow-up.
+- [ ] `presidium registry list`/`policy validate` against a LIVE `presidium-server`'s HTTP
+  endpoints (`--server-url` mode) -- the local-SQLite-file mode shipped first; this is a real,
+  separate, named follow-up, not silently promised.
+- [ ] Comprehensive documentation site (MkDocs) -- `mkdocs.yml`'s own nav structure already
+  exists; no GitHub Pages deployment or `Deploy Docs` workflow yet (confirmed: `civitas-io/
+  python-civitas` has a real, working one to copy directly).
 - [ ] Example applications (3-5 real-world scenarios)
 - [ ] v1.0.0 release
 

@@ -112,7 +112,7 @@ class GovernedRuntime:
         key_dir = registry_cfg.get("key_dir")
 
         policies_cfg = presidium_config.get("policies", [])
-        rules = _parse_policy_rules(policies_cfg)
+        rules = parse_policy_rules(policies_cfg)
         engine = CelPolicyEngine()
         if rules:
             engine.load_policies(rules)
@@ -171,7 +171,7 @@ class GovernedRuntime:
         full_config = substitute_vars(full_config)
         presidium_config = full_config.get("presidium", {})
         policies_cfg = presidium_config.get("policies", [])
-        rules = _parse_policy_rules(policies_cfg)
+        rules = parse_policy_rules(policies_cfg)
         self.engine.load_policies(rules)
         logger.info("policy.reload rules=%d source=%s", len(rules), path)
         return len(rules)
@@ -215,7 +215,13 @@ class GovernedRuntime:
         )
 
 
-def _parse_policy_rules(configs: list[dict[str, Any]]) -> list[PolicyRule]:
+def parse_policy_rules(configs: list[dict[str, Any]]) -> list[PolicyRule]:
+    """Parse a real "presidium.policies:" YAML block (a list of dicts) into PolicyRule
+    objects. Real, public since 2026-08-24 -- previously private (_parse_policy_rules),
+    promoted because presidium_contrib.cli's "policy validate" command needs the exact same
+    parsing this module's own from_config()/reload_policies() use, not a reimplementation
+    that could silently drift out of sync with what a real topology YAML actually accepts.
+    """
     rules: list[PolicyRule] = []
     for cfg in configs:
         stage_raw = cfg.get("stage", "pre_tool")

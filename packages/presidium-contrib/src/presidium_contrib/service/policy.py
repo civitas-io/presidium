@@ -129,7 +129,7 @@ class PolicyEvaluatorServer(GenServer):
                     # `result.decision.value` then crashed with a real AttributeError on
                     # every non-default-ALLOW decision. Caught by real tests, not inspection
                     # alone -- 0% coverage on this file had masked it entirely. Matches
-                    # GovernedRuntime._parse_policy_rules()'s own correct pattern.
+                    # presidium.runtime.parse_policy_rules()'s own correct pattern.
                     decision=PolicyDecision(r.get("decision", "deny")),
                     reason=r.get("reason"),
                     priority=r.get("priority", 0),

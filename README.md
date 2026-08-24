@@ -29,8 +29,11 @@ pip install presidium-contrib      # adapters: OPA, OpenBao, Slack, Postgres, th
 > `GovernedToolProvider` are real, drop-in Civitas `ModelProvider`/`ToolProvider` implementations.
 > `CelPolicyEngine` fails closed on no policy match by default (a real, documented breaking
 > change from earlier releases). Trust ceiling propagation and monotonic capability narrowing on
-> delegation/spawn are shipped. 707 tests (469 `presidium` + 238 `presidium-contrib`), mypy
-> strict, ruff clean. Only credential resolution remains undone from M7's original scope.
+> delegation/spawn are shipped. **M5 (SDK + CLI) started the same day**: a real `presidium`
+> command (`pip install presidium-contrib[sqlite]`) -- `presidium version`, `registry list`,
+> `policy validate`, `trust replay` -- mirroring `civitas`'s own CLI shape exactly. 725 tests
+> (469 `presidium` + 256 `presidium-contrib`), mypy strict, ruff clean. Only credential
+> resolution remains undone from M7's original scope.
 
 ## What Is Presidium?
 
@@ -71,6 +74,25 @@ presidium/
 ├── AGENTS.md            # AI assistant instructions
 └── pyproject.toml       # Workspace config
 ```
+
+## Command-Line Interface
+
+```bash
+pip install presidium-contrib[sqlite]  # CLI + local SqliteRegistry support
+```
+
+```bash
+presidium version                                   # show presidium + presidium-contrib versions
+presidium registry list --db registry.db            # list agents in a local SqliteRegistry file
+presidium policy validate topology.yaml              # validate a CEL policy YAML file
+presidium trust replay --events e.json --spec s.json # deterministic trust-score replay (FR-5.3)
+```
+
+Mirrors `civitas`'s own CLI shape exactly (Typer + Rich). **Real, honest scope**: `registry
+list`/`policy validate` operate on local files, not a live `presidium-server` yet (a real,
+named follow-up); `trust show`/`trust events` (querying a *live* agent's history) aren't built
+-- no registry backend today persists a durable, queryable trust-event history to query in the
+first place.
 
 ## Packages
 
