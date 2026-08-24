@@ -69,9 +69,12 @@ structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) 
   `result.decision.value` then crashed with a real `AttributeError` on every non-default-ALLOW
   decision. 0% coverage had masked this entirely; caught immediately by the first real test that
   exercised a non-trivial policy outcome. `presidium-contrib` coverage: 71% → **82%**.
-- [ ] **Build M7 (Presidium Server) itself.** Without it, Presidium cannot be reached by anything
-  outside a single Civitas process — including Fabrica. This is the actual structural gap between
-  "three separate pillars" and "one integrated platform." See the M7 section below.
+- [x] **Build M7 (Presidium Server) itself.** **Done 2026-08-22/23.** `check_grant()` over real
+  REST+mTLS is shipped and now genuinely proven end to end (real handshake test, real published
+  `civitas>=0.11.3` dependency, no workaround) -- the structural gap between "three separate
+  pillars" and "one integrated platform" is closed for the `check_grant` path. Registry CRUD/
+  approval/credential endpoints remain deferred (see M7 section below) -- not part of this item's
+  own scope.
 - [x] **Wire `GovernedModelProvider`/`GovernedToolProvider` to actually call a backend, not just
   check permission.** **Done 2026-08-22.** New `presidium.providers.civitas_adapters` module:
   `GovernedModelProviderAdapter`/`GovernedToolAdapter`, real structural implementations of
