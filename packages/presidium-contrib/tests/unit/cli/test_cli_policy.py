@@ -9,6 +9,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from presidium_contrib.cli import app
+from tests.unit.cli._helpers import unwrapped
 
 runner = CliRunner()
 
@@ -85,9 +86,9 @@ def test_validate_reports_every_real_error_not_just_the_first(tmp_path: Path) ->
     path = _write(tmp_path, BROKEN)
     result = runner.invoke(app, ["policy", "validate", str(path)])
     assert result.exit_code == 1
-    assert "missing required field" in result.output
-    assert "bad-cel" in result.output
-    assert "good-one" in result.output
+    assert "missing required field" in unwrapped(result.output)
+    assert "bad-cel" in unwrapped(result.output)
+    assert "good-one" in unwrapped(result.output)
 
 
 INVALID_ENUM = """
@@ -105,7 +106,7 @@ def test_validate_invalid_decision_value_reports_a_real_error(tmp_path: Path) ->
     path = _write(tmp_path, INVALID_ENUM)
     result = runner.invoke(app, ["policy", "validate", str(path)])
     assert result.exit_code == 1
-    assert "bad-decision" in result.output
+    assert "bad-decision" in unwrapped(result.output)
 
 
 def test_validate_no_policies_found_fails(tmp_path: Path) -> None:

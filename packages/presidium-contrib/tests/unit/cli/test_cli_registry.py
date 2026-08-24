@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 from presidium.model import AgentRecord, Grant
 from presidium.registry.sqlite import SqliteRegistry
 from presidium_contrib.cli import app
+from tests.unit.cli._helpers import unwrapped
 
 runner = CliRunner()
 
@@ -45,7 +46,7 @@ def test_registry_list_shows_a_real_seeded_agent(tmp_path: Path) -> None:
     # failed on the first real run for exactly that reason), matching civitas.cli's own test
     # suite's explicit lesson never to assert on rendered-text substrings that might wrap.
     assert result.exit_code == 0
-    assert "researcher" in result.output
+    assert "researcher" in unwrapped(result.output)
 
 
 def test_registry_list_nonexistent_db_exits_zero_with_a_warning(tmp_path: Path) -> None:
@@ -56,8 +57,8 @@ def test_registry_list_nonexistent_db_exits_zero_with_a_warning(tmp_path: Path) 
     # Same real wrapping caveat as the seeded-agent test above -- a long tmp_path can wrap
     # across lines too. "does-not-exist.db" is short enough to never wrap in practice.
     assert result.exit_code == 0
-    assert "No registry database found" in result.output
-    assert "does-not-exist.db" in result.output
+    assert "No registry database found" in unwrapped(result.output)
+    assert "does-not-exist.db" in unwrapped(result.output)
 
 
 def test_registry_list_empty_registry(tmp_path: Path) -> None:

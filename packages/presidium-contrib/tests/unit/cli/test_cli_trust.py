@@ -10,6 +10,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from presidium_contrib.cli import app
+from tests.unit.cli._helpers import unwrapped
 
 runner = CliRunner()
 
@@ -52,7 +53,7 @@ def test_replay_produces_a_real_deterministic_score(tmp_path: Path) -> None:
     )
 
     assert result.exit_code == 0, result.output
-    assert "0.4420" in result.output
+    assert "0.4420" in unwrapped(result.output)
 
     # Real determinism check (FR-5.3): running it again produces the exact same score.
     result2 = runner.invoke(
@@ -89,7 +90,7 @@ def test_replay_includes_the_real_spec_hash(tmp_path: Path) -> None:
         initial_value=SPEC["initial_value"],
         decay=DecayConfig(**SPEC["decay"]),
     )
-    assert expected_spec.spec_hash in result.output
+    assert expected_spec.spec_hash in unwrapped(result.output)
 
 
 def test_replay_events_with_context_field(tmp_path: Path) -> None:
@@ -163,5 +164,5 @@ def test_replay_malformed_events_file_fails_with_a_helpful_message(tmp_path: Pat
     )
 
     assert result.exit_code == 1
-    assert "missing required field" in result.output
-    assert "timestamp" in result.output
+    assert "missing required field" in unwrapped(result.output)
+    assert "timestamp" in unwrapped(result.output)

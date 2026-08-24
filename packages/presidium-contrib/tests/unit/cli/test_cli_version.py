@@ -11,6 +11,7 @@ from importlib.metadata import version as pkg_version
 from typer.testing import CliRunner
 
 from presidium_contrib.cli import app
+from tests.unit.cli._helpers import unwrapped
 
 runner = CliRunner()
 
@@ -18,5 +19,5 @@ runner = CliRunner()
 def test_version_shows_both_real_package_versions() -> None:
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
-    assert pkg_version("presidium") in result.output
-    assert pkg_version("presidium-contrib") in result.output
+    assert pkg_version("presidium") in unwrapped(result.output)
+    assert pkg_version("presidium-contrib") in unwrapped(result.output)
