@@ -123,6 +123,14 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## Real, working pre-commit hooks -- installed, verified, not just configured
+
+**2026-08-24**: `.pre-commit-config.yaml` existed here since June but the hook was never actually
+installed. Now real: `uv run pre-commit install && uv run pre-commit install --hook-type
+pre-push` wires up ruff/ruff-format/gitleaks on every commit, real per-package `mypy` and both
+test suites on every push. `CONTRIBUTING.md` also substantially corrected while touching it --
+it still described Presidium as pre-implementation, despite everything shipped this session.
+
 ## Real bugs found and fixed this session — read before assuming similar code elsewhere is correct
 
 Every one of these was caught by an actual test run, a real running system, or a real fresh-venv
