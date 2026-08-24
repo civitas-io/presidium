@@ -344,6 +344,74 @@ Tool results may contain sensitive data (SSNs, credit cards, API keys, emails) t
 
 PII detection itself is not CEL — it uses regex patterns or an external service (Microsoft Presidio, AWS Comprehend). The CEL policy decides *what to do* when PII is detected (deny, redact, require approval). The detection is a context enrichment step before policy evaluation.
 
+### The pipeline that composes all three — `GovernedMcpToolPipeline`, DONE, 2026-08-24
+
+All three primitives above (`PoisoningDetector`, `PIIDetector`, `redact_dict`) were real, tested,
+shipped code with **zero real composition** until now — nothing in this codebase ever called
+them together, or called them from an actual tool-call path at all.
+`presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline` is the real implementation of
+exactly this section's description, composing `GovernedToolProvider` (authorization) and a
+`ToolsGatewayBackend` (operations) with all three enrichment steps spliced into the real call
+sequence:
+
+```
+list_tools()                                    ← discovery, no PRE_TOOL check (decision 4),
+                                                    each tool tagged with its live poisoning_status
+call_tool(name, arguments)
+    ↓
+PoisoningDetector.check() on the tool's live description/schema
+    ↓ CLEAN (or allow_unapproved_tools=True)     ↓ UNAPPROVED/CHANGED
+redact_dict(arguments) → ActionRequest.parameters   raise ToolPoisoningDetectedError
+    ↓                                               (backend never called)
+GovernedToolProvider.check()                    ← PRE_TOOL (real authorization, sees the
+    ↓ ALLOW                                        REDACTED arguments, not the raw ones)
+backend.call_tool(name, arguments)              ← the REAL, unredacted arguments -- the tool
+    ↓ result                                       still needs real values to function
+PIIDetector.scan_dict(result) → result enriched
+  with contains_pii/pii_pattern_names (if a PIIDetector is configured)
+    ↓
+GovernedToolProvider.post_check()               ← POST_TOOL (a CEL policy can now genuinely
+    ↓ ALLOW                                        reference result.contains_pii, per this
+                                                    section's own CEL example above)
+PIIDetector.mask_dict(result) if contains_pii    ← optional, on by default
+  and mask_pii_in_results=True
+    ↓
+Agent receives result
+```
+
+Deliberately **not** built as an extension of `GatewayToolProvider`
+(`presidium/providers/gateway.py`): that class calls the backend then immediately runs
+`post_check()` on the raw result — there's no seam to inject PII-scan enrichment between "get the
+result" and "evaluate POST_TOOL policy against it" without reaching into its internals.
+`GovernedMcpToolPipeline` orchestrates the same two underlying primitives directly instead, with
+the extra steps spliced in. `GatewayToolProvider` remains the right choice for callers who don't
+need MCP governance primitives; this is a specialized, heavier-weight alternative for callers who
+do, not a replacement.
+
+Poisoning detection fails closed by default (`allow_unapproved_tools: bool = False`), matching
+this codebase's `allow_unmatched_requests`/`allow_ungoverned`/`allow_unsandboxed` naming and
+fail-closed convention — an unapproved or changed tool blocks the call before the backend is ever
+reached. PII scanning is opt-in by presence (`pii_detector: PIIDetector | None = None`) since
+scanning every string in every result is a real, non-free cost, not something every deployment
+wants unconditionally.
+
+**This resolves one of this doc's own Open Questions below** ("Should POST_TOOL be able to
+*modify* results (redact inline) or only ALLOW/DENY?") — not by adding a new POST_TOOL decision
+type to the CEL engine itself (a bigger, separate change, left open), but by giving the pipeline
+its own separate, explicit `mask_pii_in_results` toggle: CEL still only ever decides
+ALLOW/DENY/REQUIRE_APPROVAL; masking the value actually returned to the agent is the pipeline's
+own, independent, honestly-simpler mechanism layered on top.
+
+15 new tests (`tests/unit/mcp_gateway/test_pipeline.py`), 100% coverage on `pipeline.py`,
+`ruff`/`ruff format --check`/`mypy --strict` clean, real fresh-venv install
+verified (a real, notable finding along the way: this required building both `presidium` and
+`presidium-contrib` from local source together, since `presidium.providers.gateway` — added this
+same session — isn't in any released `presidium` version on PyPI yet; a plain `pip install`
+against the real PyPI index would have pulled the stale, published `presidium` and failed this
+exact import. **Both packages have accumulated substantial real, unreleased functionality since
+their last real PyPI releases (`presidium` v0.2.1, `presidium-contrib` v0.2.0) — a real release
+gap, named here, not silently left implicit.**
+
 ### Result Size Limits
 
 Unbounded tool results can exhaust agent context windows:
@@ -381,7 +449,7 @@ Presidium owns authorization and post-execution validation.
 - Should tool approval be per-agent or global? (Lean per-agent — matches grant model)
 - How do we handle tools that legitimately change (version updates)? (Re-approval workflow with diff)
 - PII detection backend: built-in regex patterns vs. external service (Presidio)? (Start regex, Presidio as contrib adapter)
-- Should POST_TOOL be able to *modify* results (redact inline) or only ALLOW/DENY? (Lean toward ALLOW/DENY/REDACT as a third decision type for post-execution)
+- ~~Should POST_TOOL be able to *modify* results (redact inline) or only ALLOW/DENY? (Lean toward ALLOW/DENY/REDACT as a third decision type for post-execution)~~ **Resolved, 2026-08-24, differently than originally leaned**: not a new CEL decision type -- `GovernedMcpToolPipeline`'s own separate `mask_pii_in_results` toggle masks the value actually returned to the agent, independent of what CEL decided. See "The pipeline that composes all three" above.
 - Integration with Civitas's existing MCP module?
 - **What does a grant look like for an agent-target, not a tool-target?** `tool:database:read` is
   natural for MCP tools; an A2A delegation target needs a grant shape too (e.g.

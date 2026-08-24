@@ -123,6 +123,41 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## `GovernedMcpToolPipeline` -- composes the three MCP governance primitives -- DONE, 2026-08-24
+
+Before this, `PIIDetector`/`PoisoningDetector`/`redact_dict` were real, tested, shipped code with
+**zero real composition** -- nothing in this codebase ever called them together, or from an
+actual tool-call path at all. New `presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline`
+is the real implementation of `docs/design/mcp-gateway.md`'s own "Tool Poisoning Detection"/
+"Credential Redaction"/"Output PII Masking" sections:
+
+- **Poisoning check first, fail-closed by default** (`allow_unapproved_tools: bool = False`,
+  matching this codebase's `allow_*` naming convention) -- an unapproved or changed tool blocks
+  the call before the backend is ever reached. `list_tools()` tags each tool with its live
+  `poisoning_status` as a real, additive enrichment.
+- **Arguments redacted (`redact_dict`) before reaching `ActionRequest.parameters`** (today's
+  earlier `scope`-threading work made this a real, usable hook) -- a CEL policy or audit log
+  sees `"**REDACTED**"`, never the raw secret; the actual backend call still gets the real,
+  unredacted arguments (the tool needs real values to function).
+- **`PIIDetector.scan_dict()` enriches the result with `contains_pii`/`pii_pattern_names`
+  before `post_check()` runs** -- opt-in by `pii_detector` presence (scanning every string in
+  every result isn't free). A CEL POST_TOOL policy can now genuinely reference
+  `result.contains_pii`, closing the real gap the design doc's own CEL example depended on but
+  nothing ever populated. Verified end to end, not assumed.
+- **Resolves the design doc's own open question** ("Should POST_TOOL modify results or only
+  ALLOW/DENY?") differently than originally leaned -- not a new CEL decision type, but the
+  pipeline's own separate, explicit `mask_pii_in_results` toggle (on by default) masking the
+  value actually returned to the agent, independent of what CEL decided.
+- 15 new tests (`tests/unit/mcp_gateway/test_pipeline.py`), 100% coverage on the new file,
+  `ruff`/`ruff format --check`/`mypy --strict` clean.
+
+**Real release gap found and named while verifying this, not silently ignored**: a real
+fresh-venv install required building `presidium` from local source, not pip-installing the real
+published PyPI package -- `presidium.providers.gateway` (this session's own earlier
+AgentGatewayClient work) isn't in any released `presidium` version yet. Both `presidium` (last
+real release v0.2.1) and `presidium-contrib` (v0.2.0) have accumulated substantial real,
+unreleased functionality since -- tracked as its own new P1 roadmap item, not urgent but real.
+
 ## `AgentGatewayClient.delegate_to_agent()` (A2A half) -- DONE, 2026-08-24
 
 Completes the `call_tool()`/`delegate_to_agent()` split from the earlier MCP-tool-side work,
@@ -271,7 +306,9 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 - LiteLLM + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) — designed,
   evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
   reference path).
-- Composing the three MCP governance primitives (PII/poisoning/redaction) into one real pipeline.
+- **New real release of `presidium`/`presidium-contrib`** — both packages have accumulated
+  substantial real, shipped-but-unreleased functionality since v0.2.1/v0.2.0 (see the gap noted
+  above); not urgent, but a real, standing item.
 - M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples — now genuinely unblocked given
   real releases exist), M6 (Cloud, commercial) — all designed, none built.
 - M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly

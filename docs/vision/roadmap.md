@@ -220,11 +220,26 @@ real, separate work, not automatically unblocked by this alone.
   `CivitasBridge.request_supervision()` is a pass-through, not called by Fabrica's own managers in
   v1) — this closes the registry-level hole so that whichever real orchestrator eventually gets
   built inherits safety by default, not a live exploit against a running feature.
-- [ ] Compose the three MCP governance primitives (`PIIDetector`, `PoisoningDetector`, redaction)
-  into one real pipeline — today callers must wire all three in themselves. **Real, richer
-  candidates found in the same AGT comparison**, worth evaluating alongside this: message signing
-  with replay protection, session tokens with TTL, sliding-window rate limiting (already flagged
-  above under M7), and CVE-feed integration (OSV API) against MCP servers in active use — AGT's
+- [x] **Compose the three MCP governance primitives into one real pipeline — DONE, 2026-08-24.**
+  New `presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline`: poisoning check (fail-
+  closed by default, `allow_unapproved_tools` opt-out) -> redact arguments into
+  `ActionRequest.parameters` for policy/audit visibility -> real `GovernedToolProvider.check()`
+  PRE_TOOL authorization -> the real, unredacted backend call -> optional `PIIDetector.scan_dict()`
+  enrichment of the result with `contains_pii`/`pii_pattern_names` (opt-in by `pii_detector`
+  presence) -> `post_check()` POST_TOOL authorization (a CEL policy can now genuinely reference
+  `result.contains_pii`, closing this doc's own "Should POST_TOOL be able to modify results"
+  open question with a separate, explicit `mask_pii_in_results` toggle rather than a new CEL
+  decision type). 15 new tests, 100% coverage on the new file, `ruff`/`ruff format --check`/
+  `mypy --strict` clean. **Real release gap found and named, not silently ignored**: verifying
+  this via a real fresh-venv install required building `presidium` from local source (not
+  pip-installing the real published PyPI version) — `presidium.providers.gateway` (this
+  session's own earlier AgentGatewayClient work) isn't in any released `presidium` version yet.
+  Both `presidium` (last real release v0.2.1) and `presidium-contrib` (v0.2.0) have accumulated
+  substantial real, unreleased functionality since — a real, standing item, not urgent but
+  worth doing soon (see "What's next" in HANDOFF.md).
+- [ ] **Real, richer candidates found in the same AGT comparison**, worth evaluating: message
+  signing with replay protection, session tokens with TTL, sliding-window rate limiting (already
+  flagged above under M7), and CVE-feed integration (OSV API) against MCP servers in active use — AGT's
   `MCP-SECURITY-GATEWAY-1.0` spec covers all of these; none are committed here yet, listed as
   real candidates to evaluate, not a plan to copy wholesale.
 - [x] **DONE, 2026-08-24.** Fixed `AGENTS.md` — not by building the `litellm`/`kong`/`portkey`/
@@ -237,6 +252,15 @@ real, separate work, not automatically unblocked by this alone.
   `civitas`/`cel-python` now — `pynacl`/`cryptography` too), and the monorepo tree missing
   `presidium.identity`/`presidium.lineage`/`presidium_contrib.spiffe`/`presidium_contrib.server`
   entirely (all real, shipped modules from this session, never added to this file).
+- [ ] **New real release of `presidium`/`presidium-contrib`** — named 2026-08-24, not urgent but
+  a real, standing gap: since v0.2.1/v0.2.0, both packages have accumulated substantial real,
+  shipped-but-unreleased functionality (`providers/gateway.py`, `identity.py`/`lineage.py`,
+  `presidium_contrib.spiffe`, `presidium_contrib.server`, A2A delegation,
+  `GovernedMcpToolPipeline`, CEL default-deny, `scope` threading, the pre-commit hooks
+  themselves). Discovered concretely when a real fresh-venv install for
+  `GovernedMcpToolPipeline` required building `presidium` from local source, since
+  `presidium.providers.gateway` isn't on PyPI in any released version yet -- anyone installing
+  the real, published packages today cannot use most of what this session shipped.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
 - [ ] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git tag"
