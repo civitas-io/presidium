@@ -123,6 +123,13 @@ real, separate work, not automatically unblocked by this alone.
   `presidium-contrib` tests pass (+5), 452 `presidium` tests pass (+13), `ruff`/`mypy --strict`
   clean. Any AgentGateway pin must be `>=1.4.0` (GHSA-mvgg-jvj2-4frq, a real HIGH-severity
   security advisory, is fixed exactly there).
+- [ ] **`AgentGatewayClient.delegate_to_agent()` real implementation (A2A half)** — the explicit,
+  deliberately-deferred follow-up to the item above, tracked here so it doesn't silently get
+  lost. Currently raises `NotImplementedError`. Needs a real, new `a2a-sdk` (PyPI, official,
+  `a2aproject/a2a-python`) dependency — a genuinely different wire protocol from MCP (agent
+  cards at `/.well-known/agent.json`, `message/stream` JSON-RPC, not `tools/list`/`tools/call`),
+  confirmed in `agentgateway-vendor-research-2026-08.md` finding 4. Real end-to-end test needs an
+  actual running A2A agent (the `a2a-samples` Hello World agent is a real, available reference).
 - [x] **Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — DONE, 2026-08-24.** Real vendor
   research (`docs/design/spiffe-vendor-research-2026-08.md`), a real design pass
   (`docs/design/agent-registry.md`'s updated "M3+ upgrade path" section), and real implementation,
