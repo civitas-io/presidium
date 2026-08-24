@@ -232,6 +232,15 @@ class InMemoryRegistry:
         self._sync_trust(record)
         return self._snapshot(record)
 
+    async def update_identity(
+        self, name: str, public_key: str, public_key_algorithm: str = "ed25519"
+    ) -> AgentRecord:
+        record = self._get_or_raise(name)
+        record.public_key = public_key
+        record.public_key_algorithm = public_key_algorithm  # type: ignore[assignment]
+        self._touch(record)
+        return self._snapshot(record)
+
     async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
         record = self._agents.get(name)
         return verify_agent_signature(record, data, signature)

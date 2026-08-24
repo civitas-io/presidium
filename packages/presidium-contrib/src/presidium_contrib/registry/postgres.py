@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS agent_records (
     agent_id TEXT PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     public_key TEXT NOT NULL,
+    public_key_algorithm TEXT NOT NULL DEFAULT 'ed25519',
     grants JSONB NOT NULL DEFAULT '[]',
     trust_value DOUBLE PRECISION NOT NULL DEFAULT 0.5,
     trust_tier TEXT NOT NULL DEFAULT 'standard',
@@ -100,6 +101,7 @@ def _row_to_record(row: asyncpg.Record) -> AgentRecord:
         agent_id=row["agent_id"],
         name=row["name"],
         public_key=row["public_key"],
+        public_key_algorithm=row["public_key_algorithm"],
         grants=grants,
         trust_value=row["trust_value"],
         trust_tier=TrustTier(row["trust_tier"]),
@@ -189,20 +191,21 @@ class PostgresAgentRegistry:
             async with pool.acquire() as conn:
                 await conn.execute(
                     """INSERT INTO agent_records
-                    (agent_id, name, public_key, grants, trust_value, trust_tier,
-                     status, owner, parent_agent_id, trust_ceiling, depth,
+                    (agent_id, name, public_key, public_key_algorithm, grants, trust_value,
+                     trust_tier, status, owner, parent_agent_id, trust_ceiling, depth,
                      description, agent_version, capabilities, metadata,
                      revision, created_at, updated_at)
-                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
                     ON CONFLICT (name) DO UPDATE SET
-                     agent_id=$1, public_key=$3, grants=$4, trust_value=$5,
-                     trust_tier=$6, status=$7, owner=$8, parent_agent_id=$9,
-                     trust_ceiling=$10, depth=$11, description=$12,
-                     agent_version=$13, capabilities=$14, metadata=$15,
-                     revision=$16, updated_at=$18""",
+                     agent_id=$1, public_key=$3, public_key_algorithm=$4, grants=$5,
+                     trust_value=$6, trust_tier=$7, status=$8, owner=$9, parent_agent_id=$10,
+                     trust_ceiling=$11, depth=$12, description=$13,
+                     agent_version=$14, capabilities=$15, metadata=$16,
+                     revision=$17, updated_at=$19""",
                     record.agent_id,
                     record.name,
                     record.public_key,
+                    record.public_key_algorithm,
                     grants_json,
                     record.trust_value,
                     record.trust_tier.value,
@@ -389,6 +392,16 @@ class PostgresAgentRegistry:
             await self._save(record)
             return await self._lookup_internal(name)
 
+    async def update_identity(
+        self, name: str, public_key: str, public_key_algorithm: str = "ed25519"
+    ) -> AgentRecord:
+        async with self._write_lock:
+            record = await self._lookup_or_raise(name)
+            record.public_key = public_key
+            record.public_key_algorithm = public_key_algorithm  # type: ignore[assignment]
+            await self._save(record)
+            return await self._lookup_internal(name)
+
     async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
         record = await self.lookup(name)
         return verify_agent_signature(record, data, signature)
@@ -427,11 +440,13 @@ class PostgresAgentRegistry:
         async with pool.acquire() as conn:
             await conn.execute(
                 """UPDATE agent_records SET
-                    grants=$1, trust_value=$2, trust_tier=$3, status=$4,
-                    owner=$5, parent_agent_id=$6, trust_ceiling=$7, depth=$8,
-                    description=$9, agent_version=$10, capabilities=$11,
-                    metadata=$12, revision=$13, updated_at=$14
-                WHERE name=$15""",
+                    public_key=$1, public_key_algorithm=$2, grants=$3, trust_value=$4,
+                    trust_tier=$5, status=$6, owner=$7, parent_agent_id=$8, trust_ceiling=$9,
+                    depth=$10, description=$11, agent_version=$12, capabilities=$13,
+                    metadata=$14, revision=$15, updated_at=$16
+                WHERE name=$17""",
+                record.public_key,
+                record.public_key_algorithm,
                 grants_json,
                 record.trust_value,
                 record.trust_tier.value,

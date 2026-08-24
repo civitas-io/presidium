@@ -25,6 +25,7 @@ dependencies = [
     "civitas>=0.11.3",  # 0.11.3: HTTP mTLS in direct mode actually works (GH civitas-io/python-civitas#25 R10)
     "cel-python>=0.1",
     "pynacl>=1.5",
+    "cryptography>=41",  # ec_p256 identity verification (presidium-contrib[spiffe]'s default SVID key type) -- same real-hard-dependency-despite-lazy-import precedent as pynacl above, not a truly optional extra
 ]
 
 [project.optional-dependencies]

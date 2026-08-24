@@ -1505,6 +1505,7 @@ source = { editable = "packages/presidium" }
 dependencies = [
     { name = "cel-python" },
     { name = "civitas" },
+    { name = "cryptography" },
     { name = "pynacl" },
 ]
 
@@ -1533,6 +1534,7 @@ requires-dist = [
     { name = "aiosqlite", marker = "extra == 'sqlite'", specifier = ">=0.20" },
     { name = "cel-python", specifier = ">=0.1" },
     { name = "civitas", specifier = ">=0.11.3" },
+    { name = "cryptography", specifier = ">=41" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10" },
     { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.20" },
     { name = "pynacl", specifier = ">=1.5" },

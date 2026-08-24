@@ -10,7 +10,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -143,7 +143,17 @@ class AgentRecord:
     """Short name for Civitas message routing."""
 
     public_key: str
-    """Ed25519 public key (base64) — cryptographic identity binding."""
+    """Public key (base64), raw bytes in the format ``public_key_algorithm`` expects —
+    cryptographic identity binding."""
+
+    public_key_algorithm: Literal["ed25519", "ec_p256"] = "ed25519"
+    """Which algorithm ``public_key`` is encoded for. Default ``"ed25519"`` matches this
+    codebase's own real, shipped identity binding (Civitas's ``AgentIdentity`` keypairs) --
+    unchanged for every existing caller. ``"ec_p256"`` is real, additive support for a public
+    key derived from a real SPIRE-issued X.509-SVID's leaf certificate
+    (``presidium-contrib[spiffe]``) -- SPIRE's own default SVID key type, confirmed directly
+    against a real SVID example in SPIFFE's own docs, not assumed. See
+    ``presidium.identity.verify_agent_signature()``, which dispatches on this field."""
 
     # Governance
     grants: list[Grant] = field(default_factory=list)

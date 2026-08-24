@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS agent_records (
     agent_id TEXT PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     public_key TEXT NOT NULL,
+    public_key_algorithm TEXT NOT NULL DEFAULT 'ed25519',
     grants TEXT NOT NULL DEFAULT '[]',
     trust_value REAL NOT NULL DEFAULT 0.5,
     trust_tier TEXT NOT NULL DEFAULT 'standard',
@@ -94,6 +95,7 @@ def _record_to_row(r: AgentRecord) -> dict[str, Any]:
         "agent_id": r.agent_id,
         "name": r.name,
         "public_key": r.public_key,
+        "public_key_algorithm": r.public_key_algorithm,
         "grants": json.dumps([_grant_to_dict(g) for g in r.grants]),
         "trust_value": r.trust_value,
         "trust_tier": r.trust_tier.value,
@@ -143,6 +145,7 @@ def _row_to_record(row: aiosqlite.Row) -> AgentRecord:
         agent_id=row["agent_id"],
         name=row["name"],
         public_key=row["public_key"],
+        public_key_algorithm=row["public_key_algorithm"],
         grants=grants,
         trust_value=row["trust_value"],
         trust_tier=TrustTier(row["trust_tier"]),
@@ -227,12 +230,12 @@ class SqliteRegistry:
 
             await db.execute(
                 """INSERT OR REPLACE INTO agent_records
-                (agent_id, name, public_key, grants, trust_value, trust_tier,
-                 status, owner, parent_agent_id, trust_ceiling, depth,
+                (agent_id, name, public_key, public_key_algorithm, grants, trust_value,
+                 trust_tier, status, owner, parent_agent_id, trust_ceiling, depth,
                  description, agent_version, capabilities, metadata,
                  revision, created_at, updated_at)
-                VALUES (:agent_id, :name, :public_key, :grants, :trust_value,
-                        :trust_tier, :status, :owner, :parent_agent_id,
+                VALUES (:agent_id, :name, :public_key, :public_key_algorithm, :grants,
+                        :trust_value, :trust_tier, :status, :owner, :parent_agent_id,
                         :trust_ceiling, :depth, :description, :agent_version,
                         :capabilities, :metadata, :revision, :created_at,
                         :updated_at)""",
@@ -410,6 +413,16 @@ class SqliteRegistry:
             await self._save(record)
             return await self._lookup_or_raise_unlocked(name)
 
+    async def update_identity(
+        self, name: str, public_key: str, public_key_algorithm: str = "ed25519"
+    ) -> AgentRecord:
+        async with self._write_lock:
+            record = await self._lookup_or_raise_unlocked(name)
+            record.public_key = public_key
+            record.public_key_algorithm = public_key_algorithm  # type: ignore[assignment]
+            await self._save(record)
+            return await self._lookup_or_raise_unlocked(name)
+
     async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
         record = await self.lookup(name)
         return verify_agent_signature(record, data, signature)
@@ -452,6 +465,7 @@ class SqliteRegistry:
         row = _record_to_row(record)
         await db.execute(
             """UPDATE agent_records SET
+                public_key=:public_key, public_key_algorithm=:public_key_algorithm,
                 grants=:grants, trust_value=:trust_value, trust_tier=:trust_tier,
                 status=:status, owner=:owner, parent_agent_id=:parent_agent_id,
                 trust_ceiling=:trust_ceiling, depth=:depth,

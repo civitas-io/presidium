@@ -35,6 +35,7 @@ def _make_row(record: AgentRecord | None = None) -> dict[str, object]:
         "agent_id": r.agent_id,
         "name": r.name,
         "public_key": r.public_key,
+        "public_key_algorithm": r.public_key_algorithm,
         "grants": [_grant_to_dict(g) for g in r.grants],
         "trust_value": r.trust_value,
         "trust_tier": r.trust_tier.value,
@@ -190,6 +191,44 @@ class TestPostgresAgentRegistryWithMock:
         reg._pool = _mock_pool(mock_conn)
 
         assert await reg.verify_signature("ghost", b"data", b"sig") is False
+
+    async def test_update_identity_persists_new_key_and_algorithm(self) -> None:
+        """Real proof update_identity()'s UPDATE statement actually includes
+        public_key/public_key_algorithm -- a real bug (found and fixed
+        alongside SqliteRegistry's identical one) where _save()'s shared
+        UPDATE statement omitted them entirely, silently no-op'ing any
+        change to a record's identity.
+        """
+        record = _make_record()
+        before_row = _make_row(record)
+        after_record = _make_record()
+        after_record.public_key = "new-ec-p256-key"
+        after_record.public_key_algorithm = "ec_p256"
+        after_row = _make_row(after_record)
+
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.side_effect = [before_row, after_row]
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        updated = await reg.update_identity("researcher", "new-ec-p256-key", "ec_p256")
+
+        assert updated.public_key == "new-ec-p256-key"
+        assert updated.public_key_algorithm == "ec_p256"
+        # The real UPDATE call itself carries the new key/algorithm as its
+        # first two positional params, per _save()'s own SET clause order.
+        execute_call = mock_conn.execute.call_args
+        assert execute_call.args[1] == "new-ec-p256-key"
+        assert execute_call.args[2] == "ec_p256"
+
+    async def test_update_identity_unknown_agent_raises(self) -> None:
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow.return_value = None
+        reg = PostgresAgentRegistry("postgresql://localhost/test")
+        reg._pool = _mock_pool(mock_conn)
+
+        with pytest.raises(AgentNotFoundError):
+            await reg.update_identity("ghost", "some-key")
 
 
 class TestPostgresLineage:

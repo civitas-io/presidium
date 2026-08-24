@@ -43,6 +43,18 @@ class AgentRegistry(Protocol):
 
     async def update_status(self, name: str, status: AgentStatus) -> AgentRecord: ...
 
+    async def update_identity(
+        self, name: str, public_key: str, public_key_algorithm: str = "ed25519"
+    ) -> AgentRecord:
+        """Replace ``name``'s stored public key/algorithm -- real, additive support for
+        rotation (e.g. a real SPIRE-issued X.509-SVID renewing on its own schedule via
+        ``presidium-contrib[spiffe]``). Raises ``AgentNotFoundError`` for an unknown agent,
+        matching ``update_status()``'s own existing convention exactly -- this is a real
+        mutation of an existing record, not a fail-closed-as-a-return-value check like
+        ``verify_signature()``.
+        """
+        ...
+
     async def verify_signature(self, name: str, data: bytes, signature: bytes) -> bool:
         """Verify ``signature`` over ``data`` against ``name``'s stored public key.
 
