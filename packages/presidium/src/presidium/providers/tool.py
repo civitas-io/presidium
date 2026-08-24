@@ -128,17 +128,36 @@ class GovernedToolProvider:
         return result
 
     async def check(self, agent_name: str, tool: str, action: str = "invoke") -> Any:
-        """Evaluate PRE_TOOL policies. Returns PolicyResult."""
-        result, record = await self._evaluate(agent_name, f"tool:{tool}", action)
+        """Evaluate PRE_TOOL policies for a tool target. Returns PolicyResult.
+
+        Thin wrapper over check_resource() with the tool: prefix -- see check_resource()'s own
+        docstring for the full raise/approval/enforcement-mode behavior this delegates to.
+        """
+        return await self.check_resource(agent_name, f"tool:{tool}", action)
+
+    async def check_resource(self, agent_name: str, resource: str, action: str = "invoke") -> Any:
+        """Evaluate PRE_TOOL policies against a resource string used verbatim (no tool: prefix).
+
+        Real reuse point, not a duplicate of check(): lets a caller outside the tool: namespace
+        (e.g. GatewayToolProvider.delegate_to_agent()'s agent:<name> resource, per
+        mcp-gateway.md's "Design decisions, 2026-08-24") get the exact same raise-on-deny/
+        require-approval/enforcement-mode handling check() gives tool: resources, without
+        reaching into a private method or duplicating this logic. check() itself is now just
+        this method plus the tool: prefix.
+
+        Raises PolicyDeniedError on DENY, an unresolvable agent_name, or a denied
+        REQUIRE_APPROVAL. Returns the PolicyResult on ALLOW, ADVISORY, or SOFT.
+        """
+        result, record = await self._evaluate(agent_name, resource, action)
         if record is None:
             raise PolicyDeniedError(result.reason, result.policy_name)
 
         if result.enforcement == EnforcementMode.ADVISORY:
             if result.decision != PolicyDecision.ALLOW:
                 logger.info(
-                    "policy.advisory agent=%s tool=%s decision=%s policy=%s",
+                    "policy.advisory agent=%s resource=%s decision=%s policy=%s",
                     agent_name,
-                    tool,
+                    resource,
                     result.decision.value,
                     result.policy_name,
                 )
@@ -147,9 +166,9 @@ class GovernedToolProvider:
         if result.enforcement == EnforcementMode.SOFT:
             if result.decision != PolicyDecision.ALLOW:
                 logger.warning(
-                    "policy.soft agent=%s tool=%s decision=%s policy=%s",
+                    "policy.soft agent=%s resource=%s decision=%s policy=%s",
                     agent_name,
-                    tool,
+                    resource,
                     result.decision.value,
                     result.policy_name,
                 )
@@ -165,13 +184,13 @@ class GovernedToolProvider:
                     result.policy_name,
                 )
             approval_request = ApprovalRequest(
-                request_id=f"tool-{agent_name}-{tool}-{datetime.now(UTC).isoformat()}",
+                request_id=f"tool-{agent_name}-{resource}-{datetime.now(UTC).isoformat()}",
                 agent_id=record.agent_id,
-                resource=f"tool:{tool}",
+                resource=resource,
                 action=action,
                 reason=result.reason or "Approval required",
                 approvers=result.approvers or [],
-                context={"tool": tool},
+                context={"resource": resource},
                 policy_name=result.policy_name or "",
             )
             decision = await self._approval.request_approval(approval_request)
@@ -190,14 +209,34 @@ class GovernedToolProvider:
         action: str,
         result_data: dict[str, Any],
     ) -> Any:
-        """Evaluate POST_TOOL policies against tool output. Returns PolicyResult."""
+        """Evaluate POST_TOOL policies for a tool target. Returns PolicyResult.
+
+        Thin wrapper over post_check_resource() with the tool: prefix, mirroring check()'s own
+        split into check_resource().
+        """
+        return await self.post_check_resource(agent_name, f"tool:{tool}", action, result_data)
+
+    async def post_check_resource(
+        self,
+        agent_name: str,
+        resource: str,
+        action: str,
+        result_data: dict[str, Any],
+    ) -> Any:
+        """Evaluate POST_TOOL policies against a resource string used verbatim (no tool: prefix).
+
+        Real reuse point for GatewayToolProvider.delegate_to_agent()'s agent:<name> resource --
+        without this, post_check()'s own internal f"tool:{tool}" prefixing would have silently
+        produced a double-prefixed "tool:agent:<name>" resource for the POST_TOOL evaluation,
+        a real bug caught before it shipped, not after.
+        """
         record = await self._registry.lookup(agent_name)
         if record is None:
             raise PolicyDeniedError("Agent not found in registry", None)
 
         context = EvaluationContext(
             agent=record,
-            request=ActionRequest(resource=f"tool:{tool}", action=action),
+            request=ActionRequest(resource=resource, action=action),
             time=datetime.now(UTC),
             result=result_data,
         )

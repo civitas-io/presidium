@@ -107,17 +107,22 @@ real, separate work, not automatically unblocked by this alone.
 
 ### P1 — real, designed, necessary for genuine production-readiness, not immediately blocking
 
-- [ ] `AgentGatewayClient` missing `list_tools()`/`call_tool()` — MCP/A2A governance is designed but
-  not exercised end to end yet (LLM side works, tool side doesn't). Tracked under M7. **Real vendor
-  research done 2026-08-24 before implementation**, against AgentGateway `v1.4.1`:
-  [`docs/design/agentgateway-vendor-research-2026-08.md`](../design/agentgateway-vendor-research-2026-08.md).
-  Key findings: no `mcp` SDK upgrade needed (AgentGateway explicitly supports the older, stateful
-  client this org already pins); the MCP-tool half directly reuses GH #26's real Streamable HTTP
-  work; the A2A-agent half is a real, separate chunk needing a new `a2a-sdk` dependency; the
-  actual undone work is three layers (`ToolsGatewayBackend` Protocol, a new operations-delegation
-  path in `GovernedToolProvider`, and the concrete `AgentGatewayClient` methods), not just the
-  client class; any AgentGateway pin must be `>=1.4.0` (a real, HIGH-severity security advisory,
-  GHSA-mvgg-jvj2-4frq, is fixed exactly there).
+- [x] **`AgentGatewayClient`'s MCP tool-side gap — DONE, 2026-08-24.** Real vendor research
+  ([`docs/design/agentgateway-vendor-research-2026-08.md`](../design/agentgateway-vendor-research-2026-08.md))
+  against AgentGateway `v1.4.1`, a real design pass (`docs/design/mcp-gateway.md`'s "Design
+  decisions, 2026-08-24"), and real implementation, all same session. New
+  `presidium/providers/gateway.py` (`LLMGatewayBackend`/`ToolsGatewayBackend` Protocols,
+  `GatewayModelProvider`/`GatewayToolProvider`); `GovernedToolProvider` gained
+  `check_resource()`/`post_check_resource()` for the new `agent:<name>` grant namespace (a real
+  double-prefix bug caught and fixed during implementation, before it shipped);
+  `AgentGatewayClient.list_tools()`/`call_tool()` are real MCP `tools/list`/`tools/call` over
+  Streamable HTTP (the exact transport GH #26 shipped), verified end to end against a real
+  running MCP server, not mocked. **A2A delegation deliberately deferred** —
+  `delegate_to_agent()` raises `NotImplementedError` explicitly (needs a real, new `a2a-sdk`
+  dependency and its own test, a separate follow-up, not silently stubbed). 167
+  `presidium-contrib` tests pass (+5), 452 `presidium` tests pass (+13), `ruff`/`mypy --strict`
+  clean. Any AgentGateway pin must be `>=1.4.0` (GHSA-mvgg-jvj2-4frq, a real HIGH-severity
+  security advisory, is fixed exactly there).
 - [ ] Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — the "full" version of the P0 Ed25519
   item above, once the basic binding is fixed. Tracked under M7.
 - [ ] LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —

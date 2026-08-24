@@ -14,26 +14,39 @@ mirrors everything below in more narrative form, kept in sync after every real c
 **GH #26 (Streamable HTTP MCP transport, python-civitas/fabrica) -- DONE, closed, benchmarked.**
 See either of those repos' own `HANDOFF.md` for the real detail.
 
-**This repo's own next real task: `AgentGatewayClient`'s tool-side gap (`list_tools()`/
-`call_tool()`) -- vendor research done 2026-08-24, design pass not started yet.** Before touching
-code, researched AgentGateway's current real state (latest `v1.4.1`) directly against its own
-docs/releases/security advisories -- full findings:
-[`docs/design/agentgateway-vendor-research-2026-08.md`](docs/design/agentgateway-vendor-research-2026-08.md).
-Key takeaways to carry into the design pass: (1) no `mcp` SDK upgrade needed -- AgentGateway
-explicitly, natively supports the older, stateful client this org's `mcp==2.0.0` pin uses; (2) the
-MCP-tool half of `call_tool()` directly reuses GH #26's real, tested Streamable HTTP transport --
-a genuine, confirmed unblock, not a guess; (3) the A2A-agent half is a real, separate, bigger
-piece of work needing a new `a2a-sdk` dependency, not an extension of the MCP path -- recommend
-sequencing MCP first, A2A second, even though the public `call_tool()` signature stays unified;
-(4) the real, undone work is three layers, not one -- `presidium/providers/gateway.py` (the
-`ToolsGatewayBackend` Protocol) doesn't exist yet, `GovernedToolProvider` has zero
-operations-delegation mechanism today (confirmed by reading its current source, pure
-authorization only), and `AgentGatewayClient` is only the outermost, third layer; (5) a real,
-HIGH-severity security advisory (GHSA-mvgg-jvj2-4frq, session/authz confusion across routes) is
-fixed in `v1.4.0` -- any AgentGateway pin must be `>=1.4.0`; (6) a real, previously-unstated
-architectural question needs an explicit answer in the design pass: should AgentGateway's own
-native MCP authorization (it has real CEL-based tool ACLs) be disabled in favor of Presidium being
-the sole authority, or run as defense-in-depth alongside it?
+**`AgentGatewayClient`'s MCP tool-side gap -- DONE, 2026-08-24.** Vendor research
+([`docs/design/agentgateway-vendor-research-2026-08.md`](docs/design/agentgateway-vendor-research-2026-08.md))
+fed directly into a real design pass (`docs/design/mcp-gateway.md`'s "Design decisions,
+2026-08-24") and real implementation, same session:
+
+- **New `presidium/providers/gateway.py`**: `LLMGatewayBackend`/`ToolsGatewayBackend` Protocols
+  (previously design-doc-only), `GatewayModelProvider`/`GatewayToolProvider` -- a real, third
+  composition pattern alongside `GovernedModelProvider`/`GovernedToolProvider` (pure
+  authorization) and `civitas_adapters.py`'s `GovernedModelProviderAdapter`/`GovernedToolAdapter`
+  (direct in-process Civitas provider wrapping). 13 new tests, 100% coverage on the new file.
+- **`GovernedToolProvider` gained `check_resource()`/`post_check_resource()`** -- verbatim-
+  resource variants of `check()`/`post_check()` (which always auto-prefix `tool:`), needed for
+  the new `agent:<name>` grant namespace. `check()`/`post_check()` are now thin wrappers over
+  these -- a real, safe refactor, all 439 pre-existing tests confirmed still passing unchanged.
+  **A real double-prefix bug (`"tool:agent:<name>"`) was caught and fixed during implementation,
+  before it shipped**, not after -- exactly the kind of thing this org's own "verify, don't
+  assume" discipline exists to catch.
+- **`AgentGatewayClient.list_tools()`/`call_tool()` -- real MCP `tools/list`/`tools/call` over
+  Streamable HTTP**, using the exact `mcp.client.streamable_http.streamable_http_client` GH #26
+  shipped. Verified end to end against a real running MCP server (not mocked) --
+  `tests/integration/test_agentgateway_mcp_real_server.py`, 5 tests. New `mcp>=2.0` dependency on
+  the `[agentgateway]` extra; confirmed via a real editable install that the base
+  `presidium-contrib` package (no extra) still imports fine, and `agentgateway.client` fails
+  cleanly (pre-existing behavior, not a new gap) without the extra installed.
+- **`AgentGatewayClient.delegate_to_agent()` deliberately raises `NotImplementedError`**, not a
+  silent stub -- the A2A half needs a real `a2a-sdk` dependency and its own real test, named as
+  an explicit, separate follow-up (design decision 3), not attempted in this pass.
+- **Decision made, not left open**: AgentGateway's own native MCP authorization is left
+  configured permissively for this integration in v1 -- Presidium is the sole authorization
+  authority for this path. Real, named revisit trigger recorded if that assumption changes.
+
+167 presidium-contrib tests pass (was 162, +5 real new ones), 452 presidium tests pass (was 439,
++13 new), `ruff`/`mypy --strict` clean on both packages' `src/`.
 
 ---
 

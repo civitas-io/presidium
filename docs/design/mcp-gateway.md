@@ -76,12 +76,19 @@ class ToolsGatewayBackend(Protocol):
     async def health(self) -> bool: ...
 ```
 
-**Current adapter status:** AgentGateway is the only implementation today, and it is currently
-**incomplete relative to this Protocol** — `presidium_contrib.agentgateway.client.AgentGatewayClient`
-(as shipped) only has `chat()`/`list_models()`/`health()` (the LLM side); `list_tools()`/
-`call_tool()` need to be added to actually exercise AgentGateway's MCP + A2A routing. This is a
-concrete, scoped implementation gap (not a design gap) — tracked as a GH issue rather than fixed
-silently in this doc pass.
+**Current adapter status, 2026-08-24 -- MCP tool side DONE, A2A side deliberately deferred.**
+All three layers named in the vendor research below are now real, shipped code:
+`presidium/providers/gateway.py` (`LLMGatewayBackend`, `ToolsGatewayBackend`,
+`GatewayModelProvider`, `GatewayToolProvider`), `GovernedToolProvider`/`GovernedModelProvider`
+gaining `check_resource()`/`post_check_resource()` (verbatim-resource variants of `check()`/
+`post_check()`, needed for the `agent:<name>` namespace, not just `tool:<name>`), and
+`AgentGatewayClient.list_tools()`/`call_tool()` -- real MCP `tools/list`/`tools/call` over
+Streamable HTTP, verified end to end against a real running MCP server (not mocked;
+`tests/integration/test_agentgateway_mcp_real_server.py`, 5 tests). `delegate_to_agent()` exists
+on both `AgentGatewayClient` and `GatewayToolProvider` but the client's own implementation
+raises `NotImplementedError` explicitly -- the A2A half needs a real `a2a-sdk` dependency and its
+own end-to-end test, deliberately sequenced as a separate follow-up (decision 3 below), not
+silently stubbed to look done.
 
 **2026-08-24 vendor research, before implementation starts:**
 [`docs/design/agentgateway-vendor-research-2026-08.md`](agentgateway-vendor-research-2026-08.md) —
@@ -110,23 +117,122 @@ directly and this conclusion still holds — no new competing product has emerge
 
 ### Agents as tools (outbound)
 
-`call_tool(name, arguments)` is deliberately the same method whether `name` resolves to a classic
-MCP tool (`"database.query"`) or another agent reached via A2A (`"specialist_researcher"`). From
-the calling agent's and `GovernedToolProvider`'s perspective, both are just "invoke this named
-capability with these arguments" — the backend (AgentGateway) is what actually knows whether that
-name routes to an MCP server or an A2A peer, using its existing tool-federation/A2A capability
-discovery.
+`call_tool(name, arguments)` is deliberately the same *conceptual* operation whether `name`
+resolves to a classic MCP tool (`"database.query"`) or another agent reached via A2A
+(`"specialist_researcher"`) -- the same grant model, the same `PRE_TOOL`/`POST_TOOL` CEL stages,
+the same audit trail, the same tool-poisoning-style change detection and credential redaction
+apply to both. A policy author never writes separate rules for "calling a tool" vs. "delegating to
+an agent."
 
-Practically, this means:
-- The same grant model applies: an agent needs `tool:<name>` (or an equivalent grant shape for
-  agent-targets, TBD in implementation) whether the target is a tool or another agent.
-- The same `PRE_TOOL`/`POST_TOOL` CEL policy stages apply uniformly — a policy author does not
-  write separate rules for "calling a tool" vs. "delegating to an agent."
-- The same audit trail, tool-poisoning-style change detection, and credential redaction apply to
-  both, since they flow through one `call_tool()` path.
+**Design decisions, 2026-08-24, made directly from `agentgateway-vendor-research-2026-08.md`'s
+findings, resolving what was previously left TBD:**
 
-This is scoped to **outbound only** — a civitas agent calling out through the gateway. See
+1. **Grant/resource shape, resolved**: `tool:<name>` for an MCP tool (unchanged, matches
+   `GovernedToolProvider.check()`'s existing `f"tool:{tool}"` convention exactly), and
+   **`agent:<name>`** for an A2A delegation target -- parallel shape, same `action` parameter
+   handling `check()` already has (default `"invoke"`), not baked into the resource string
+   itself. Chosen for consistency with the one naming pattern this codebase already has, not a
+   new one invented for this case.
+2. **One conceptual operation, two concrete Python methods, not one polymorphic method** -- a real
+   correction to this doc's original framing, forced by vendor-research finding 4: AgentGateway's
+   A2A support is a genuinely different wire protocol (a pure HTTP reverse proxy, agent cards,
+   `message/stream`) from its MCP support (real MCP JSON-RPC over Streamable HTTP), needing a
+   separate `a2a-sdk` client under the hood. A single Python method cannot construct the correct
+   `tool:`/`agent:` authorization resource string without already knowing which kind of target
+   it's calling -- so the **caller** states the target kind explicitly (they already know
+   semantically whether they're calling a tool or delegating to an agent), and the "one path"
+   guarantee is preserved at the *policy/audit* level (both funnel through the same
+   `GovernedToolProvider.check()`/`post_check()` calls and the same underlying
+   `ToolsGatewayBackend` health/lifecycle), not by hiding the distinction from the caller
+   entirely. Concretely: `GatewayToolProvider.call_tool(name, arguments)` for MCP tools,
+   `GatewayToolProvider.delegate_to_agent(agent_name, arguments)` for A2A targets -- see
+   `providers/gateway.py` below.
+3. **Sequencing, resolved**: MCP-tool support ships first (real, immediately buildable -- reuses
+   GH #26's already-tested Streamable HTTP transport directly). A2A delegation is a real, explicit
+   second phase, needing the new `a2a-sdk` dependency and its own end-to-end test against a real
+   A2A agent -- not attempted in the same change.
+4. **`list_tools()` is authorization-exempt, by design, not an oversight**: listing available
+   tools doesn't execute anything, so it passes straight through to the backend with no
+   `PRE_TOOL` check -- matching the existing precedent that discovery and invocation are different
+   trust boundaries (an agent can see a tool exists without being granted to call it; the CEL
+   policy is evaluated at `call_tool()`/`delegate_to_agent()` time, not at listing time).
+5. **AgentGateway's own native MCP authorization (CEL-based tool ACLs, confirmed real in the
+   vendor research) is configured permissively/allow-all for calls arriving via this integration
+   in v1** -- Presidium remains the sole authorization authority for this path, consistent with
+   `llm-gateway.md`'s already-stated principle applied explicitly to the MCP side for the first
+   time. This is a deployment/configuration recommendation for whoever runs the real AgentGateway
+   instance, not something enforceable from the Python client alone. **Named as a real, deliberate
+   choice with a real, named revisit trigger**: if an AgentGateway deployment is ever reachable by
+   a caller OTHER than through Presidium's own governed path, its own authorization becomes a
+   legitimate, real defense-in-depth layer worth enabling -- not a hypothetical, just not this
+   integration's default assumption for v1.
+
+This is scoped to **outbound only** -- a civitas agent calling out through the gateway. See
 Non-Goals for the deferred inbound direction.
+
+### `GatewayToolProvider`/`GatewayModelProvider` -- the real composition shape
+
+A third, distinct integration point in this codebase, alongside the two that already exist --
+worth naming clearly so a future reader doesn't conflate them (this confusion is exactly what
+`agentgateway-vendor-research-2026-08.md` §4 found and flagged):
+
+1. `GovernedModelProvider`/`GovernedToolProvider` (`providers/model.py`/`providers/tool.py`) --
+   pure authorization gates. `check()`/`post_check()` only. No backend of any kind.
+2. `GovernedModelProviderAdapter`/`GovernedToolAdapter` (`providers/civitas_adapters.py`) -- wraps
+   a real, *directly-constructed, in-process* Civitas `ModelProvider`/`ToolProvider`. No external
+   gateway process. Already real, shipped (P0 item 5, 2026-08-22).
+3. **New: `GatewayModelProvider`/`GatewayToolProvider` (`providers/gateway.py`, this design)** --
+   wraps an `LLMGatewayBackend`/`ToolsGatewayBackend` (AgentGateway today; a real, running,
+   separate process reached over the network). Same check-then-delegate-then-post_check
+   composition pattern as (2), applied to a gateway backend instead of a direct Civitas provider
+   -- reusing an established pattern, not inventing a new one, but genuinely a different
+   construction path since the backend Protocols return raw OpenAI-style/MCP-style dicts, not
+   civitas's `ModelResponse`/`ToolProvider` shapes.
+
+```python
+class LLMGatewayBackend(Protocol):
+    """Already specified in llm-gateway.md -- AgentGatewayClient's real chat()/list_models()/
+    health() already satisfy this shape exactly, structurally, with zero changes needed."""
+    async def chat(
+        self, messages: list[dict[str, str]], *, model: str | None = None,
+        agent_name: str | None = None, **kwargs: Any,
+    ) -> dict[str, Any]: ...
+    async def list_models(self) -> list[dict[str, Any]]: ...
+    async def health(self) -> bool: ...
+
+
+class ToolsGatewayBackend(Protocol):
+    async def list_tools(self, *, agent_name: str | None = None) -> list[dict[str, Any]]: ...
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any], *, agent_name: str | None = None,
+    ) -> dict[str, Any]: ...
+    async def delegate_to_agent(
+        self, agent_name_target: str, arguments: dict[str, Any], *, agent_name: str | None = None,
+    ) -> dict[str, Any]: ...
+    async def health(self) -> bool: ...
+
+
+class GatewayToolProvider:
+    """Composes a GovernedToolProvider (authorization) with a ToolsGatewayBackend (operations).
+    Bound to one agent_name at construction, matching the civitas_adapters.py precedent."""
+
+    def __init__(
+        self, *, backend: ToolsGatewayBackend, tool_provider: GovernedToolProvider, agent_name: str,
+    ) -> None: ...
+
+    async def list_tools(self) -> list[dict[str, Any]]:
+        """No PRE_TOOL check -- discovery, not invocation. See decision 4 above."""
+        return await self._backend.list_tools(agent_name=self._agent_name)
+
+    async def call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        """resource = f"tool:{name}" -- check, delegate, post_check. Raises PolicyDeniedError
+        on a PRE_TOOL or POST_TOOL deny, matching GovernedToolAdapter's existing convention."""
+        ...
+
+    async def delegate_to_agent(self, agent_name_target: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        """resource = f"agent:{agent_name_target}" -- otherwise identical shape to call_tool()."""
+        ...
+```
 
 ### Access Control
 
