@@ -11,6 +11,29 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 `civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
 
+## Status as of 2026-08-24: **presidium v0.3.0 and presidium-contrib v0.3.0 are real, live on PyPI**
+
+```
+pip install presidium          # 0.3.0
+pip install presidium-contrib  # 0.3.0
+pip install "presidium-contrib[agentgateway,spiffe]"  # real MCP+A2A gateway client, real SPIRE identity
+```
+
+Confirmed via a real fresh-venv install against the actual published PyPI packages (not local
+source) -- both base imports and the new `providers.gateway`/`identity`/`lineage` modules, both
+extras. GitHub Releases:
+[`v0.3.0`](https://github.com/civitas-io/presidium/releases/tag/v0.3.0),
+[`contrib-v0.3.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.3.0), both
+with real CycloneDX SBOM assets. `presidium` tagged/published first (confirmed live via PyPI's
+JSON API) before `presidium-contrib` -- its own dependency floor is now `presidium>=0.3.0`, a
+real fix caught before release (it was still `>=0.1`, which would have let a fresh
+`presidium-contrib` install silently resolve an incompatible `presidium` missing
+`providers.gateway`).
+
+**Everything in this file below the CHANGELOG-summarized entries is now genuinely live and
+installable**, not just committed to `main` -- see `CHANGELOG.md`'s `[0.3.0]` entry for the
+single, comprehensive summary of what shipped since v0.2.1/v0.2.0.
+
 **GH #26 (Streamable HTTP MCP transport, python-civitas/fabrica) -- DONE, closed, benchmarked.**
 See either of those repos' own `HANDOFF.md` for the real detail.
 
@@ -306,9 +329,6 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 - LiteLLM + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) — designed,
   evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
   reference path).
-- **New real release of `presidium`/`presidium-contrib`** — both packages have accumulated
-  substantial real, shipped-but-unreleased functionality since v0.2.1/v0.2.0 (see the gap noted
-  above); not urgent, but a real, standing item.
 - M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples — now genuinely unblocked given
   real releases exist), M6 (Cloud, commercial) — all designed, none built.
 - M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly

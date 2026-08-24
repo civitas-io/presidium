@@ -252,15 +252,21 @@ real, separate work, not automatically unblocked by this alone.
   `civitas`/`cel-python` now — `pynacl`/`cryptography` too), and the monorepo tree missing
   `presidium.identity`/`presidium.lineage`/`presidium_contrib.spiffe`/`presidium_contrib.server`
   entirely (all real, shipped modules from this session, never added to this file).
-- [ ] **New real release of `presidium`/`presidium-contrib`** — named 2026-08-24, not urgent but
-  a real, standing gap: since v0.2.1/v0.2.0, both packages have accumulated substantial real,
-  shipped-but-unreleased functionality (`providers/gateway.py`, `identity.py`/`lineage.py`,
-  `presidium_contrib.spiffe`, `presidium_contrib.server`, A2A delegation,
-  `GovernedMcpToolPipeline`, CEL default-deny, `scope` threading, the pre-commit hooks
-  themselves). Discovered concretely when a real fresh-venv install for
-  `GovernedMcpToolPipeline` required building `presidium` from local source, since
-  `presidium.providers.gateway` isn't on PyPI in any released version yet -- anyone installing
-  the real, published packages today cannot use most of what this session shipped.
+- [x] **New real release of `presidium`/`presidium-contrib` — DONE, 2026-08-24.**
+  [`presidium` v0.3.0](https://github.com/civitas-io/presidium/releases/tag/v0.3.0) and
+  [`presidium-contrib` v0.3.0](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.3.0),
+  both confirmed live on the real PyPI index (`pip install presidium presidium-contrib` and
+  `pip install "presidium-contrib[agentgateway,spiffe]"`, verified via a real fresh-venv install
+  against the actual published packages, not local source). CHANGELOG.md's `[0.3.0]` entry
+  covers everything: `providers/gateway.py`, `identity.py`/`lineage.py`,
+  `presidium_contrib.spiffe`, A2A delegation, `GovernedMcpToolPipeline`, CEL default-deny (a
+  real, documented breaking behavioral change), `scope` threading. **Real, load-bearing fix
+  caught before release**: `presidium-contrib`'s own dependency floor was still
+  `presidium>=0.1` despite needing `presidium.providers.gateway` (only real as of this same
+  0.3.0) — bumped to `presidium>=0.3.0`, closing the exact class of bug that would have made a
+  fresh `pip install presidium-contrib` silently resolve an incompatible `presidium`. `presidium`
+  tagged/published first, confirmed live via PyPI's JSON API, before tagging `presidium-contrib`
+  — order matters given the new floor.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
 - [ ] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git tag"
