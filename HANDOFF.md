@@ -11,12 +11,29 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 `civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
 
-**Next real task across the org, agreed with the user, not started yet -- does NOT touch this
-repo directly**: [python-civitas GH #26](https://github.com/civitas-io/python-civitas/issues/26)
-(Streamable HTTP MCP transport) -- a two-repo item between `civitas-io/python-civitas` and
-`civitas-io/fabrica`. See either of those repos' own `HANDOFF.md` for the real detail. This
-repo's own next real item, once that's done, is the `AgentGatewayClient` tool-side gap
-(`list_tools()`/`call_tool()`) -- see "Implementation Priority" -> P1 in `docs/vision/roadmap.md`.
+**GH #26 (Streamable HTTP MCP transport, python-civitas/fabrica) -- DONE, closed, benchmarked.**
+See either of those repos' own `HANDOFF.md` for the real detail.
+
+**This repo's own next real task: `AgentGatewayClient`'s tool-side gap (`list_tools()`/
+`call_tool()`) -- vendor research done 2026-08-24, design pass not started yet.** Before touching
+code, researched AgentGateway's current real state (latest `v1.4.1`) directly against its own
+docs/releases/security advisories -- full findings:
+[`docs/design/agentgateway-vendor-research-2026-08.md`](docs/design/agentgateway-vendor-research-2026-08.md).
+Key takeaways to carry into the design pass: (1) no `mcp` SDK upgrade needed -- AgentGateway
+explicitly, natively supports the older, stateful client this org's `mcp==2.0.0` pin uses; (2) the
+MCP-tool half of `call_tool()` directly reuses GH #26's real, tested Streamable HTTP transport --
+a genuine, confirmed unblock, not a guess; (3) the A2A-agent half is a real, separate, bigger
+piece of work needing a new `a2a-sdk` dependency, not an extension of the MCP path -- recommend
+sequencing MCP first, A2A second, even though the public `call_tool()` signature stays unified;
+(4) the real, undone work is three layers, not one -- `presidium/providers/gateway.py` (the
+`ToolsGatewayBackend` Protocol) doesn't exist yet, `GovernedToolProvider` has zero
+operations-delegation mechanism today (confirmed by reading its current source, pure
+authorization only), and `AgentGatewayClient` is only the outermost, third layer; (5) a real,
+HIGH-severity security advisory (GHSA-mvgg-jvj2-4frq, session/authz confusion across routes) is
+fixed in `v1.4.0` -- any AgentGateway pin must be `>=1.4.0`; (6) a real, previously-unstated
+architectural question needs an explicit answer in the design pass: should AgentGateway's own
+native MCP authorization (it has real CEL-based tool ACLs) be disabled in favor of Presidium being
+the sole authority, or run as defense-in-depth alongside it?
 
 ---
 

@@ -83,12 +83,30 @@ class ToolsGatewayBackend(Protocol):
 concrete, scoped implementation gap (not a design gap) — tracked as a GH issue rather than fixed
 silently in this doc pass.
 
+**2026-08-24 vendor research, before implementation starts:**
+[`docs/design/agentgateway-vendor-research-2026-08.md`](agentgateway-vendor-research-2026-08.md) —
+real, current findings against AgentGateway `v1.4.1`, checked directly against its own docs/
+releases/security advisories, not carried over from this doc's original snapshot. Highlights:
+(1) a real, HIGH-severity security advisory (GHSA-mvgg-jvj2-4frq, session/authz confusion across
+routes) is fixed in `v1.4.0` — any future pin must be `>=1.4.0`; (2) the MCP version-negotiation
+question this doc's own Open Questions section raised is resolved — AgentGateway explicitly
+supports an older, stateful `mcp` SDK client (what this org currently has) against its modern
+endpoint, and that endpoint speaks the exact Streamable HTTP transport GH #26 just shipped, so the
+MCP-tool half of `call_tool()` needs no new transport work; (3) the A2A-agent half is a genuinely
+separate, bigger piece of work than the unified `call_tool()` signature implies — a different wire
+protocol entirely, needing a new `a2a-sdk` dependency, not an extension of the MCP path; (4) the
+real, undone work is three layers, not one — `presidium/providers/gateway.py` (the
+`ToolsGatewayBackend` Protocol itself) does not exist yet, `GovernedToolProvider` has zero
+operations-delegation mechanism today (confirmed by reading its current source), and
+`AgentGatewayClient` is only the third, outermost layer.
+
 No second `ToolsGatewayBackend` candidate is proposed here, unlike the LLM side. The market
 research behind `llm-gateway.md`'s backend table did not turn up another product that does MCP +
 A2A routing with a self-hostable, Python-friendly profile — the ~10 MCP-gateway projects noted in
 §"MCP Governance Landscape" below (mcp-zero, mcp-guardian, etc.) informed *pattern* choices, not a
 second full backend. This is a documented gap, revisited if a concrete need or customer signal
-surfaces one.
+surfaces one. **2026-08-24 confirmation**: `v1.4.1`'s own release notes/changelog were checked
+directly and this conclusion still holds — no new competing product has emerged.
 
 ### Agents as tools (outbound)
 
@@ -245,6 +263,12 @@ Presidium owns authorization and post-execution validation.
   natural for MCP tools; an A2A delegation target needs a grant shape too (e.g.
   `agent:specialist_researcher:invoke`?) — needs to be pinned down when `call_tool()`'s agent-target
   path is actually implemented, not just designed.
-- **Civitas issue #26** ("MCP client only supports stdio/sse transport — no Streamable HTTP") may
+- ~~**Civitas issue #26** ("MCP client only supports stdio/sse transport — no Streamable HTTP") may
   block reaching AgentGateway's MCP proxy over its preferred Streamable HTTP transport — worth
-  checking whether `list_tools`/`call_tool`'s implementation depends on that landing first.
+  checking whether `list_tools`/`call_tool`'s implementation depends on that landing first.~~
+  **Resolved, 2026-08-24**: GH #26 is closed (`civitas` v0.11.3, `fabrica-context` v0.2.0), and it
+  was a real prerequisite, not a false alarm — AgentGateway's MCP endpoint is genuine Streamable
+  HTTP, confirmed directly against its own docs. See
+  [`agentgateway-vendor-research-2026-08.md`](agentgateway-vendor-research-2026-08.md) §2 for the
+  full confirmation, including that no `mcp` SDK upgrade is needed first (AgentGateway explicitly
+  supports the older, stateful client this org's `mcp==2.0.0` pin uses).
