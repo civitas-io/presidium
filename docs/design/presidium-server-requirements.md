@@ -163,12 +163,31 @@ confirmed directly against its source before wiring it in, not assumed compatibl
   while `/health` keeps returning `200` throughout -- 4 new tests in
   `test_presidium_server_real_gateway.py`, including confirming the default is genuinely off.
 
-### FR-5 (Deferred to a later milestone): Registry, approval, credential endpoints
+### FR-5: Registry, approval, credential endpoints
 
-**FR-5.1**: Registry CRUD + grant management, approval request/list/decide, and credential
-resolution are designed conceptually (per the original M7 scope) but **not built in this first
-cut** — nothing concretely calls them over a network yet, matching "ship the default, revisit if
-forced." Real, scoped follow-up, not abandoned.
+**FR-5.1 (DONE, 2026-08-24): Registry CRUD.** `POST /v1/agents` (register), `GET /v1/agents`
+(list, unfiltered -- see the honest scope note below), `GET /v1/agents/{name}` (lookup),
+`DELETE /v1/agents/{name}` (deregister) -- `presidium_contrib.server.registry_agent`, one real
+GenServer per route (not the `__op__`-marker pattern originally sketched in
+`presidium-server.md`'s "Deferred" section -- that pattern was already tried and rejected during
+check_grant's own implementation). Grant management (add/remove grants over the network) remains
+real, designed, not built -- registration deliberately excludes `grants` from the settable
+field set.
+
+**Real, load-bearing framework constraint found while implementing**: `civitas.gateway.
+dispatch.py` classifies any reply payload containing a top-level `"error"` key as
+`DispatchStatus.AGENT_ERROR` (HTTP 400), regardless of whether anything raised. Every registry
+CRUD reply uses `"reason"` instead, matching `PresidiumGatewayAgent`'s own pre-existing (but
+previously undocumented as a *reason*) convention.
+
+**Real, honest scope note**: `GET /v1/agents` does not support `list_agents()`'s own
+status/trust_tier/owner filters -- `civitas.gateway`'s dispatch never forwards a route's query
+string into a `mode: "call"` route's payload. A real, named follow-up, not silently missing.
+
+**FR-5.2 (Deferred to a later milestone)**: Approval request/list/decide and credential
+resolution are designed conceptually (per the original M7 scope) but **not built** — nothing
+concretely calls them over a network yet, matching "ship the default, revisit if forced." Real,
+scoped follow-up, not abandoned.
 
 ---
 

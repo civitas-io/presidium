@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [0.5.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
+
+### Added
+
+#### presidium-contrib -- Registry CRUD over the network
+
+Closes `presidium-server.md`'s long-standing "Deferred: the fuller REST surface" item. New
+`presidium_contrib.server.registry_agent`: `RegisterAgentGatewayAgent` (`POST /v1/agents`),
+`ListAgentsGatewayAgent` (`GET /v1/agents`), `GetAgentGatewayAgent` (`GET /v1/agents/{name}`),
+`DeregisterAgentGatewayAgent` (`DELETE /v1/agents/{name}`), `build_registry_gateway_config()`.
+New `presidium_contrib/server/serialization.py` -- real `AgentRecord`/`Grant` JSON
+(de)serialization, built from scratch.
+
+- **Real, corrected design**: one real GenServer per HTTP route, not the `payload["__op__"]`
+  multi-op pattern originally sketched for this -- that pattern was already tried and rejected
+  for check_grant/health earlier in M7.
+- **Real, previously-unknown framework constraint found while implementing**:
+  `civitas.gateway.dispatch.py` classifies any reply payload containing a top-level `"error"`
+  key as `DispatchStatus.AGENT_ERROR` -> HTTP 400, regardless of whether anything raised. Every
+  reply uses `"reason"` instead, matching `PresidiumGatewayAgent`'s own pre-existing convention.
+- **Real, honest scope notes**: `GET /v1/agents` doesn't support `list_agents()`'s own
+  status/trust_tier/owner filters (civitas's dispatch never forwards query strings into a
+  `mode: "call"` route's payload); grants are deliberately not settable via the register
+  endpoint; register is upsert, matching `AgentRegistry.register()`'s own real behavior.
+- 15 new tests, 100% coverage on all three new/changed files.
+
 ## [0.4.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
 
 ### Added

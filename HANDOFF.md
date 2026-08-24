@@ -152,6 +152,38 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## Registry CRUD over the network -- DONE, 2026-08-24
+
+Closes the design doc's own long-standing "Deferred: the fuller REST surface" item. New
+`presidium_contrib.server.registry_agent`: `RegisterAgentGatewayAgent` (`POST /v1/agents`),
+`ListAgentsGatewayAgent` (`GET /v1/agents`), `GetAgentGatewayAgent` (`GET /v1/agents/{name}`),
+`DeregisterAgentGatewayAgent` (`DELETE /v1/agents/{name}`), `build_registry_gateway_config()`.
+New `presidium_contrib/server/serialization.py` -- real `AgentRecord`/`Grant` JSON
+(de)serialization, built from scratch (no such helper existed before).
+
+- **Real, corrected design, not the original sketch**: one real GenServer per HTTP route, NOT
+  the `payload["__op__"]` multi-op pattern the design doc originally proposed for this -- that
+  exact pattern was already tried and rejected for check_grant/health during the earlier M7
+  work (`payload_extra` is never populated for ordinary, user-declared routes).
+- **Real, previously-unknown, load-bearing framework constraint found while implementing, not
+  assumed**: `civitas.gateway.dispatch.py` classifies ANY reply payload containing a top-level
+  `"error"` key as `DispatchStatus.AGENT_ERROR`, mapping to a real HTTP 400 -- regardless of
+  whether anything actually raised. Caught this the hard way in a real end-to-end test (a
+  "missing required field" reply I expected to be 200 came back 400). Every reply now uses
+  `"reason"` instead, matching `PresidiumGatewayAgent`'s own pre-existing convention -- it had
+  already avoided this pitfall, I just hadn't realized why until this.
+- **Real, honest scope notes, not silently glossed over**: `GET /v1/agents` doesn't support
+  `list_agents()`'s own status/trust_tier/owner filters (`civitas.gateway`'s dispatch never
+  forwards a route's query string into a `mode: "call"` route's payload -- confirmed directly);
+  grants are deliberately not settable via the register endpoint (a real, separate,
+  not-yet-built grant-management endpoint); register is upsert, matching
+  `AgentRegistry.register()`'s own real, existing behavior, not inventing new
+  duplicate-detection/409-Conflict semantics.
+- 15 new tests (`test_registry_agent.py` unit + `test_registry_gateway_real_http.py` real
+  end-to-end HTTP, including a real, explicit proof that `GET`/`POST` on the same `/v1/agents`
+  path route to two different agents correctly), 100% coverage on all three new/changed files,
+  `ruff`/`ruff format --check`/`mypy --strict` clean. Real fresh-venv install verified.
+
 ## Rate limiting at the M7 network boundary -- DONE, 2026-08-24
 
 Reuses Civitas's own first-party G4 rate limiter (`civitas.gateway.ratelimit.RateLimiter`/

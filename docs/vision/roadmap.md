@@ -538,10 +538,30 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   `check_grant`, a new `HealthCheckAgent` for `/health`) instead — simpler, and correctly matches
   the real API. 39 new tests (unit + a real end-to-end suite through an actual `HTTPGateway` and
   real `httpx` requests over real HTTP), both new modules at 100% coverage.
-- [ ] **(deferred, tracked not forgotten)** Registry CRUD + grant management, approval
-  request/list/decide, credential resolution over the network — real, designed intents
-  (`presidium-server.md`'s own "Deferred" section sketches how each would extend the same
-  `PresidiumGatewayAgent` pattern), not built until something concretely needs them.
+- [x] **Registry CRUD over the network -- DONE, 2026-08-24.**
+  `presidium_contrib.server.registry_agent`: `RegisterAgentGatewayAgent` (`POST /v1/agents`),
+  `ListAgentsGatewayAgent` (`GET /v1/agents`), `GetAgentGatewayAgent` (`GET /v1/agents/{name}`),
+  `DeregisterAgentGatewayAgent` (`DELETE /v1/agents/{name}`), `build_registry_gateway_config()`.
+  **Real, corrected design, not the original sketch**: one real GenServer per HTTP route, NOT the
+  `payload["__op__"]` multi-op pattern `presidium-server.md`'s own "Deferred" section originally
+  proposed -- that exact pattern was already tried and rejected for check_grant/health earlier
+  (payload_extra is never populated for ordinary, user-declared routes). New
+  `presidium_contrib/server/serialization.py` -- real AgentRecord/Grant JSON (de)serialization,
+  built from scratch (no such helper existed on either dataclass before). **Real, previously-
+  unknown framework constraint found while implementing**: `civitas.gateway.dispatch.py`
+  classifies ANY reply payload containing a top-level `"error"` key as `DispatchStatus.
+  AGENT_ERROR` -> HTTP 400, regardless of whether anything raised -- every reply uses `"reason"`
+  instead, matching `PresidiumGatewayAgent`'s own pre-existing convention (confirmed it already
+  avoided this pitfall; caught this the hard way via a real end-to-end test, not by reading the
+  framework source first). **Real, honest scope notes, not silently glossed over**: `GET
+  /v1/agents` doesn't support `list_agents()`'s own status/trust_tier/owner filters (civitas's
+  dispatch never forwards query strings into a `mode: "call"` route's payload); grants are
+  deliberately not settable via the register endpoint (a real, separate, not-yet-built
+  grant-management endpoint); register is upsert, matching `AgentRegistry.register()`'s own real
+  behavior, not inventing new duplicate-detection. 15 new tests (unit + real end-to-end HTTP),
+  100% coverage on all three new/changed files, `ruff`/`ruff format --check`/`mypy --strict`
+  clean. Approval request/list/decide and credential resolution remain real, designed intents,
+  not built until something concretely needs them.
 - [x] **DONE, 2026-08-24.** `scope` (FR-1.4) is now threaded through to `ActionRequest.parameters`
   — `GovernedToolProvider.check_grant()`/`check()`/`check_resource()` gained an additive,
   optional `parameters: dict[str, Any] | None = None`, and `PresidiumGatewayAgent.handle_call()`

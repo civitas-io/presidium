@@ -12,11 +12,23 @@ from presidium_contrib.server.gateway_agent import (
     build_check_grant_gateway_config,
     build_rate_limiter,
 )
+from presidium_contrib.server.registry_agent import (
+    DeregisterAgentGatewayAgent,
+    GetAgentGatewayAgent,
+    ListAgentsGatewayAgent,
+    RegisterAgentGatewayAgent,
+    build_registry_gateway_config,
+)
 
 __all__ = [
     "RATE_LIMITER_AGENT_NAME",
+    "DeregisterAgentGatewayAgent",
+    "GetAgentGatewayAgent",
     "HealthCheckAgent",
+    "ListAgentsGatewayAgent",
     "PresidiumGatewayAgent",
+    "RegisterAgentGatewayAgent",
     "build_check_grant_gateway_config",
     "build_rate_limiter",
+    "build_registry_gateway_config",
 ]

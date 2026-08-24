@@ -28,8 +28,10 @@ check_grant()` — a fully-specified, implementation-ready contract — has noth
 
 ## Non-Goals (this milestone)
 
-- Registry CRUD, approval request/list/decide, credential resolution over the network — designed
-  conceptually (see "Deferred: the fuller REST surface" below), not built.
+- ~~Registry CRUD~~ over the network — **DONE, 2026-08-24**, see "Deferred: the fuller REST
+  surface" below for the full real detail (now shipped, not deferred). Approval
+  request/list/decide, credential resolution over the network remain real, designed intents,
+  not built.
 - A true distributed GenServer mesh recomposing `PolicyEvaluatorServer`/`RegistryServer` for
   `check_grant` — `GovernedRuntime`'s existing in-process composition already does this correctly.
 - `presidium-contrib[spiffe]` (real SPIRE SVIDs) — a separate, later upgrade to agent-level
@@ -239,13 +241,42 @@ own docstring).
 ## Deferred: the fuller REST surface
 
 The original M7 scope named registry CRUD, approval request/list/decide, and credential
-resolution as real requirements. All remain real, designed intents — not built in this cut because
-nothing concretely calls them over a network yet. When a real consumer appears:
+resolution as real requirements.
 
-- **Registry CRUD** would follow the same `PresidiumGatewayAgent` pattern — new `__op__` values
-  (`register`, `deregister`, `lookup`, `list`), delegating to `self._runtime.registry` directly
-  (no new orchestration needed, since registry operations don't compose with policy/approval the
-  way `check_grant` does).
+**Registry CRUD — DONE, 2026-08-24, real, shipped.** `presidium_contrib.server.registry_agent`:
+`RegisterAgentGatewayAgent` (`POST /v1/agents`), `ListAgentsGatewayAgent` (`GET /v1/agents`),
+`GetAgentGatewayAgent` (`GET /v1/agents/{name}`), `DeregisterAgentGatewayAgent`
+(`DELETE /v1/agents/{name}`), plus `build_registry_gateway_config()`. **Real, corrected design**:
+NOT the `payload["__op__"]` multi-op-per-agent pattern this section originally sketched below —
+that exact pattern was already tried and rejected for check_grant/health during M7's own
+original implementation (payload_extra is never populated for ordinary, user-declared routes,
+confirmed against `civitas.gateway.router.RouteTable.from_config()`). One real GenServer per
+real HTTP route instead, matching the corrected, already-verified pattern from the start. New
+`presidium_contrib/server/serialization.py` handles real AgentRecord/Grant JSON (de)serialization
+(no such helper existed before this).
+
+**A real, previously-unknown, load-bearing framework constraint found while implementing, not
+assumed**: `civitas.gateway.dispatch.py`'s own `_call()` classifies ANY reply payload containing
+a top-level `"error"` key as `DispatchStatus.AGENT_ERROR`, which maps to a real HTTP 400 --
+regardless of whether anything actually raised. Every reply in this module uses `"reason"`
+instead, matching `PresidiumGatewayAgent`'s own pre-existing convention (confirmed it already
+avoided this pitfall) -- caught this the hard way in a real end-to-end test, not by reading the
+framework source first.
+
+**Real, honest scope note**: `GET /v1/agents` does not support the `status`/`trust_tier`/`owner`
+query-string filters `AgentRegistry.list_agents()` itself already supports in-process --
+`civitas.gateway`'s own dispatch never forwards a route's query string into a `mode: "call"`
+route's payload (confirmed directly; only the parsed JSON body and path params are merged). A
+real, named, not-yet-built follow-up if filtering becomes concretely needed. Deregister uses
+upsert-matching-register semantics: no duplicate-detection/409-Conflict invented beyond what
+`AgentRegistry.register()`/`deregister()` themselves already do. Grants are deliberately NOT
+settable via the register endpoint (a real, separate, not-yet-built grant-management endpoint
+territory) -- confirmed serialized correctly on read when set in-process.
+
+15 new tests (`test_registry_agent.py` unit + `test_registry_gateway_real_http.py` real
+end-to-end HTTP), 100% coverage on all three new/changed files, `ruff`/`ruff format --check`/
+`mypy --strict` clean.
+
 - **Approval request/list/decide** is the real piece that would let a `REQUIRE_APPROVAL` decision
   from `check_grant` actually get resolved over the network — genuinely useful work, deferred
   because `check_grant` returning the decision as a value (FR-1.5) is useful on its own even
@@ -260,10 +291,10 @@ nothing concretely calls them over a network yet. When a real consumer appears:
  Civitas's HTTP Gateway" back when it was written, but sat unconnected to any milestone):
 
 ```
-GET    /v1/agents                    # List registered agents (registry CRUD)
-GET    /v1/agents/{name}             # Get agent details
-GET    /v1/agents/{name}/trust       # Trust score history
-POST   /v1/agents/{name}/suspend     # Suspend an agent
+GET    /v1/agents                    # List registered agents (registry CRUD) -- DONE, 2026-08-24
+GET    /v1/agents/{name}             # Get agent details -- DONE, 2026-08-24
+GET    /v1/agents/{name}/trust       # Trust score history -- still real, not built
+POST   /v1/agents/{name}/suspend     # Suspend an agent -- still real, not built
 
 GET    /v1/policies                  # List policies
 POST   /v1/policies/validate         # Validate policy YAML
