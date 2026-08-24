@@ -481,11 +481,22 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 
 ## What's next — the real, current P1 list (see roadmap.md for the full detail on each)
 
+- **M5 (SDK + CLI) -- started, not finished.** Real, named remaining pieces: `presidium run`
+  (bootstrap a `GovernedRuntime` from topology YAML, mirroring `civitas run`); registry
+  list/policy validate against a *live* `presidium-server`'s HTTP endpoints (`--server-url`
+  mode -- the local-file mode shipped first); the docs site deployment (`mkdocs.yml`'s own nav
+  already exists, no GitHub Pages workflow yet -- `civitas-io/python-civitas` has a real,
+  working `Deploy Docs` workflow to copy directly); 3-5 example applications; the v1.0.0 tag.
+- **Credential resolution** (M7's last remaining "Deferred: the fuller REST surface" item,
+  FR-5.3 in `presidium-server-requirements.md`) -- deliberately unsketched, needs its own real
+  design pass on what's safe to expose over a network at all before any implementation.
 - LiteLLM + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) — designed,
   evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
   reference path).
-- M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples — now genuinely unblocked given
-  real releases exist), M6 (Cloud, commercial) — all designed, none built.
+- M4 (Autonomy Progression), M6 (Cloud, commercial) — designed, none built. **A real, named
+  prerequisite for M5's own `trust show`/`trust events` CLI commands** (not yet built for
+  exactly this reason): a durable, queryable trust-event history, arguably M4's own FR-4.5
+  (decision journal).
 - M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly
   sequenced *after* M7 ships (which it now has), not before; real baseline numbers already
   measured (~88μs/~11,400 evals/sec per core, pure Python, GIL-bound — see roadmap.md).

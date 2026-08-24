@@ -1401,3 +1401,126 @@ published `civitas` — no local editable-install workaround, no xfail. 439 `pre
   removed, module docstring updated to reflect the real, resolved state
 - `docs/vision/roadmap.md` — M7's mTLS item updated with the final, real outcome
 - `docs/log.md` — this entry
+
+## [2026-08-24] feat | AgentGatewayClient MCP tool-side, presidium-contrib[spiffe], CEL default-deny
+
+**Trigger:** Three real P1 items sequenced together this session, each preceded by real vendor
+research (AgentGateway v1.4.1's own security advisories/docs; SPIRE v1.15.3's own current
+release/Python SDK), not carried over from earlier snapshots.
+
+**What changed:**
+- New `presidium/providers/gateway.py` (`LLMGatewayBackend`/`ToolsGatewayBackend` Protocols,
+  `GatewayModelProvider`/`GatewayToolProvider` — a third composition pattern). `GovernedToolProvider`
+  gained `check_resource()`/`post_check_resource()` for the new `agent:<name>` grant namespace.
+  `AgentGatewayClient.list_tools()`/`call_tool()` — real MCP over Streamable HTTP, verified end
+  to end against a real running MCP server.
+- New `presidium_contrib.spiffe` (`SpiffeIdentitySource`, `bind_identity_to_registry()`) — a real
+  async bridge over the official `spiffe` SDK's blocking, thread-based Workload API client.
+  `AgentRecord` gained `public_key_algorithm` (`"ed25519"` default, `"ec_p256"` additive);
+  `cryptography>=41` became a real, hard core `presidium` dependency. Verified end to end against
+  an actual running SPIRE v1.15.3 server on the homelab — a genuine EC P-256 X.509-SVID confirmed.
+- `CelPolicyEngine` now fails closed on no policy match by default (`allow_unmatched_requests`/
+  `unmatched_enforcement` as the two explicit, named opt-out knobs) — a real, documented breaking
+  behavioral change, migrated across 10 existing test files with a new shared `ALLOW_ALL` fixture,
+  not a shortcut.
+
+**Verification:** 466-469 `presidium` tests, 175-179 `presidium-contrib` tests pass across the
+three items (see individual commits `80f2025`, `9d1e480`/`ae0c49e`, `eb0af7e`), 100% coverage on
+new/changed files, `ruff`/`mypy --strict` clean throughout.
+
+**Pages updated:** `docs/design/agentgateway-vendor-research-2026-08.md`,
+`docs/design/spiffe-vendor-research-2026-08.md`, `docs/design/mcp-gateway.md`,
+`docs/design/agent-registry.md`, `docs/design/policy-engine.md`,
+`docs/guides/getting-started.md`, `docs/vision/roadmap.md`, `HANDOFF.md`, `docs/log.md` (this
+entry, and the two P0/P1 items it should have been added for at the time — a real gap in this
+file, closed retroactively rather than left unfixed).
+
+## [2026-08-24] feat | AgentGatewayClient A2A delegation, GovernedMcpToolPipeline
+
+**Trigger:** The explicit, tracked P1 follow-up to the MCP tool-side work above (real A2A vendor
+research: `a2a-sdk` 1.1.2, AgentGateway's own per-upstream-agent A2A proxy model), and the
+long-standing "compose the three MCP governance primitives" item.
+
+**What changed:**
+- `AgentGatewayClient.delegate_to_agent()` — real A2A delegation. `a2a_routes: dict[str, str]`
+  (explicit target-agent-name → gateway-route-URL map, since AgentGateway's A2A proxy is
+  per-upstream-agent, not federated like MCP). New `AgentGatewayDelegationError`. Verified end to
+  end against a real running A2A server (a faithful port of the official `a2a-samples` Hello
+  World reference agent).
+- New `presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline` — composes
+  `PoisoningDetector`/`redact_dict`/`PIIDetector` (previously real, tested, but never called
+  together) into one real pipeline: poisoning check → redact-for-audit → PRE_TOOL authorization →
+  real backend call → PII scan/enrich → POST_TOOL authorization → optional PII masking.
+
+**Verification:** 469 `presidium` tests, 198-202 `presidium-contrib` tests pass across both items
+(commits `a3be25e`, `8992b4a`), 100% coverage on new files, real fresh-venv installs verified.
+
+**Pages updated:** `docs/design/a2a-delegation-vendor-research-2026-08.md`,
+`docs/design/mcp-gateway.md`, `docs/vision/roadmap.md`, `HANDOFF.md`, `docs/log.md`.
+
+## [2026-08-24] release | v0.3.0 through v0.6.0 -- M7's own deferred REST surface completed
+
+**Trigger:** A real, standing release gap found while verifying `GovernedMcpToolPipeline`: both
+packages had accumulated substantial shipped-but-unreleased functionality since v0.2.1/v0.2.0.
+
+**What changed:** `presidium` v0.3.0 (everything from the two entries above, plus trust ceiling
+propagation/monotonic capability narrowing, the real mTLS fix). Then three real,
+`presidium-contrib`-only releases closing M7's own "Deferred: the fuller REST surface" items in
+sequence: v0.4.0 (rate limiting, reusing Civitas's own first-party G4 limiter — a real,
+load-bearing finding that global/per-route middleware concatenate, not deduplicate, forced wiring
+it onto `/v1/check_grant`'s own per-route list specifically), v0.5.0 (registry CRUD — one real
+GenServer per HTTP route, not the originally-sketched `__op__`-marker pattern; found and fixed a
+real framework constraint where any reply payload with a top-level `"error"` key gets mapped to
+HTTP 400 regardless of whether anything raised), v0.6.0 (approval list/decide — with an explicit,
+honest scope boundary: `check_grant()` never calls `ApprovalService.request_approval()`, so only
+the blocking `check()` path's approvals are trackable here).
+
+**Verification:** Each release tagged/published/verified independently via real fresh-venv
+installs against the actual published PyPI packages (hitting, and each time correctly resolving,
+real PyPI propagation delays). `presidium` stayed at v0.3.0 throughout the three contrib-only
+releases — confirmed no core changes were needed for any of them.
+
+**Pages updated:** `CHANGELOG.md` (four new version entries), `docs/design/presidium-server.md`,
+`docs/design/presidium-server-requirements.md`, `docs/vision/roadmap.md`, `HANDOFF.md`,
+`README.md`, `civitas-io/.github` org profile README, `civitas-io/context` wiki, `docs/log.md`.
+
+## [2026-08-24] feat + docs | M5 CLI start, full documentation audit, fabrica dependency floor fix
+
+**Trigger:** User asked to walk through M4-M8 scoping; M5 was chosen. Then a direct "is all our
+docs up to date" question triggered a real, systematic staleness audit across all three repos.
+
+**What changed:**
+- New `presidium_contrib.cli` — the first real `presidium` command (Typer + Rich, mirroring
+  `civitas.cli`'s own package structure): `version`, `registry list --db <path>`, `policy
+  validate <file>`, `trust replay --events <file> --spec <file>`. `presidium.runtime.
+  parse_policy_rules()` promoted from private to public for the `policy validate` command to
+  reuse directly. Real, honest re-scoping: `trust show`/`trust events` (querying a live agent's
+  history) deliberately not built — no registry backend today persists a durable, queryable
+  trust-event history. Two real bugs found and fixed before shipping (an unclosed `SqliteRegistry`
+  connection; `--as-of` parsing sitting outside error handling). One real CI failure caught and
+  fixed the same session (Rich text wrapping differently on CI's narrower terminal, splitting a
+  filename mid-word — fixed with a general `unwrapped()` test helper, not a narrow patch).
+  Released as `presidium` v0.4.0 / `presidium-contrib` v0.7.0.
+- Documentation audit found and fixed real staleness in `AGENTS.md` (A2A delegation still
+  described as unbuilt, missing the entire `cli/` module, missing `[sqlite]` extra, stale test
+  counts), `README.md` (extras list missing `[sqlite]`), `docs/index.md` and `docs/vision/
+  roadmap.md`'s own Timeline table (both still said M5 "not started" — the same Timeline table
+  already caught once this session for a different milestone, confirming it needs re-checking
+  after every milestone-affecting change), and `docs/design/trust-scoring-requirements.md`
+  (FR-5.1-5.3 had no status annotations).
+- In `civitas-io/fabrica`: found its committed `uv.lock` had silently pinned `presidium`/
+  `presidium-contrib` to v0.2.1/v0.2.0 all session (a `>=` floor doesn't auto-upgrade) — meaning
+  its own real end-to-end mTLS test hadn't exercised any of today's presidium work at all.
+  Re-verified the real test still passes against the actual current `presidium-contrib` v0.7.0
+  before bumping the floors (confirmed no hidden regression from the CEL default-deny change: the
+  test already has its own explicit terminal DENY rule).
+
+**Verification:** 18 new CLI tests, 469 `presidium` + 256 `presidium-contrib` tests pass; real
+fresh-venv installs against the actual published PyPI packages; `civitas-io/fabrica`'s 292 real
+tests pass against the upgraded, real, current dependency floors. `ruff`/`ruff format --check`/
+`mypy --strict` clean across all touched files in both repos.
+
+**Pages updated:** `presidium_contrib/cli/` (new package), `AGENTS.md`, `README.md`,
+`docs/index.md`, `docs/vision/roadmap.md`, `docs/design/trust-scoring-requirements.md`,
+`CHANGELOG.md`, `HANDOFF.md`, `civitas-io/fabrica`'s `pyproject.toml`/`uv.lock`/`HANDOFF.md`,
+`civitas-io/.github` org profile README, `civitas-io/context` wiki, `docs/log.md` (this entry).
