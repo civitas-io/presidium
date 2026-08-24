@@ -20,7 +20,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 |---|---|
 | [Manifesto](vision/manifesto.md) | Core thesis: governance should be architectural, not bolted on. 88% of agents fail in production due to infrastructure, not models. Principles: OSS-first, Python-native, developer-centric, vendor-neutral. |
 | [Market Positioning](vision/positioning.md) | Competitive 2x2 (governance depth × runtime depth). Presidium occupies the only empty quadrant. Detailed comparisons vs. AGT, Fiddler, Temporal. Target users: platform engineers, agent developers, enterprise compliance. |
-| [Roadmap](vision/roadmap.md) | Six milestones: M1 (docs, complete) → M2 (core interfaces, complete) → M3 (contrib adapters + trust scoring, complete) → M4 (autonomy progression + agent value chain) → M5 (SDK + CLI) → M6 (cloud + compliance). |
+| [Roadmap](vision/roadmap.md) | Eight milestones, current as of 2026-08-24: M1 (docs, complete) → M2 (core interfaces, complete) → M3 (contrib adapters + trust scoring, complete) → M4 (autonomy progression, not started) → M5 (SDK + CLI, not started, genuinely unblocked) → M6 (cloud + compliance, not started) → M7 (Presidium Server, **complete for its P0 scope + rate limiting/registry CRUD/approval list-decide**, only credential resolution remains) → M8 (Rust vs. Python performance research, not started, now unblocked by M7). |
 
 ## Architecture
 
@@ -58,8 +58,8 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
 | [Trust Scoring Requirements](design/trust-scoring-requirements.md) | `presidium` + `presidium-contrib` | M3-M6 | Draft |
 | [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Superseded by Presidium Server, 2026-08-22 |
-| [Presidium Server Requirements](design/presidium-server-requirements.md) | `presidium` (1 new method) + `presidium-contrib.server` | M7 | Draft (2026-08-22) |
-| [Presidium Server](design/presidium-server.md) | `presidium-contrib.server` (needs `civitas[http]`) | M7 | Draft (2026-08-22) |
+| [Presidium Server Requirements](design/presidium-server-requirements.md) | `presidium` (1 new method) + `presidium-contrib.server` | M7 | Shipped -- FR-1 through FR-5.2 done (2026-08-22–24); only FR-5.3 (credential resolution) remains, deliberately unsketched |
+| [Presidium Server](design/presidium-server.md) | `presidium-contrib.server` (needs `civitas[http]`) | M7 | Shipped -- check_grant, rate limiting, registry CRUD, approval list/decide all real and released; only credential resolution remains |
 
 ## Research
 

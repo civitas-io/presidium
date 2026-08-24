@@ -528,8 +528,10 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   real module rather than a separate standalone package.
 - [x] **(P0)** Implement `PresidiumGatewayAgent` and `GovernedToolProvider.check_grant()`.
   **Done 2026-08-22.** `POST /v1/check_grant` + `GET /health` only in this first cut — registry
-  CRUD, approval request/list/decide, and credential resolution remain designed (see
-  `presidium-server.md`'s own "Deferred" section) but explicitly out of scope for now. **A real,
+  CRUD, approval request/list/decide, and credential resolution remained designed (see
+  `presidium-server.md`'s own "Deferred" section) but explicitly out of scope for that first cut.
+  **Update, 2026-08-24: registry CRUD and approval list/decide are both now DONE too** — see the
+  two dedicated bullets below; only credential resolution remains undone. **A real,
   second implementation-time correction found and fixed**: the design's original
   `payload_extra`-based single-agent dispatch doesn't work —
   `civitas.gateway.router.RouteTable.from_config()` never populates `payload_extra` for ordinary,
@@ -737,13 +739,18 @@ The M2 `TrustScorer` ships as a simple 0.0-1.0 scalar. Post-M4, investigate repl
 
 These are aspirational, not commitments. Adjusted based on community feedback and contributor availability.
 
+**Status column last verified against real, current source 2026-08-24** -- this table went
+stale before (it showed M7 as "Planning" for two days after M7's own P0 scope shipped, and for
+zero days after its rate-limiting/registry-CRUD/approval extensions shipped); check the
+M-section itself, not just this table, if in doubt.
+
 | Milestone | Target | Status |
 |---|---|---|
 | M1: Foundation | Q2 2026 | Complete |
 | M2: Core Interfaces + CEL Policy | Q3 2026 | Complete |
 | M3: Contrib Adapters + Reference Impls | Q3-Q4 2026 | Complete |
-| M4: Autonomy Progression | Q4 2026 | Planning |
-| M5: SDK + CLI | Q1 2027 | Planning |
-| M6: Cloud | 2027+ | Future |
-| M7: Presidium Server | TBD | Planning |
-| M8: Performance Research (Rust vs. Python) | After M7 | Planning |
+| M4: Autonomy Progression | Q4 2026 | Planning -- not started |
+| M5: SDK + CLI | Q1 2027 | Planning -- not started; genuinely unblocked (P0 gate cleared v0.2.1, real releases now through v0.6.0) |
+| M6: Cloud | 2027+ | Future -- not started, explicitly commercial |
+| M7: Presidium Server | TBD | **Complete for its P0 scope + 3 of 4 "Deferred" extensions** (check_grant, registry CRUD, rate limiting, approval list/decide -- real, shipped, released as of 2026-08-24). Only credential resolution remains, deliberately unsketched |
+| M8: Performance Research (Rust vs. Python) | After M7 | Planning -- not started; now genuinely unblocked, M7 exists to benchmark against |

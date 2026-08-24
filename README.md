@@ -15,17 +15,22 @@ pip install presidium              # core: policy, registry, trust, credentials
 pip install presidium-contrib      # adapters: OPA, OpenBao, Slack, Postgres, the M7 server, ...
 ```
 
-> **Status:** Alpha, real and tested, not just designed. M1–M3 complete. **M7 (Presidium Server)
-> shipped and its mTLS handshake genuinely proven end to end**: `GovernedRuntime`'s governance is
-> reachable over real REST+mTLS (`presidium-contrib[server]`), satisfying
+> **Status:** Alpha, real and tested, not just designed. M1–M3 complete. **M7 (Presidium
+> Server) shipped in full for its P0 scope plus three of its four originally-deferred REST
+> extensions** (2026-08-22 through 2026-08-24): `GovernedRuntime`'s governance is reachable over
+> real REST+mTLS (`presidium-contrib[server]`) -- `check_grant()`, registry CRUD
+> (register/list/get/deregister agents), approval list/decide, and rate limiting (reusing
+> Civitas's own first-party G4 limiter) are all real and released. Satisfies
 > [`civitas-io/fabrica`](https://github.com/civitas-io/fabrica)'s `PresidiumClient.check_grant()`
-> contract exactly -- verified against Fabrica's own real `RestPresidiumClient`, not just an
-> in-repo test. `GovernedModelProvider`/`GovernedToolProvider` are also real, drop-in Civitas
-> `ModelProvider`/`ToolProvider` implementations (`presidium.providers.civitas_adapters`). Trust
-> ceiling propagation and monotonic capability narrowing on delegation/spawn (both real security
-> gaps found via a direct comparison against Microsoft's Agent Governance Toolkit) are shipped.
-> 601 tests (439 `presidium` + 162 `presidium-contrib`), 95.94%/87% coverage, mypy strict, ruff
-> clean.
+> contract exactly -- verified against Fabrica's own real `RestPresidiumClient`. `AgentGatewayClient`
+> (`presidium-contrib[agentgateway]`) speaks real MCP tool calls AND real A2A agent delegation
+> over Streamable HTTP, not LLM routing alone. `presidium-contrib[spiffe]` adds real SPIRE-issued
+> X.509-SVID identity alongside the default Ed25519 binding. `GovernedModelProvider`/
+> `GovernedToolProvider` are real, drop-in Civitas `ModelProvider`/`ToolProvider` implementations.
+> `CelPolicyEngine` fails closed on no policy match by default (a real, documented breaking
+> change from earlier releases). Trust ceiling propagation and monotonic capability narrowing on
+> delegation/spawn are shipped. 707 tests (469 `presidium` + 238 `presidium-contrib`), mypy
+> strict, ruff clean. Only credential resolution remains undone from M7's original scope.
 
 ## What Is Presidium?
 
@@ -72,15 +77,16 @@ presidium/
 | Package | Purpose | Install | Status |
 |---|---|---|---|
 | `presidium` | Protocols, dataclasses, CEL policy engine, scoring library, trust scoring, `GovernedRuntime`, drop-in `ModelProvider`/`ToolProvider` adapters | `pip install presidium` | M1–M3 complete |
-| `presidium-contrib` | Real network server (`presidium-contrib[server]`, M7), adapters for OPA/OpenBao/AgentGateway/Slack/Webhook/Postgres; reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M1–M3 complete; M7 (Presidium Server) shipped |
+| `presidium-contrib` | Real network server (`presidium-contrib[server]`, M7: check_grant, registry CRUD, approval list/decide, rate limiting), adapters for OPA/OpenBao/AgentGateway/SPIFFE/Slack/Webhook/Postgres; reference impls for Agent Registry, MCP governance, trust scoring, service mode | `pip install presidium-contrib[opa]` | M1–M3 complete; M7 (Presidium Server) shipped, minus credential resolution |
 
 `presidium` is the only required dependency. `presidium-contrib` extras are opt-in:
 
 ```
-presidium-contrib[server]        # Presidium Server (M7) — check_grant() over real REST+mTLS
+presidium-contrib[server]        # Presidium Server (M7) — check_grant, registry CRUD, approval list/decide, rate limiting, over real REST+mTLS
 presidium-contrib[opa]           # OPA adapter (for teams already running OPA)
 presidium-contrib[openbao]       # OpenBao credential backend (Vault-compatible, MPL 2.0)
-presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — reference LLM + MCP + A2A gateway
+presidium-contrib[agentgateway]  # AgentGateway (Linux Foundation) — real LLM + real MCP tools + real A2A delegation
+presidium-contrib[spiffe]        # Real SPIRE-issued X.509-SVID identity (opt-in alongside the Ed25519 default)
 presidium-contrib[slack]         # Slack-based human-in-the-loop
 presidium-contrib[webhook]       # Webhook-based approval provider
 presidium-contrib[postgres]      # PostgreSQL agent registry backend
@@ -92,8 +98,9 @@ abstraction (letting AgentGateway/LiteLLM/etc. be swapped as interchangeable bac
 [`docs/design/mcp-gateway.md`](docs/design/mcp-gateway.md)) but not built — there is no
 `presidium-contrib[litellm]` extra yet, despite earlier drafts of this README describing one.
 Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry are stubbed in the design docs only,
-not built either. `AgentGatewayClient` (`presidium-contrib[agentgateway]`) is real today, LLM-side
-only (no `list_tools`/`call_tool` yet).
+not built either. `AgentGatewayClient` (`presidium-contrib[agentgateway]`) is real today for
+all three surfaces: LLM chat/list_models, real MCP `list_tools`/`call_tool` over Streamable
+HTTP, and real A2A agent delegation.
 
 ### Library Mode vs. Service Mode
 
