@@ -117,19 +117,26 @@ real, separate work, not automatically unblocked by this alone.
   double-prefix bug caught and fixed during implementation, before it shipped);
   `AgentGatewayClient.list_tools()`/`call_tool()` are real MCP `tools/list`/`tools/call` over
   Streamable HTTP (the exact transport GH #26 shipped), verified end to end against a real
-  running MCP server, not mocked. **A2A delegation deliberately deferred** —
-  `delegate_to_agent()` raises `NotImplementedError` explicitly (needs a real, new `a2a-sdk`
-  dependency and its own test, a separate follow-up, not silently stubbed). 167
-  `presidium-contrib` tests pass (+5), 452 `presidium` tests pass (+13), `ruff`/`mypy --strict`
-  clean. Any AgentGateway pin must be `>=1.4.0` (GHSA-mvgg-jvj2-4frq, a real HIGH-severity
-  security advisory, is fixed exactly there).
-- [ ] **`AgentGatewayClient.delegate_to_agent()` real implementation (A2A half)** — the explicit,
-  deliberately-deferred follow-up to the item above, tracked here so it doesn't silently get
-  lost. Currently raises `NotImplementedError`. Needs a real, new `a2a-sdk` (PyPI, official,
-  `a2aproject/a2a-python`) dependency — a genuinely different wire protocol from MCP (agent
-  cards at `/.well-known/agent.json`, `message/stream` JSON-RPC, not `tools/list`/`tools/call`),
-  confirmed in `agentgateway-vendor-research-2026-08.md` finding 4. Real end-to-end test needs an
-  actual running A2A agent (the `a2a-samples` Hello World agent is a real, available reference).
+  running MCP server, not mocked. 167 `presidium-contrib` tests pass (+5), 452 `presidium` tests
+  pass (+13), `ruff`/`mypy --strict` clean. Any AgentGateway pin must be `>=1.4.0`
+  (GHSA-mvgg-jvj2-4frq, a real HIGH-severity security advisory, is fixed exactly there).
+- [x] **`AgentGatewayClient.delegate_to_agent()` real implementation (A2A half) — DONE,
+  2026-08-24, same day as the MCP-tool half above.** Real vendor research first
+  ([`docs/design/a2a-delegation-vendor-research-2026-08.md`](../design/a2a-delegation-vendor-research-2026-08.md)):
+  confirmed the real `a2a-sdk` (`1.1.2`, `a2aproject/a2a-python`) client API
+  (`create_client()`/`send_message()`/`get_stream_response_text()`) and the real, new,
+  load-bearing finding that AgentGateway's A2A proxy is per-upstream-agent (one route per agent
+  server, agent-card URL rewriting), not federated behind one shared endpoint the way MCP tools
+  are. `AgentGatewayClient` gained `a2a_routes: dict[str, str] | None` (an explicit target-name
+  -> gateway-route-URL map) and a real `delegate_to_agent()` mapping `arguments["text"]` onto a
+  real A2A text message (or the whole dict onto a structured data message otherwise), extracting
+  the result via `get_stream_response_text()` and raising a new `AgentGatewayDelegationError` on
+  an unconfigured target or a terminal FAILED/REJECTED/CANCELED `TaskState`. Verified end to end
+  against a real running A2A server (`tests/integration/fixtures/hello_a2a_server.py`, a faithful
+  port of the real, official a2a-samples Hello World reference agent's exact `Task` lifecycle,
+  not simplified) — 6 new tests, not mocked, all passing on the first real run. 469 `presidium`
+  tests pass, 183 `presidium-contrib` tests pass (+6), 96% coverage on the changed client file,
+  `ruff`/`ruff format --check`/`mypy --strict` clean.
 - [x] **Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — DONE, 2026-08-24.** Real vendor
   research (`docs/design/spiffe-vendor-research-2026-08.md`), a real design pass
   (`docs/design/agent-registry.md`'s updated "M3+ upgrade path" section), and real implementation,

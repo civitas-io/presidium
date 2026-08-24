@@ -76,7 +76,7 @@ class ToolsGatewayBackend(Protocol):
     async def health(self) -> bool: ...
 ```
 
-**Current adapter status, 2026-08-24 -- MCP tool side DONE, A2A side deliberately deferred.**
+**Current adapter status, 2026-08-24 -- BOTH MCP tool side and A2A side DONE.**
 All three layers named in the vendor research below are now real, shipped code:
 `presidium/providers/gateway.py` (`LLMGatewayBackend`, `ToolsGatewayBackend`,
 `GatewayModelProvider`, `GatewayToolProvider`), `GovernedToolProvider`/`GovernedModelProvider`
@@ -84,11 +84,28 @@ gaining `check_resource()`/`post_check_resource()` (verbatim-resource variants o
 `post_check()`, needed for the `agent:<name>` namespace, not just `tool:<name>`), and
 `AgentGatewayClient.list_tools()`/`call_tool()` -- real MCP `tools/list`/`tools/call` over
 Streamable HTTP, verified end to end against a real running MCP server (not mocked;
-`tests/integration/test_agentgateway_mcp_real_server.py`, 5 tests). `delegate_to_agent()` exists
-on both `AgentGatewayClient` and `GatewayToolProvider` but the client's own implementation
-raises `NotImplementedError` explicitly -- the A2A half needs a real `a2a-sdk` dependency and its
-own end-to-end test, deliberately sequenced as a separate follow-up (decision 3 below), not
-silently stubbed to look done.
+`tests/integration/test_agentgateway_mcp_real_server.py`, 5 tests).
+
+**A2A delegation -- DONE, same day, second phase per decision 3 below.** Real vendor research
+first ([`docs/design/a2a-delegation-vendor-research-2026-08.md`](a2a-delegation-vendor-research-2026-08.md)):
+confirmed the real `a2a-sdk` (`1.1.2`) client API shape (`create_client()`/`send_message()`/
+`get_stream_response_text()`), confirmed AgentGateway's A2A proxy is a transparent, agent-card-
+rewriting reverse proxy per-upstream-agent (not federated behind one endpoint the way MCP tools
+are -- the real, new, load-bearing finding this research added). `AgentGatewayClient.__init__`
+gained `a2a_routes: dict[str, str] | None` (an explicit target-agent-name -> gateway-route-URL
+map, since AgentGateway itself has no "resolve by agent name" mechanism);
+`delegate_to_agent()`'s `arguments` maps a `"text"` key onto a real A2A text message (the only
+shape a text-only agent can respond to) or the whole dict onto a real A2A structured data
+message otherwise. New `AgentGatewayDelegationError` for an unconfigured target or a terminal
+FAILED/REJECTED/CANCELED `TaskState`. Verified end to end against a real running A2A server
+(`tests/integration/fixtures/hello_a2a_server.py`, a faithful port of the real, official
+a2a-samples Hello World reference agent's exact `Task` lifecycle logic -- not simplified, since
+proving the completed-`Task` response path specifically mattered) --
+`tests/integration/test_agentgateway_a2a_real_server.py`, 6 tests, not mocked. 469 `presidium`
+tests pass, 183 `presidium-contrib` tests pass (+6), 96% coverage on the changed client file
+(the two uncovered lines are a pre-existing, unrelated `call_tool()` branch and a
+practically-untriggerable defensive-only guard), `ruff`/`ruff format --check`/`mypy --strict`
+clean. New `a2a-sdk>=1.1.2` dependency on the `[agentgateway]` extra.
 
 **2026-08-24 vendor research, before implementation starts:**
 [`docs/design/agentgateway-vendor-research-2026-08.md`](agentgateway-vendor-research-2026-08.md) —
@@ -150,7 +167,8 @@ findings, resolving what was previously left TBD:**
 3. **Sequencing, resolved**: MCP-tool support ships first (real, immediately buildable -- reuses
    GH #26's already-tested Streamable HTTP transport directly). A2A delegation is a real, explicit
    second phase, needing the new `a2a-sdk` dependency and its own end-to-end test against a real
-   A2A agent -- not attempted in the same change.
+   A2A agent -- not attempted in the same change. **DONE, same day** -- see the "Current adapter
+   status" note above for the full real detail.
 4. **`list_tools()` is authorization-exempt, by design, not an oversight**: listing available
    tools doesn't execute anything, so it passes straight through to the backend with no
    `PRE_TOOL` check -- matching the existing precedent that discovery and invocation are different

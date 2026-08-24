@@ -90,14 +90,3 @@ class TestAgentGatewayClientMcpRealServer:
     async def test_mcp_url_defaults_to_base_url_slash_mcp(self) -> None:
         client = AgentGatewayClient("http://example.com:9000")
         assert client._mcp_url == "http://example.com:9000/mcp"  # noqa: SLF001
-
-    async def test_health_check_never_reached_by_agent_delegation(
-        self, _running_mcp_server: None
-    ) -> None:
-        """delegate_to_agent() is explicitly not implemented yet (real,
-        named gap, not silently stubbed) -- confirms it raises rather than
-        returning a fake success."""
-        client = AgentGatewayClient(mcp_url=_MCP_URL)
-
-        with pytest.raises(NotImplementedError, match="not implemented"):
-            await client.delegate_to_agent("some_agent", {})

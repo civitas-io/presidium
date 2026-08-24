@@ -13,10 +13,18 @@ import logging
 from typing import Any
 
 import httpx
+from a2a.client import create_client
+from a2a.client.client import ClientConfig
+from a2a.helpers import get_stream_response_text, new_data_message, new_text_message
+from a2a.types import Role, SendMessageRequest, StreamResponse, TaskState
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 from presidium.errors import PresidiumError
+
+_FAILED_TASK_STATES = frozenset(
+    {TaskState.TASK_STATE_FAILED, TaskState.TASK_STATE_REJECTED, TaskState.TASK_STATE_CANCELED}
+)
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +41,24 @@ class AgentGatewayToolError(PresidiumError):
         self.tool_name = tool_name
         self.detail = detail
         super().__init__(f"AgentGateway tool {tool_name!r} failed: {detail}")
+
+
+class AgentGatewayDelegationError(PresidiumError):
+    """Raised when an A2A delegation cannot be completed.
+
+    Two real, distinct causes, both surfaced through this one error type
+    (mirroring AgentGatewayToolError's precedent of one error type per
+    adapter operation, not per cause): the target agent name has no
+    configured AgentGateway route (a configuration problem, caught before
+    any network call), or the target agent itself reported a terminal
+    non-success TaskState (FAILED/REJECTED/CANCELED) for the delegated
+    request.
+    """
+
+    def __init__(self, agent_name_target: str, detail: str) -> None:
+        self.agent_name_target = agent_name_target
+        self.detail = detail
+        super().__init__(f"AgentGateway A2A delegation to {agent_name_target!r} failed: {detail}")
 
 
 class AgentGatewayClient:
@@ -73,6 +99,7 @@ class AgentGatewayClient:
         timeout: float = 30.0,
         headers: dict[str, str] | None = None,
         mcp_url: str | None = None,
+        a2a_routes: dict[str, str] | None = None,
     ) -> None:
         self._base_url = base_url.rstrip("/")
         self._default_model = default_model
@@ -87,6 +114,14 @@ class AgentGatewayClient:
         # derived from base_url by default assumption. /mcp matches the
         # path used throughout AgentGateway's own real docs/examples.
         self._mcp_url = mcp_url.rstrip("/") if mcp_url else f"{self._base_url}/mcp"
+        # A2A routing is per-upstream-agent, not federated behind one shared endpoint the way
+        # MCP tools are -- confirmed directly against AgentGateway's own docs
+        # (a2a-delegation-vendor-research-2026-08.md finding 3). There is no "ask the gateway
+        # for whichever backend is named X" mechanism, so the caller must supply this mapping
+        # explicitly. An empty/omitted map is valid -- it just means no delegation targets are
+        # configured yet, matching this class's existing "fail loud on real gaps" discipline
+        # rather than guessing a URL shape.
+        self._a2a_routes: dict[str, str] = a2a_routes or {}
 
     async def chat(
         self,
@@ -210,18 +245,60 @@ class AgentGatewayClient:
         *,
         agent_name: str | None = None,
     ) -> dict[str, Any]:
-        """A2A agent delegation -- NOT YET IMPLEMENTED.
+        """A2A agent delegation over AgentGateway's A2A reverse-proxy routing.
 
-        Deliberately deferred, per agentgateway-vendor-research-2026-08.md
-        finding 4 and mcp-gateway.md's own "Design decisions, 2026-08-24"
-        §3: AgentGateway's A2A support is a genuinely different wire
-        protocol (a pure HTTP reverse proxy, agent cards, ``message/
-        stream``) from its MCP support, needing a real, new ``a2a-sdk``
-        dependency this class does not have yet. Raising explicitly rather
-        than silently returning a stub result.
+        Real, implemented per a2a-delegation-vendor-research-2026-08.md. Two things that
+        finding forced, both different from call_tool()'s MCP shape:
+
+        1. AgentGateway routes A2A per upstream agent (one route per agent server), not
+           federated behind one shared endpoint the way MCP tools are -- ``agent_name_target``
+           is resolved through ``self._a2a_routes`` (supplied at construction), not derived from
+           ``self._base_url``. Raises AgentGatewayDelegationError immediately, before any network
+           call, if the target isn't configured -- never guesses a URL shape.
+        2. ``arguments`` maps onto A2A's message model, not MCP's flat kwargs: an ``arguments["
+           text"]`` key sends a real text message (the common, conversational-delegation case --
+           and the only shape a text-only agent like the real a2a-samples Hello World reference
+           agent can respond to meaningfully); otherwise the whole dict is sent as a structured
+           data message, using A2A's own first-class support for that.
+
+        Extracts the final result via ``get_stream_response_text()`` (handles the completed-Task
+        shape the real reference agent actually produces, not just a bare Message reply) and
+        raises AgentGatewayDelegationError on a terminal FAILED/REJECTED/CANCELED TaskState,
+        rather than returning a successful-looking empty result.
         """
-        raise NotImplementedError(
-            "AgentGatewayClient.delegate_to_agent() is not implemented yet -- A2A delegation "
-            "needs a real a2a-sdk client, a separate, explicit follow-up. See "
-            "docs/design/agentgateway-vendor-research-2026-08.md finding 4."
+        route = self._a2a_routes.get(agent_name_target)
+        if route is None:
+            raise AgentGatewayDelegationError(
+                agent_name_target,
+                "No AgentGateway A2A route configured for this target agent -- pass it in "
+                "AgentGatewayClient(a2a_routes={...}) at construction time.",
+            )
+
+        text = arguments.get("text")
+        message = (
+            new_text_message(str(text), role=Role.ROLE_USER)
+            if text is not None
+            else new_data_message(arguments, role=Role.ROLE_USER)
         )
+        if agent_name:
+            message.metadata.update({"presidium_agent": agent_name})
+
+        client = await create_client(agent=route, client_config=ClientConfig(streaming=False))
+        try:
+            request = SendMessageRequest(message=message)
+            final: StreamResponse | None = None
+            async for chunk in client.send_message(request):
+                final = chunk
+        finally:
+            await client.close()
+
+        if final is None:
+            raise AgentGatewayDelegationError(agent_name_target, "No response received")
+
+        if final.HasField("task") and final.task.status.state in _FAILED_TASK_STATES:
+            raise AgentGatewayDelegationError(
+                agent_name_target,
+                f"Task ended in state {TaskState.Name(final.task.status.state)}",
+            )
+
+        return {"content": get_stream_response_text(final)}

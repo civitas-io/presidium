@@ -123,6 +123,39 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## `AgentGatewayClient.delegate_to_agent()` (A2A half) -- DONE, 2026-08-24
+
+Completes the `call_tool()`/`delegate_to_agent()` split from the earlier MCP-tool-side work,
+same day. Real vendor research first
+([`docs/design/a2a-delegation-vendor-research-2026-08.md`](docs/design/a2a-delegation-vendor-research-2026-08.md)):
+confirmed the real `a2a-sdk` (`1.1.2`, official `a2aproject/a2a-python`) client API
+(`create_client()`/`send_message()`/`get_stream_response_text()`) and the real, new,
+load-bearing finding that **AgentGateway's A2A proxy routes per-upstream-agent** (one route per
+agent server, agent-card URL rewriting) -- unlike MCP, there's no "resolve by agent name"
+mechanism, which directly shaped the implementation.
+
+- `AgentGatewayClient.__init__` gained `a2a_routes: dict[str, str] | None` -- an explicit
+  target-agent-name -> gateway-route-URL map, supplied at construction.
+- `delegate_to_agent()` maps `arguments["text"]` onto a real A2A text message (the only shape a
+  text-only agent can respond to) or the whole dict onto a real A2A structured data message
+  otherwise. Extracts the result via `get_stream_response_text()` (handles the completed-`Task`
+  response shape the real reference agent actually produces, not just a bare `Message` reply).
+- New `AgentGatewayDelegationError` for an unconfigured target (raised before any network call)
+  or a terminal FAILED/REJECTED/CANCELED `TaskState`.
+- **Verified end to end against a real running A2A server**
+  (`tests/integration/fixtures/hello_a2a_server.py`) -- a faithful port of the real, official
+  `a2a-samples` Hello World reference agent's exact `Task` lifecycle logic, not simplified
+  (needed to genuinely exercise the completed-Task path). 6 new tests
+  (`tests/integration/test_agentgateway_a2a_real_server.py`), not mocked, all passed on the
+  first real run.
+- 469 `presidium` tests pass, 183 `presidium-contrib` tests pass (+6), 96% coverage on the
+  changed client file (two uncovered lines: a pre-existing, unrelated `call_tool()` branch, and
+  a practically-untriggerable defensive-only guard), `ruff`/`ruff format --check`/
+  `mypy --strict` clean. Real fresh-venv install verified both with and without
+  `[agentgateway]`. New `a2a-sdk>=1.1.2` dependency on that extra.
+- `docs/design/mcp-gateway.md` updated (the "MCP tool side DONE, A2A side deferred" framing
+  corrected to reflect both being done); `roadmap.md`'s P1 checkbox flipped.
+
 ## Two P1 quick wins -- DONE, 2026-08-24
 
 **`AGENTS.md` corrected.** It had drifted significantly since 2026-06-16: described
@@ -235,8 +268,6 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 
 ## What's next — the real, current P1 list (see roadmap.md for the full detail on each)
 
-- `AgentGatewayClient.delegate_to_agent()` (the A2A half) — needs a real, new `a2a-sdk`
-  dependency and its own end-to-end test; the MCP-tool half is already done.
 - LiteLLM + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) — designed,
   evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
   reference path).

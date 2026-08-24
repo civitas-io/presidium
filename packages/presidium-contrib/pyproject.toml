@@ -27,7 +27,7 @@ dependencies = [
 [project.optional-dependencies]
 opa = ["httpx>=0.27"]
 openbao = ["hvac>=2.0"]
-agentgateway = ["httpx>=0.27", "mcp>=2.0"]
+agentgateway = ["httpx>=0.27", "mcp>=2.0", "a2a-sdk>=1.1.2"]
 spiffe = ["spiffe>=0.3.1"]
 slack = ["slack-sdk>=3.27", "aiohttp>=3.9"]
 webhook = ["httpx>=0.27"]
