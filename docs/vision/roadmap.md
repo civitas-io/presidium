@@ -184,9 +184,10 @@ real, separate work, not automatically unblocked by this alone.
   `pyproject.toml` yet — cheap doc fix once the adapters above land.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
-- [ ] M5: SDK + CLI, and a real first PyPI release + git tag for `presidium`/`presidium-contrib`
-  (matches `fabrica`'s own real v0.1.0 precedent) — do this once every P0 item above is actually
-  true, not before.
+- [ ] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git tag"
+  half of this item is DONE** (`presidium` v0.2.1, `presidium-contrib` v0.2.0, both live on PyPI,
+  real git tags/GitHub Releases) — the CLI/docs-site/examples half remains, now genuinely
+  unblocked since every P0 item above is true.
 - [ ] M8: Performance Research — correctly sequenced after M7, not before (see M8 below).
 
 ### P2 — deferred by design, commercial, or dependent on things outside our control
@@ -317,9 +318,10 @@ tiers work fine statically in the meantime). See "Implementation Priority" above
 
 ## M5: SDK + CLI
 
-**Priority: P1** — do this once every P0 item in "Implementation Priority" above is actually
-true, not before. Releasing a first real PyPI package with a fictional cryptographic-identity
-claim (see the Ed25519 P0 item) would be worse than not releasing.
+**Priority: P1.** The gating condition (every P0 item true, no fictional cryptographic-identity
+claim) is now genuinely met -- `presidium` v0.2.1/`presidium-contrib` v0.2.0 are real, live PyPI
+releases with a real Ed25519 identity binding and a real, proven mTLS handshake behind them. What
+remains here is the CLI/docs-site/examples work specifically, not the release itself.
 
 **Goal:** One package, one install, complete experience. Trust CLI for operators.
 

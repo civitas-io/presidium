@@ -6,14 +6,26 @@ Runtime + governance as one architecture. Not bolted on, not a sidecar, native.
 
 ---
 
+[![PyPI - presidium](https://img.shields.io/pypi/v/presidium?label=presidium)](https://pypi.org/project/presidium/)
+[![PyPI - presidium-contrib](https://img.shields.io/pypi/v/presidium-contrib?label=presidium-contrib)](https://pypi.org/project/presidium-contrib/)
+[![GitHub release](https://img.shields.io/github/v/release/civitas-io/presidium)](https://github.com/civitas-io/presidium/releases)
+
+```bash
+pip install presidium              # core: policy, registry, trust, credentials
+pip install presidium-contrib      # adapters: OPA, OpenBao, Slack, Postgres, the M7 server, ...
+```
+
 > **Status:** Alpha, real and tested, not just designed. M1–M3 complete. **M7 (Presidium Server)
-> shipped**: `GovernedRuntime`'s governance is now reachable over real REST+mTLS
-> (`presidium-contrib[server]`), satisfying [`civitas-io/fabrica`](https://github.com/civitas-io/fabrica)'s
-> `PresidiumClient.check_grant()` contract exactly — verified end to end through an actual
-> `civitas.gateway.HTTPGateway`. `GovernedModelProvider`/`GovernedToolProvider` are also real,
-> drop-in Civitas `ModelProvider`/`ToolProvider` implementations now
-> (`presidium.providers.civitas_adapters`). 530 tests (377 `presidium` + 153
-> `presidium-contrib`), 95.69%/83% coverage, mypy strict, ruff clean.
+> shipped and its mTLS handshake genuinely proven end to end**: `GovernedRuntime`'s governance is
+> reachable over real REST+mTLS (`presidium-contrib[server]`), satisfying
+> [`civitas-io/fabrica`](https://github.com/civitas-io/fabrica)'s `PresidiumClient.check_grant()`
+> contract exactly -- verified against Fabrica's own real `RestPresidiumClient`, not just an
+> in-repo test. `GovernedModelProvider`/`GovernedToolProvider` are also real, drop-in Civitas
+> `ModelProvider`/`ToolProvider` implementations (`presidium.providers.civitas_adapters`). Trust
+> ceiling propagation and monotonic capability narrowing on delegation/spawn (both real security
+> gaps found via a direct comparison against Microsoft's Agent Governance Toolkit) are shipped.
+> 601 tests (439 `presidium` + 162 `presidium-contrib`), 95.94%/87% coverage, mypy strict, ruff
+> clean.
 
 ## What Is Presidium?
 

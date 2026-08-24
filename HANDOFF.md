@@ -45,9 +45,10 @@ real CycloneDX SBOM assets attached.
    `tool_for()`, matching the real, already-established per-agent-construction precedent
    `civitas.process.AgentProcess.connect_mcp()` uses for `civitas-io/fabrica`'s own `MCPTool`.
 
-**Real, current numbers**: 439 `presidium` tests (95%+ coverage), 158 `presidium-contrib` tests
-(87% coverage), 3x stable, `ruff`/`mypy --strict` clean on both packages' `src/` (the real,
-CI-gated scope).
+**Real, current numbers**: 439 `presidium` tests (95.94% coverage), 162 `presidium-contrib` tests
+(87% coverage, 0 xfails -- the mTLS handshake test's two previously-xfailed scenarios now pass for
+real against the published `civitas>=0.11.3`), 3x stable, `ruff`/`mypy --strict` clean on both
+packages' `src/` (the real, CI-gated scope).
 
 ---
 
@@ -85,8 +86,8 @@ install — never by inspection alone. Worth knowing the *pattern*, not just the
 `presidium.lineage` module, enforced inside `register()`/`add_grant()` on all three registry
 backends (defense in depth, not an opt-in helper). New `AgentRecord.trust_ceiling`/`depth` fields;
 `LinearTrustScore(ceiling=...)`; new `UnresolvableParentError`/`GrantEscalationError`/
-`DelegationDepthExceededError`. 60+ new tests, 439 `presidium` + 158 `presidium-contrib` tests
-pass 3x stable. See `docs/log.md`'s 2026-08-22 "trust ceiling propagation + monotonic capability
+`DelegationDepthExceededError`. 60+ new tests, 439 `presidium` + 162 `presidium-contrib` tests
+pass 3x stable (0 xfails, since the mTLS work below). See `docs/log.md`'s 2026-08-22 "trust ceiling propagation + monotonic capability
 narrowing" entry and `docs/vision/roadmap.md`'s own updated entries for full detail. Commit
 `ddcbe91`.
 
