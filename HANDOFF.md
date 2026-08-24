@@ -8,8 +8,15 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 
 **Cross-project context**: this project is one of three real pillars in the `civitas-io` org
 (Civitas = runtime, Presidium = this repo, governance, Fabrica = context layer). The private
-`civitas-io/context` repo is the cross-repo reasoning substrate — `projects/presidium.md` there
+`civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
+
+**Next real task across the org, agreed with the user, not started yet -- does NOT touch this
+repo directly**: [python-civitas GH #26](https://github.com/civitas-io/python-civitas/issues/26)
+(Streamable HTTP MCP transport) -- a two-repo item between `civitas-io/python-civitas` and
+`civitas-io/fabrica`. See either of those repos' own `HANDOFF.md` for the real detail. This
+repo's own next real item, once that's done, is the `AgentGatewayClient` tool-side gap
+(`list_tools()`/`call_tool()`) -- see "Implementation Priority" -> P1 in `docs/vision/roadmap.md`.
 
 ---
 
