@@ -15,26 +15,27 @@ mirrors everything below in more narrative form, kept in sync after every real c
 
 ```
 pip install presidium          # 0.3.0
-pip install presidium-contrib  # 0.5.0
-pip install "presidium-contrib[agentgateway,spiffe,server]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server + rate limiting + registry CRUD
+pip install presidium-contrib  # 0.6.0
+pip install "presidium-contrib[agentgateway,spiffe,server]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server + rate limiting + registry CRUD + approval list/decide
 ```
 
 Confirmed via a real fresh-venv install against the actual published PyPI packages (not local
 source) -- base imports, the new `providers.gateway`/`identity`/`lineage` modules,
 `[agentgateway]`/`[spiffe]` extras, and `presidium_contrib.server`'s `build_rate_limiter()`/
-`rate_limit=` toggle plus its new registry CRUD gateway agents/`build_registry_gateway_config()`.
+`rate_limit=` toggle, registry CRUD gateway agents, and approval list/decide gateway agents.
 GitHub Releases: [`v0.3.0`](https://github.com/civitas-io/presidium/releases/tag/v0.3.0),
 [`contrib-v0.3.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.3.0),
 [`contrib-v0.4.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.4.0) (rate
 limiting), [`contrib-v0.5.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.5.0)
-(registry CRUD) -- `presidium` core stayed at `v0.3.0` throughout, no changes needed for either
-`presidium-contrib`-only release. All with real CycloneDX SBOM assets. `presidium`
+(registry CRUD), [`contrib-v0.6.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.6.0)
+(approval list/decide) -- `presidium` core stayed at `v0.3.0` throughout, no changes needed for
+any `presidium-contrib`-only release. All with real CycloneDX SBOM assets. `presidium`
 tagged/published first (confirmed live via PyPI's JSON API) before `presidium-contrib` -- its
 own dependency floor is now `presidium>=0.3.0`, a real fix caught before release (it was still
 `>=0.1`, which would have let a fresh `presidium-contrib` install silently resolve an
 incompatible `presidium` missing `providers.gateway`). **Real, expected PyPI propagation delay
-hit twice during these verifications** (a bare/pinned `pip install presidium-contrib` briefly
-still resolved the previous version right after each publish) -- matches this org's own
+hit three times across these verifications** (a bare/pinned `pip install presidium-contrib`
+briefly still resolved the previous version right after each publish) -- matches this org's own
 documented "wait and re-check via the JSON API" precedent, not a real release bug.
 
 **Everything in this file below the CHANGELOG-summarized entries is now genuinely live and
