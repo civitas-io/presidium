@@ -134,6 +134,35 @@ security product's own network-facing API should have the smallest attack surfac
 its real job, not everything that's convenient by default. `/health` is a single, explicit,
 purpose-built route.
 
+### FR-4.5 (DONE, 2026-08-24): Rate limiting / backpressure at the network boundary
+
+**A real concern this doc's own original scope named but didn't build**: a shared network
+service needs protection an in-process library call never does. Resolved by reusing Civitas's
+own first-party G4 rate limiter (`civitas.gateway.ratelimit.RateLimiter`/`rate_limit`
+middleware, sliding-window, per-client-IP) rather than building a second mechanism --
+confirmed directly against its source before wiring it in, not assumed compatible.
+
+- `build_check_grant_gateway_config()` gained a `rate_limit: bool = False` toggle -- **opt-in,
+  not opt-out**, unlike `require_mtls`: rate limiting is an availability/operational control
+  with real tuning implications (the wrong `max_requests` rejects legitimate traffic), not a
+  fail-closed security boundary the way mTLS is.
+- **Wired onto `/v1/check_grant` specifically, never `/health`** -- a real, deliberate design
+  choice found while implementing: global (`GatewayConfig.middleware`) and per-route
+  (`RouteEntry.middleware`) middleware are *concatenated* per request, not deduplicated
+  (confirmed directly against `civitas.gateway.asgi.py`'s own dispatch chain construction) --
+  so mTLS stays in the global list (applies once, uniformly) and rate limiting goes only in
+  `check_grant`'s own per-route list. A liveness probe must never be rejected because real
+  traffic used up the budget.
+- New `build_rate_limiter()` -- a thin, real constructor wrapper around
+  `civitas.gateway.ratelimit.RateLimiter`, exposing `RATE_LIMITER_AGENT_NAME` (`"rate_limiter"`)
+  so a caller doesn't need to discover, by reading Civitas's own source, that the middleware's
+  own lookup hardcodes that exact name (confirmed: an unregistered name raises
+  `MessageRoutingError` immediately -- no silent fail-open, no 30s hang).
+- Verified end to end, not just at config-assembly level: a real running gateway with a real,
+  small budget (3 requests/window) genuinely returns `429` (with `Retry-After`) once exhausted,
+  while `/health` keeps returning `200` throughout -- 4 new tests in
+  `test_presidium_server_real_gateway.py`, including confirming the default is genuinely off.
+
 ### FR-5 (Deferred to a later milestone): Registry, approval, credential endpoints
 
 **FR-5.1**: Registry CRUD + grant management, approval request/list/decide, and credential

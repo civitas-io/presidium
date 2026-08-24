@@ -6,9 +6,17 @@ the repo root for the full design. `presidium_contrib.server` requires the
 """
 
 from presidium_contrib.server.gateway_agent import (
+    RATE_LIMITER_AGENT_NAME,
     HealthCheckAgent,
     PresidiumGatewayAgent,
     build_check_grant_gateway_config,
+    build_rate_limiter,
 )
 
-__all__ = ["HealthCheckAgent", "PresidiumGatewayAgent", "build_check_grant_gateway_config"]
+__all__ = [
+    "RATE_LIMITER_AGENT_NAME",
+    "HealthCheckAgent",
+    "PresidiumGatewayAgent",
+    "build_check_grant_gateway_config",
+    "build_rate_limiter",
+]

@@ -146,6 +146,34 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## Rate limiting at the M7 network boundary -- DONE, 2026-08-24
+
+Reuses Civitas's own first-party G4 rate limiter (`civitas.gateway.ratelimit.RateLimiter`/
+`rate_limit` middleware -- sliding-window, per-client-IP) rather than building a second
+mechanism, confirmed compatible by reading its source directly first.
+
+- **`build_check_grant_gateway_config()` gained `rate_limit: bool = False`** -- opt-in, not
+  opt-out, unlike `require_mtls`: an availability/operational control with real tuning
+  implications, not a fail-closed security boundary.
+- **New `build_rate_limiter()`** -- a thin constructor wrapper around
+  `civitas.gateway.ratelimit.RateLimiter`, exposing `RATE_LIMITER_AGENT_NAME` (`"rate_limiter"`)
+  so a caller doesn't need to discover, by reading Civitas's source, that the middleware's own
+  lookup hardcodes that exact name (confirmed: an unregistered name raises `MessageRoutingError`
+  immediately, not a silent fail-open or a 30s hang).
+- **Real, load-bearing finding caught while implementing, not assumed**: global
+  (`GatewayConfig.middleware`) and per-route (`RouteEntry.middleware`) middleware are
+  *concatenated* per request, not deduplicated (confirmed directly against
+  `civitas.gateway.asgi.py`'s own dispatch chain construction). Rate limiting is wired onto
+  `/v1/check_grant`'s own per-route middleware specifically, never the global list or `/health`
+  -- a liveness probe must never be rejected because real check_grant traffic used up the
+  budget, and putting mTLS in both the global AND per-route list would have silently run it
+  twice.
+- **Verified end to end, not just at config-assembly level**: a real running gateway with a
+  real, small budget (3 requests/window) genuinely returns `429` (with `Retry-After`) once
+  exhausted, while `/health` keeps returning `200` throughout -- 4 new tests in
+  `test_presidium_server_real_gateway.py`, including confirming the default is genuinely off.
+  100% coverage on the changed file, `ruff`/`ruff format --check`/`mypy --strict` clean.
+
 ## `GovernedMcpToolPipeline` -- composes the three MCP governance primitives -- DONE, 2026-08-24
 
 Before this, `PIIDetector`/`PoisoningDetector`/`redact_dict` were real, tested, shipped code with

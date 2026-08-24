@@ -590,8 +590,22 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   research done" entry above (Implementation Priority §P1) for full detail. Cross-deployment
   federation via trust domain bundles remains a real, separate, not-yet-built future direction,
   not silently dropped.
-- [ ] **(P1)** Rate limiting / backpressure at the network boundary — a real concern for a shared
-  network service that doesn't exist for an in-process library call
+- [x] **(P1)** Rate limiting / backpressure at the network boundary — **DONE, 2026-08-24.**
+  Reuses Civitas's own first-party G4 rate limiter (`civitas.gateway.ratelimit.RateLimiter`/
+  `rate_limit` middleware, sliding-window, per-client-IP) rather than building a second
+  mechanism. `build_check_grant_gateway_config()` gained `rate_limit: bool = False` (opt-in, not
+  opt-out -- an availability/tuning control, not a fail-closed security boundary like mTLS). New
+  `build_rate_limiter()` convenience constructor, exposing `RATE_LIMITER_AGENT_NAME` so a caller
+  doesn't need to discover the middleware's own hardcoded `"rate_limiter"` lookup name by reading
+  Civitas's source. **Real, load-bearing finding caught while implementing**: global and
+  per-route middleware are concatenated per request, not deduplicated (confirmed against
+  `civitas.gateway.asgi.py`'s own dispatch chain) -- so rate limiting is wired onto
+  `/v1/check_grant`'s own per-route middleware specifically, never `/health` or the global list
+  (a liveness probe must never be rejected because real traffic used up the budget; putting mTLS
+  in both the global and per-route list would have silently run it twice). Verified end to end:
+  a real running gateway with a small, real budget genuinely returns `429`/`Retry-After` once
+  exhausted, while `/health` keeps returning `200` throughout. 4 new tests, 100% coverage on the
+  changed file, `ruff`/`ruff format --check`/`mypy --strict` clean.
 
 **Deliverable:** A real, self-hostable Presidium server process, reachable over REST+mTLS by
 any authenticated external client (Civitas-based or not) — the concrete prerequisite that

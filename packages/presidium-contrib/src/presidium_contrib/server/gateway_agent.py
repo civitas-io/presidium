@@ -34,6 +34,7 @@ from __future__ import annotations
 from typing import Any
 
 from civitas.gateway import GatewayConfig
+from civitas.gateway.ratelimit import RateLimiter
 from civitas.genserver import GenServer
 
 from presidium.model import PolicyDecision
@@ -44,6 +45,19 @@ from presidium.runtime import GovernedRuntime
 #: points its two routes at.
 DEFAULT_AGENT_NAME = "presidium.gateway"
 DEFAULT_HEALTH_AGENT_NAME = "presidium.gateway.health"
+
+#: civitas.gateway.ratelimit.rate_limit's own middleware function has this
+#: name HARDCODED as a private module constant -- confirmed by reading its
+#: source directly, not assumed. A RateLimiter GenServer wired alongside
+#: PresidiumGatewayAgent/HealthCheckAgent in the same Supervisor MUST be
+#: registered under exactly this name -- confirmed directly against
+#: civitas.bus.MessageBus.request(): an unregistered recipient raises
+#: MessageRoutingError immediately (no silent fail-open, no 30s hang
+#: waiting on a timeout). Kept here, not re-derived at every call site,
+#: since civitas's own constant is
+#: private (`_RATE_LIMITER_NAME`) and not meant to be imported across
+#: package boundaries.
+RATE_LIMITER_AGENT_NAME = "rate_limiter"
 
 
 class PresidiumGatewayAgent(GenServer):
@@ -144,6 +158,7 @@ def build_check_grant_gateway_config(
     require_mtls: bool = True,
     agent_name: str = DEFAULT_AGENT_NAME,
     health_agent_name: str = DEFAULT_HEALTH_AGENT_NAME,
+    rate_limit: bool = False,
 ) -> GatewayConfig:
     """Build the real, minimal GatewayConfig for check_grant() + /health.
 
@@ -163,8 +178,28 @@ def build_check_grant_gateway_config(
     with and registered under the same Supervisor as the returned
     ``HTTPGateway`` — this function only builds the routing config, it does
     not construct or register the agents themselves.
+
+    ``rate_limit=False`` by default -- opt-in, not opt-out -- wires Civitas's own first-party
+    ``civitas.gateway.ratelimit.rate_limit`` middleware onto ``/v1/check_grant`` specifically,
+    NOT ``/health`` -- a liveness probe must never be rejected because real traffic used up the
+    budget. Defaults to disabled, unlike ``require_mtls``: rate limiting is an availability/
+    operational control with real tuning implications (the wrong ``max_requests`` can reject
+    legitimate traffic), not a fail-closed security boundary the way mTLS is -- an opt-in
+    default, not an oversight. **This is a pure boolean toggle, not a place to configure
+    ``max_requests``/``window_seconds`` -- those live on ``build_rate_limiter()`` instead, so
+    there is exactly one place those numbers are ever set, not two.** When enabled, the caller
+    MUST also construct and register a real ``civitas.gateway.ratelimit.RateLimiter`` GenServer,
+    named exactly ``RATE_LIMITER_AGENT_NAME`` ("rate_limiter"), in the same Supervisor as the
+    returned ``HTTPGateway`` -- this function only builds the routing config; see
+    ``build_rate_limiter()`` for a real, ready-made constructor with the name already correct.
     """
+    # Global (config.middleware) and per-route middleware are CONCATENATED per request, not
+    # deduplicated -- confirmed directly against civitas.gateway.asgi.py's own dispatch
+    # (`self._middlewares + route_middlewares`). mTLS goes in the global list (applies
+    # uniformly, exactly once per request); rate limiting goes ONLY in check_grant's own
+    # per-route list -- putting mTLS there too would silently run it twice.
     middleware = ["civitas.gateway.mtls.require_client_cert"] if require_mtls else []
+    check_grant_middleware = ["civitas.gateway.ratelimit.rate_limit"] if rate_limit else []
     return GatewayConfig(
         host=host,
         port=port,
@@ -179,6 +214,7 @@ def build_check_grant_gateway_config(
                 "path": "/v1/check_grant",
                 "agent": agent_name,
                 "mode": "call",
+                "middleware": check_grant_middleware,
             },
             {
                 "method": "GET",
@@ -189,3 +225,26 @@ def build_check_grant_gateway_config(
         ],
         docs_enabled=False,
     )
+
+
+def build_rate_limiter(
+    max_requests: int,
+    window_seconds: float = 60.0,
+    *,
+    name: str = RATE_LIMITER_AGENT_NAME,
+) -> RateLimiter:
+    """Real, ready-made ``civitas.gateway.ratelimit.RateLimiter`` GenServer for
+    ``build_check_grant_gateway_config(rate_limit=True)``.
+
+    A thin constructor wrapper, not a new mechanism -- ``RateLimiter`` is Civitas's own
+    first-party G4 rate limiter (sliding-window, per-client-IP), re-exposed here purely for
+    discoverability: without this, a caller wiring up an M7 server would need to know to reach
+    into ``civitas.gateway.ratelimit`` directly AND separately know the exact, hardcoded
+    ``"rate_limiter"`` name that middleware's own lookup requires -- both are handled here.
+
+    Construct once and add to the same ``Supervisor`` children list as the ``HTTPGateway``/
+    ``PresidiumGatewayAgent``/``HealthCheckAgent`` -- e.g.
+    ``Supervisor("root", children=[gateway, gateway_agent, health_agent,
+    build_rate_limiter(100, 60.0)])``.
+    """
+    return RateLimiter(name, max_requests=max_requests, window_seconds=window_seconds)

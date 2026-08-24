@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [0.4.0] - 2026-08-24 (presidium-contrib only -- presidium core unchanged)
+
+### Added
+
+#### presidium-contrib -- rate limiting / backpressure at the M7 network boundary
+
+Reuses Civitas's own first-party G4 rate limiter (`civitas.gateway.ratelimit.RateLimiter`/
+`rate_limit` middleware -- sliding-window, per-client-IP) rather than building a second
+mechanism.
+
+- **`build_check_grant_gateway_config()` gained `rate_limit: bool = False`** -- opt-in, not
+  opt-out, unlike `require_mtls`: an availability/operational control with real tuning
+  implications (the wrong `max_requests` rejects legitimate traffic), not a fail-closed security
+  boundary the way mTLS is.
+- **New `build_rate_limiter()`** -- a thin, real constructor wrapper around
+  `civitas.gateway.ratelimit.RateLimiter`, exposing `RATE_LIMITER_AGENT_NAME` (`"rate_limiter"`)
+  so a caller doesn't need to discover that the middleware's own lookup hardcodes that exact name
+  by reading Civitas's source directly.
+- Wired onto `/v1/check_grant`'s own per-route middleware specifically, never `/health` or the
+  global middleware list -- global and per-route middleware are concatenated per request, not
+  deduplicated, so putting mTLS in both would silently run it twice; a liveness probe must never
+  be rejected because real traffic used up the check_grant budget.
+- Verified end to end: a real running gateway with a real, small budget genuinely returns `429`
+  (with `Retry-After`) once exhausted, while `/health` keeps returning `200` throughout. 4 new
+  tests, 100% coverage on the changed file.
+
 ## [0.3.0] - 2026-08-24
 
 **Real, current numbers**: 469 `presidium` tests (96.16% coverage), 198 `presidium-contrib` tests

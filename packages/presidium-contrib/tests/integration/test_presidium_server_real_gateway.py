@@ -36,11 +36,14 @@ from presidium_contrib.server import (
     HealthCheckAgent,
     PresidiumGatewayAgent,
     build_check_grant_gateway_config,
+    build_rate_limiter,
 )
 from tests.policy_fixtures import ALLOW_ALL
 
 _PORT = 19443
 _BASE_URL = f"http://127.0.0.1:{_PORT}"
+_RATE_LIMITED_PORT = 19444
+_RATE_LIMITED_BASE_URL = f"http://127.0.0.1:{_RATE_LIMITED_PORT}"
 
 DENY_NO_GRANT = PolicyRule(
     name="enforce-grants",
@@ -170,3 +173,124 @@ class TestPresidiumServerRealGateway:
         async with httpx.AsyncClient() as client:
             resp = await client.get(f"{_BASE_URL}/docs", timeout=5.0)
         assert resp.status_code == 404
+
+
+@pytest.fixture
+async def _running_rate_limited_gateway() -> AsyncGenerator[None]:
+    """A second, separate real gateway (its own port) with rate_limit=True -- proves the real
+    civitas.gateway.ratelimit.RateLimiter GenServer + middleware wiring actually rejects
+    requests with a real 429 over real HTTP, not just that the config assembles without error.
+    """
+    registry = InMemoryRegistry()
+    await registry.register(
+        AgentRecord(
+            agent_id="presidium://acme.com/researcher",
+            name="researcher",
+            public_key="",
+            grants=[Grant(resources=["code_mode"], actions=["invoke"], id="g1")],
+        )
+    )
+    engine = CelPolicyEngine()
+    engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
+    runtime = GovernedRuntime(registry=registry, engine=engine)
+
+    gateway_config = build_check_grant_gateway_config(
+        port=_RATE_LIMITED_PORT, require_mtls=False, rate_limit=True
+    )
+    gateway = HTTPGateway("api", config=gateway_config)
+    gateway_agent = PresidiumGatewayAgent(runtime=runtime)
+    health_agent = HealthCheckAgent()
+    # Real, small budget -- deliberately low so the test can exhaust it in a handful of
+    # requests, not thousands.
+    rate_limiter = build_rate_limiter(max_requests=3, window_seconds=60.0)
+
+    supervisor = Supervisor("root", children=[gateway, gateway_agent, health_agent, rate_limiter])
+    civitas_runtime = Runtime(supervisor=supervisor)
+    await civitas_runtime.start()
+    try:
+        try:
+            await _wait_for_port_open("127.0.0.1", _RATE_LIMITED_PORT)
+        except (OSError, TimeoutError):
+            pass
+        await asyncio.sleep(0.05)
+        yield
+    finally:
+        await civitas_runtime.stop()
+
+
+class TestPresidiumServerRateLimiting:
+    """Real, end-to-end proof that civitas.gateway.ratelimit is correctly wired onto
+    /v1/check_grant and correctly NOT wired onto /health -- both halves matter, not just that
+    a 429 eventually happens somewhere.
+    """
+
+    async def test_check_grant_rejects_over_the_real_budget_with_429(
+        self, _running_rate_limited_gateway: None
+    ) -> None:
+        async with httpx.AsyncClient() as client:
+            statuses = []
+            for _ in range(5):
+                resp = await client.post(
+                    f"{_RATE_LIMITED_BASE_URL}/v1/check_grant",
+                    json={"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+                    timeout=5.0,
+                )
+                statuses.append(resp.status_code)
+
+        # Real budget is 3 -- the first 3 real requests succeed, the rest are real 429s.
+        assert statuses == [200, 200, 200, 429, 429]
+
+    async def test_429_response_includes_retry_after(
+        self, _running_rate_limited_gateway: None
+    ) -> None:
+        async with httpx.AsyncClient() as client:
+            for _ in range(3):
+                await client.post(
+                    f"{_RATE_LIMITED_BASE_URL}/v1/check_grant",
+                    json={"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+                    timeout=5.0,
+                )
+            resp = await client.post(
+                f"{_RATE_LIMITED_BASE_URL}/v1/check_grant",
+                json={"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+                timeout=5.0,
+            )
+
+        assert resp.status_code == 429
+        assert "Retry-After" in resp.headers
+        assert resp.json() == {"error": "rate limit exceeded"}
+
+    async def test_health_is_never_rate_limited(self, _running_rate_limited_gateway: None) -> None:
+        """The real point of putting rate-limit middleware on check_grant's own per-route list,
+        not the global config -- a liveness probe must keep working even after check_grant's
+        real budget is exhausted."""
+        async with httpx.AsyncClient() as client:
+            # Exhaust check_grant's real budget first.
+            for _ in range(5):
+                await client.post(
+                    f"{_RATE_LIMITED_BASE_URL}/v1/check_grant",
+                    json={"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+                    timeout=5.0,
+                )
+
+            health_statuses = []
+            for _ in range(5):
+                resp = await client.get(f"{_RATE_LIMITED_BASE_URL}/health", timeout=5.0)
+                health_statuses.append(resp.status_code)
+
+        assert health_statuses == [200, 200, 200, 200, 200]
+
+    async def test_rate_limit_is_off_by_default(self, _running_gateway: None) -> None:
+        """The pre-existing, unrelated _running_gateway fixture (rate_limit not passed at all,
+        defaulting to False) -- confirms the default really is off, not silently on."""
+        async with httpx.AsyncClient() as client:
+            statuses = []
+            for _ in range(10):
+                resp = await client.post(
+                    f"{_BASE_URL}/v1/check_grant",
+                    json={"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+                    timeout=5.0,
+                )
+                statuses.append(resp.status_code)
+
+        assert statuses == [200] * 10
