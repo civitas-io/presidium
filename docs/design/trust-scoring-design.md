@@ -162,7 +162,7 @@ class EventContext:
 class DecayConfig:
     function: Literal["linear", "exponential"] = "linear"
     rate: float = 0.01           # linear: per hour; exponential: half-life in hours
-    
+
 @dataclass(frozen=True)
 class WindowConfig:
     max_events: int | None = 100
@@ -185,33 +185,33 @@ class ScoringConfig:
 
 class WindowedTrustScorer:
     """Stateful trust scorer. Buffer + cold-start + delegates math to scoring.functions."""
-    
+
     def __init__(self, config: TrustConfig, cold_start: ColdStartStrategy, *, clock=None):
         self._events: list[Event] = []
         self._config = config
         self._cold_start = cold_start
         self._clock = clock or (lambda: datetime.now(UTC))
-    
+
     def record_event(self, event: TrustEvent, *, context: EventContext | None = None) -> None:
         self._events.append(_to_scoring_event(event, self._clock(), context))
-    
+
     @property
     def value(self) -> float:
         now = self._clock()
         windowed = [e for e in self._events if _in_window(e, now, self._config.window)]
         n = len(windowed)
-        
+
         if n == 0:
             return self._cold_start.initial_value()
-        
+
         computed = windowed_score(windowed, self._config.scoring, self._config.window, now)
-        
+
         if n < self._cold_start.min_events_for_normal:
             blend = n / self._cold_start.min_events_for_normal
             return clamp((1 - blend) * self._cold_start.initial_value() + blend * computed)
-        
+
         return clamp(computed)
-    
+
     @property
     def tier(self) -> TrustTier:
         return tier_for_value(self.value)

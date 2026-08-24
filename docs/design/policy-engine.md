@@ -175,10 +175,10 @@ class PolicyEngine(Protocol):
 ```python
 class CelPolicyEngine:
     """Default PolicyEngine using cel-python for in-process evaluation.
-    
+
     Compile-once, evaluate-many: CEL expressions are compiled at load time.
     Evaluation is 1-3ms per expression in cel-python.
-    
+
     Fail-closed: if a CEL expression errors during evaluation, the result
     is DENY. This is a non-configurable security invariant.
     """

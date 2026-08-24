@@ -91,7 +91,7 @@ def from_config_dict(
     agent_classes: dict[str, type[AgentProcess]] | None = None,
 ) -> Runtime:
     """Build a Runtime from a pre-parsed config dict.
-    
+
     Same as from_config() but accepts a dict instead of a file path.
     Useful when the caller has already parsed and modified the YAML
     (e.g., Presidium extracting the presidium: block before passing
@@ -131,15 +131,15 @@ from civitas.secrets.substitution import substitute_vars
 
 class GovernedRuntime:
     """Runtime with Presidium governance.
-    
+
     Wraps a Civitas Runtime, adding policy enforcement, agent registry,
     credential governance, approval service, and audit enrichment.
-    
+
     Usage:
         # From YAML (single file)
         runtime = GovernedRuntime.from_config("topology.yaml")
         await runtime.start()
-        
+
         # Programmatic
         runtime = GovernedRuntime(
             civitas_runtime=Runtime(supervisor=...),
@@ -148,7 +148,7 @@ class GovernedRuntime:
         )
         await runtime.start()
     """
-    
+
     def __init__(
         self,
         civitas_runtime: Runtime,
@@ -164,7 +164,7 @@ class GovernedRuntime:
         self._credential_provider = credential_provider or EnvCredentialProvider()
         self._approval_service = approval_service or CallbackApprovalProvider()
         self._audit_enricher = audit_enricher
-    
+
     @classmethod
     def from_config(
         cls,
@@ -172,26 +172,26 @@ class GovernedRuntime:
         agent_classes: dict[str, type] | None = None,
     ) -> GovernedRuntime:
         """Build a GovernedRuntime from a topology YAML file.
-        
+
         Reads the full YAML, extracts the presidium: block, passes
         the rest to Civitas, then builds governance components.
         """
         full_config = yaml.safe_load(Path(path).read_text())
         full_config = substitute_vars(full_config)
-        
+
         # Extract presidium config (Civitas would ignore it anyway)
         presidium_config = full_config.pop("presidium", {})
-        
+
         # Build Civitas runtime from remaining config
         civitas_runtime = Runtime.from_config_dict(full_config, agent_classes)
-        
+
         # Build governance components
         registry = _build_registry(presidium_config.get("registry", {}))
         policy_engine = _build_policy_engine(presidium_config.get("policies", []))
         credential_provider = _build_credential_provider(presidium_config.get("credentials", {}))
         approval_service = _build_approval_service(presidium_config.get("approval", {}))
         audit_enricher = _build_audit_enricher(presidium_config.get("audit", {}), registry)
-        
+
         governed = cls(
             civitas_runtime=civitas_runtime,
             registry=registry,
@@ -200,16 +200,16 @@ class GovernedRuntime:
             approval_service=approval_service,
             audit_enricher=audit_enricher,
         )
-        
+
         # Register per-agent governance data
         agents_config = presidium_config.get("agents", {})
         governed._pending_agent_config = agents_config
-        
+
         return governed
-    
+
     async def start(self) -> None:
         """Start the governed runtime.
-        
+
         1. Register per-agent governance data (owner, grants)
         2. Wrap Civitas components with governance layers
         3. Delegate to Civitas Runtime.start()
@@ -223,23 +223,23 @@ class GovernedRuntime:
                 grants=[Grant(**g) for g in agent_cfg.get("grants", [])],
             )
             await self._registry.register(record)
-        
+
         # Wrap Civitas components
         self._wrap_components()
-        
+
         # Start Civitas runtime
         await self._runtime.start()
-    
+
     async def stop(self) -> None:
         await self._runtime.stop()
-    
+
     # Delegate all Runtime methods
     async def ask(self, agent_name, payload, **kwargs):
         return await self._runtime.ask(agent_name, payload, **kwargs)
-    
+
     async def send(self, agent_name, payload, **kwargs):
         return await self._runtime.send(agent_name, payload, **kwargs)
-    
+
     def get_agent(self, name):
         return self._runtime.get_agent(name)
 ```

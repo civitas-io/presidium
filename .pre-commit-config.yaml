@@ -13,14 +13,14 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.17
+    rev: v0.16.4
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
 
@@ -28,7 +28,12 @@ repos:
     hooks:
       - id: mypy-presidium
         name: mypy (presidium)
-        entry: bash -c 'cd packages/presidium && uv run mypy src/presidium/'
+        # --frozen: use the committed uv.lock as-is -- confirmed real, needed
+        # (2026-08-24): without it, a plain `uv run` can trigger a real
+        # lockfile re-resolution as a side effect of running the hook, which
+        # pre-commit then reports as a false "Failed" (files were modified),
+        # even when mypy itself passes cleanly.
+        entry: bash -c 'cd packages/presidium && uv run --frozen mypy src/presidium/'
         language: system
         pass_filenames: false
         files: ^packages/presidium/src/
@@ -36,7 +41,7 @@ repos:
 
       - id: mypy-contrib
         name: mypy (presidium-contrib)
-        entry: bash -c 'cd packages/presidium-contrib && uv run mypy src/presidium_contrib/'
+        entry: bash -c 'cd packages/presidium-contrib && uv run --frozen mypy src/presidium_contrib/'
         language: system
         pass_filenames: false
         files: ^packages/presidium-contrib/src/
@@ -44,7 +49,7 @@ repos:
 
       - id: tests-presidium
         name: tests (presidium)
-        entry: uv run --package presidium pytest packages/presidium/tests/ -x -q --no-header --tb=line --no-cov
+        entry: uv run --frozen --package presidium pytest packages/presidium/tests/ -x -q --no-header --tb=line --no-cov
         language: system
         pass_filenames: false
         files: ^packages/presidium/
@@ -53,7 +58,7 @@ repos:
 
       - id: tests-contrib
         name: tests (presidium-contrib)
-        entry: bash -c 'cd packages/presidium-contrib && uv run pytest tests/ -x -q --no-header --tb=line --no-cov'
+        entry: bash -c 'cd packages/presidium-contrib && uv run --frozen pytest tests/ -x -q --no-header --tb=line --no-cov'
         language: system
         pass_filenames: false
         files: ^packages/presidium-contrib/

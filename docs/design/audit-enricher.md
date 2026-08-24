@@ -67,19 +67,19 @@ from civitas.audit.types import AuditEvent, AuditSink
 
 class AuditEnricher(Protocol):
     """Protocol for governance-enriched audit event processing.
-    
+
     Wraps a downstream AuditSink, enriches events with governance
     context, and forwards them.
     """
-    
+
     async def emit(self, event: AuditEvent) -> None:
         """Enrich and forward an audit event."""
         ...
-    
+
     async def flush(self) -> None:
         """Flush the downstream sink."""
         ...
-    
+
     async def close(self) -> None:
         """Close the downstream sink."""
         ...
@@ -143,11 +143,11 @@ AuditEvent(
 ```python
 class InProcessAuditEnricher:
     """Default AuditEnricher. Enriches events with governance context in-process.
-    
+
     Registry lookups are cached with a configurable TTL to avoid
     per-event I/O on high-throughput buses.
     """
-    
+
     def __init__(
         self,
         downstream: AuditSink,
@@ -158,15 +158,15 @@ class InProcessAuditEnricher:
         self._registry = registry
         self._cache_ttl = cache_ttl
         self._cache: dict[str, tuple[dict, float]] = {}  # agent_name -> (governance_data, timestamp)
-    
+
     async def emit(self, event: AuditEvent) -> None:
         agent_name = event.get("agent", "")
-        
+
         # Guard: don't re-enrich events that already have governance context
         if "governance" in event.get("details", {}):
             await self._downstream.emit(event)
             return
-        
+
         if agent_name:
             try:
                 governance = await self._get_governance_context(agent_name)
@@ -182,20 +182,20 @@ class InProcessAuditEnricher:
             except Exception:
                 # Fail-open: enrichment error → forward original event
                 logger.warning("Audit enrichment failed for agent '%s'", agent_name, exc_info=True)
-        
+
         await self._downstream.emit(event)
-    
+
     async def _get_governance_context(self, agent_name: str) -> dict:
         # Check cache
         cached = self._cache.get(agent_name)
         if cached and (time.time() - cached[1]) < self._cache_ttl:
             return cached[0]
-        
+
         # Lookup
         record = await self._registry.lookup(agent_name)
         if record is None:
             return {"agent_id": None, "trust_value": None, "trust_tier": None, "owner": None}
-        
+
         governance = {
             "agent_id": record.agent_id,
             "trust_value": record.trust_value,
@@ -204,10 +204,10 @@ class InProcessAuditEnricher:
         }
         self._cache[agent_name] = (governance, time.time())
         return governance
-    
+
     async def flush(self) -> None:
         await self._downstream.flush()
-    
+
     async def close(self) -> None:
         await self._downstream.close()
 ```

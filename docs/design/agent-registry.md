@@ -57,7 +57,7 @@ class TrustTier(Enum):
 @dataclass
 class Grant:
     """A structured authorization grant held by an agent.
-    
+
     Grants are data -- the CEL policy engine evaluates them.
     Grants are NOT policies -- policies decide whether to honor grants.
     """
@@ -75,25 +75,25 @@ class AgentRecord:
     agent_id: str                     # SPIFFE-compatible URI: presidium://{trust_domain}/{path}
     name: str                         # Short name for Civitas message routing
     public_key: str                   # Ed25519 public key (base64) — cryptographic identity binding
-    
+
     # Governance
     grants: list[Grant] = field(default_factory=list)
     trust_value: float = 0.5          # 0.0 - 1.0
     trust_tier: TrustTier = TrustTier.STANDARD
     status: AgentStatus = AgentStatus.REGISTERED
-    
+
     # Accountability
     owner: str | None = None          # Human sponsor email/ID (policy-enforced, not schema-enforced)
-    
+
     # Lineage (dynamic spawning)
     parent_agent_id: str | None = None  # Parent agent if dynamically spawned
-    
+
     # Metadata
     description: str | None = None
     agent_version: str | None = None  # App-level semver, optional
     capabilities: list[str] = field(default_factory=list)  # Civitas routing tags
     metadata: dict[str, Any] = field(default_factory=dict)
-    
+
     # Lifecycle
     revision: int = 0                 # Monotonic, incremented on every mutation
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -166,14 +166,14 @@ class TrustScorer(Protocol):
 
 class LinearTrustScore:
     """Default M2 implementation. Linear decay, 3 tiers.
-    
+
     - SUCCESS: +0.02 (capped at 1.0)
     - FAILURE: -0.05
     - POLICY_VIOLATION: -0.10
     - HUMAN_OVERRIDE: set to specified value
     - Decay: -0.01 per hour with no positive signals
     """
-    
+
     TIER_THRESHOLDS = {
         TrustTier.TRUSTED: 0.7,
         TrustTier.STANDARD: 0.3,
@@ -238,38 +238,38 @@ This filtering is the PolicyEngine's responsibility, not the AgentRegistry's. Al
 ```python
 class AgentRegistry(Protocol):
     """Protocol for the agent identity store.
-    
+
     Snapshot semantics: lookup() returns an immutable snapshot of the
     AgentRecord at the time of the call. If grants are modified after
     lookup but before policy evaluation completes, the evaluation uses
     the snapshot — not the mutated state. The snapshot includes the
     revision number, enabling optimistic concurrency checks if needed.
-    
+
     In library mode (single process), this is naturally satisfied because
     Python's GIL prevents concurrent mutation during a synchronous lookup.
     In service mode (M3+), implementations MUST return a copy, not a
     reference to mutable internal state.
     """
-    
+
     async def register(self, record: AgentRecord) -> AgentRecord: ...
     async def deregister(self, name: str) -> None: ...
     async def lookup(self, name: str) -> AgentRecord | None: ...
     async def lookup_by_id(self, agent_id: str) -> AgentRecord | None: ...
-    async def list_agents(self, 
+    async def list_agents(self,
         status: AgentStatus | None = None,
         trust_tier: TrustTier | None = None,
         owner: str | None = None,
     ) -> list[AgentRecord]: ...
-    
+
     # Grant management
     async def add_grant(self, name: str, grant: Grant) -> AgentRecord: ...
     async def remove_grant(self, name: str, grant_id: str) -> AgentRecord: ...
     async def has_grant(self, name: str, resource: str, action: str) -> bool: ...
-    
+
     # Trust management
     async def record_trust_event(self, name: str, event: TrustEvent) -> AgentRecord: ...
     async def set_trust(self, name: str, value: float, reason: str) -> AgentRecord: ...
-    
+
     # State management
     async def update_status(self, name: str, status: AgentStatus) -> AgentRecord: ...
 
@@ -295,11 +295,11 @@ When `DynamicSupervisor` receives a spawn request, the registry enforces:
 async def on_spawn_requested(self, agent_class, name, config):
     parent_record = await self.registry.lookup(self.spawner_name)
     requested_grants = config.get("grants", [])
-    
+
     for grant in requested_grants:
         if not _is_subset(grant, parent_record.grants):
             raise SpawnError(f"Grant {grant} exceeds parent's grants")
-    
+
     return True  # approved
 ```
 

@@ -79,11 +79,11 @@ class ApprovalRequest:
     approvers: list[str]                  # Who can approve (from PolicyRule.approvers)
     context: dict[str, Any]               # Additional context for the approver
     policy_name: str                      # Which policy triggered REQUIRE_APPROVAL
-    
+
     status: ApprovalStatus = ApprovalStatus.PENDING
     decision_by: str | None = None        # Approver identity
     decision_reason: str | None = None    # Approver's explanation
-    
+
     created_at: datetime = field(default_factory=lambda: datetime.now())
     decided_at: datetime | None = None
     timeout_seconds: float = 300.0        # Default 5 minutes
@@ -126,20 +126,20 @@ context = {
 ```python
 class ApprovalService(Protocol):
     """Protocol for human-in-the-loop approval."""
-    
+
     async def request_approval(self, request: ApprovalRequest) -> ApprovalDecision:
         """Submit an approval request and await the decision.
-        
+
         Blocks (async) until an approver responds or the timeout expires.
         On timeout, returns an auto-denied decision.
         Emits audit events for request creation and decision.
         """
         ...
-    
+
     async def list_pending(self) -> list[ApprovalRequest]:
         """Return all pending approval requests."""
         ...
-    
+
     async def decide(self, request_id: str, decision: ApprovalDecision) -> None:
         """Submit a decision for a pending request (called by approver backend)."""
         ...
@@ -152,16 +152,16 @@ class ApprovalService(Protocol):
 ```python
 class CallbackApprovalProvider:
     """Default ApprovalService for dev and test.
-    
+
     Approval decisions are submitted via a programmatic callback.
     No external infrastructure required.
-    
+
     Usage in tests:
         provider = CallbackApprovalProvider()
-        
+
         # Auto-approve everything (for happy-path tests)
         provider.auto_approve = True
-        
+
         # Or use manual callback
         async def my_approver(request):
             return ApprovalDecision(
@@ -171,14 +171,14 @@ class CallbackApprovalProvider:
             )
         provider.callback = my_approver
     """
-    
+
     def __init__(self):
         self.auto_approve: bool = False
         self.auto_deny: bool = False
         self.callback: Callable | None = None
         self._pending: dict[str, ApprovalRequest] = {}
         self._decisions: dict[str, asyncio.Future] = {}
-    
+
     async def request_approval(self, request: ApprovalRequest) -> ApprovalDecision:
         if self.auto_approve:
             return ApprovalDecision(
@@ -194,12 +194,12 @@ class CallbackApprovalProvider:
             )
         if self.callback:
             return await self.callback(request)
-        
+
         # Manual mode: store pending, wait for decide() call
         self._pending[request.request_id] = request
         future = asyncio.get_event_loop().create_future()
         self._decisions[request.request_id] = future
-        
+
         try:
             return await asyncio.wait_for(future, timeout=request.timeout_seconds)
         except asyncio.TimeoutError:
@@ -209,7 +209,7 @@ class CallbackApprovalProvider:
                 decided_by="timeout",
                 reason="Approval request timed out",
             )
-    
+
     async def decide(self, request_id: str, decision: ApprovalDecision) -> None:
         future = self._decisions.get(request_id)
         if future and not future.done():
@@ -225,11 +225,11 @@ class CallbackApprovalProvider:
 ```python
 class SlackApprovalProvider:
     """Routes approval requests to a Slack channel with approve/deny buttons.
-    
+
     Config:
         slack_token: Bot token with chat:write + interactive permission
         channel_id: Channel to post approval requests
-        
+
     Flow:
         1. Post message to channel with agent name, action, reason, context
         2. Message includes "Approve" and "Deny" buttons (Slack Block Kit)
@@ -243,7 +243,7 @@ class SlackApprovalProvider:
 ```python
 class TemporalApprovalProvider:
     """Creates a Temporal human task workflow for approval.
-    
+
     Flow:
         1. Start a Temporal workflow with the approval request
         2. Workflow creates a human task (Signal-based)
@@ -258,11 +258,11 @@ class TemporalApprovalProvider:
 ```python
 class WebhookApprovalProvider:
     """POSTs approval requests to a webhook URL and listens for callbacks.
-    
+
     Config:
         webhook_url: URL to POST approval requests to
         callback_path: HTTP path to listen for approval decisions
-        
+
     Flow:
         1. POST request details to webhook_url
         2. External system processes the request
@@ -281,7 +281,7 @@ How the GovernedToolProvider uses the ApprovalService:
 class GovernedToolProvider:
     async def execute(self, tool_name: str, agent_name: str, **kwargs):
         # ... policy evaluation ...
-        
+
         if result.decision == PolicyDecision.REQUIRE_APPROVAL:
             request = ApprovalRequest(
                 request_id=str(uuid.uuid4()),
@@ -299,17 +299,17 @@ class GovernedToolProvider:
                 policy_name=result.policy_name,
                 timeout_seconds=policy_timeout,
             )
-            
+
             decision = await self._approval_service.request_approval(request)
-            
+
             if not decision.approved:
                 await self._audit_denied(request, decision)
                 raise PolicyDeniedError(
                     f"Approval denied by {decision.decided_by}: {decision.reason}"
                 )
-            
+
             await self._audit_approved(request, decision)
-        
+
         # Proceed with tool call
         return await self._provider.execute(tool_name, **kwargs)
 ```
@@ -360,11 +360,11 @@ presidium:
   approval:
     backend: callback           # "callback" | "slack" | "temporal" | "webhook"
     default_timeout: 300        # seconds (5 minutes)
-    
+
     # Slack config (presidium-contrib[slack])
     # slack_token: ${SLACK_BOT_TOKEN}
     # slack_channel: C01234567
-    
+
     # Webhook config (presidium-contrib[webhook])
     # webhook_url: https://approvals.internal/api/v1/requests
     # callback_path: /presidium/approval-callback
