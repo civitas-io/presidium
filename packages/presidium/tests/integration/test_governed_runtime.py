@@ -18,6 +18,7 @@ from presidium.model import (
 from presidium.policy.cel import CelPolicyEngine
 from presidium.registry.memory import InMemoryRegistry
 from presidium.runtime import GovernedRuntime
+from tests.policy_fixtures import ALLOW_ALL
 
 ENFORCE_GRANTS = PolicyRule(
     name="enforce-grants",
@@ -49,7 +50,7 @@ async def _make_runtime_with_agent(
     grants: list[Grant] | None = None,
 ) -> GovernedRuntime:
     engine = CelPolicyEngine()
-    engine.load_policies([ENFORCE_GRANTS, TRUST_GATE_WRITES])
+    engine.load_policies([ENFORCE_GRANTS, TRUST_GATE_WRITES, ALLOW_ALL])
 
     registry = InMemoryRegistry()
     await registry.register(

@@ -162,34 +162,57 @@ pass 3x stable (0 xfails, since the mTLS work below). See `docs/log.md`'s 2026-0
 narrowing" entry and `docs/vision/roadmap.md`'s own updated entries for full detail. Commit
 `ddcbe91`.
 
-## Real, decided-but-not-implemented — don't assume these are done
+## Default-deny for `CelPolicyEngine` — DONE, 2026-08-24
 
-- **Default-deny for `CelPolicyEngine`'s no-rule-matched case.** Direction is explicitly decided
-  (default DENY over ALLOW, for reduced blast radius, even at real UX cost) — but a real
-  implementation attempt broke 24 existing tests and was reverted the same session. Every existing
-  example/test policy assumes implicit allow-by-default; none declare an explicit terminal ALLOW
-  rule. This needs its own dedicated design pass (see `docs/vision/roadmap.md`'s own entry for the
-  exact scoped follow-up list) before touching it again.
+**The direction named above as "decided, not implemented" is now real, shipped code.** When no
+policy rule matches for a stage, `CelPolicyEngine.evaluate()` now returns DENY/HARD by default,
+not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test blast radius.
+
+- **Two real, explicit, loud opt-in knobs on `CelPolicyEngine.__init__`** (and forwarded through
+  `presidium_contrib.service.policy.PolicyEvaluatorServer`), matching this codebase's own
+  `allow_ungoverned`/`allow_unsandboxed` naming precedent, not a neutral, equally-weighted enum:
+  `allow_unmatched_requests: bool = False` (restores the old always-ALLOW behavior outright) and
+  `unmatched_enforcement: EnforcementMode = EnforcementMode.HARD` (lets a migrating deployment run
+  the new DENY decision in `ADVISORY` mode first -- logged, not blocking -- before committing).
+- **The real migration this forced, done properly, not shortcut**: every existing example/test
+  policy set across `test_cel.py`, `test_governed_tool.py`, `test_governed_model.py`,
+  `test_civitas_adapters.py`, `test_gateway_provider.py`, `test_governed_runtime.py`,
+  `test_service_policy.py`, `test_gateway_agent.py`, `test_presidium_server_real_gateway.py`, and
+  `test_service_mode_real_runtime.py` given an explicit terminal ALLOW rule (a new, shared
+  `ALLOW_ALL` fixture in each package's own `tests/policy_fixtures.py` -- not shared cross-package,
+  no existing precedent for that) -- the real, intended production pattern, not a test-only
+  workaround. A few tests genuinely orthogonal to policy semantics (GenServer coexistence) use the
+  `allow_unmatched_requests=True` shortcut instead, with a comment explaining why that's the right
+  call there specifically.
+- **`docs/design/policy-engine.md`'s own P5 decision corrected in place** (struck through, not
+  deleted) with the real, empirical reasoning that overturned it: every existing policy set relied
+  on the engine's own implicit ALLOW as an unwritten "cleared enforce-grants, no more objections ->
+  allow" step -- the exact default-allow anti-pattern the original design was trying to avoid one
+  level removed. `docs/guides/getting-started.md`'s own tutorial (both the programmatic and YAML
+  examples) updated with a real, working explicit-ALLOW rule and a new "Default-deny" callout
+  section -- this doc's own example would otherwise have silently denied everything now.
+- 466 `presidium` tests pass (+8 net: several renamed/split to genuinely test the new behavior
+  rather than just patched to keep passing), 175 `presidium-contrib` tests pass (+2), 100%
+  coverage on both changed engine files, `ruff`/`mypy --strict` clean.
 
 ---
 
 ## What's next — the real, current P1 list (see roadmap.md for the full detail on each)
 
-- `AgentGatewayClient` missing `list_tools()`/`call_tool()` (MCP/A2A side; LLM side works)
-- `presidium-contrib[spiffe]` (real SPIRE-issued X.509 SVIDs) — a separate, later upgrade to
-  *agent-level* identity; not required for M7's own mTLS, which already works via a real,
-  independent private CA
+- `AgentGatewayClient.delegate_to_agent()` (the A2A half) — needs a real, new `a2a-sdk`
+  dependency and its own end-to-end test; the MCP-tool half is already done.
 - LiteLLM + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) — designed,
-  evidence-based comparison exists, not built
-- The two AGT-comparison security gaps above (trust ceiling, capability narrowing)
-- Composing the three MCP governance primitives (PII/poisoning/redaction) into one real pipeline
+  evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
+  reference path).
+- Composing the three MCP governance primitives (PII/poisoning/redaction) into one real pipeline.
+- Fix `AGENTS.md` documenting extras (`litellm`, `kong`, etc.) that don't exist in code yet.
 - `scope` (from `check_grant`'s own contract) isn't yet threaded through to `ActionRequest.
-  parameters` — CEL policies can't reference it from that path yet
-- M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples), M6 (Cloud, commercial) — all
-  designed, none built
+  parameters` — CEL policies can't reference it from that path yet.
+- M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples — now genuinely unblocked given
+  real releases exist), M6 (Cloud, commercial) — all designed, none built.
 - M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly
   sequenced *after* M7 ships (which it now has), not before; real baseline numbers already
-  measured (~88μs/~11,400 evals/sec per core, pure Python, GIL-bound — see roadmap.md)
+  measured (~88μs/~11,400 evals/sec per core, pure Python, GIL-bound — see roadmap.md).
 
 ## Working conventions established this session, worth continuing
 

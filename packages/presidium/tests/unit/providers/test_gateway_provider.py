@@ -28,6 +28,7 @@ from presidium.providers.gateway import GatewayModelProvider, GatewayToolProvide
 from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry.memory import InMemoryRegistry
+from tests.policy_fixtures import ALLOW_ALL
 
 
 class _FakeLLMGatewayBackend:
@@ -135,7 +136,7 @@ DENY_NO_GRANT_LLM = PolicyRule(
 
 class TestGatewayModelProvider:
     async def test_allowed_call_delegates_to_backend(self) -> None:
-        reg, engine = await _setup()
+        reg, engine = await _setup(ALLOW_ALL)
         backend = _FakeLLMGatewayBackend()
         model_provider = GovernedModelProvider(engine, reg)
         gateway = GatewayModelProvider(
@@ -162,6 +163,7 @@ class TestGatewayModelProvider:
 
     async def test_post_check_deny_raises(self) -> None:
         reg, engine = await _setup(
+            ALLOW_ALL,
             PolicyRule(
                 name="block-large-response",
                 stage=EvaluationStage.POST_LLM,
@@ -169,7 +171,7 @@ class TestGatewayModelProvider:
                 decision=PolicyDecision.DENY,
                 reason="Response too large",
                 priority=90,
-            )
+            ),
         )
         backend = _FakeLLMGatewayBackend(response={"content": "x" * 5000, "tokens_out": 5000})
         model_provider = GovernedModelProvider(engine, reg)
@@ -222,7 +224,7 @@ class TestGatewayToolProvider:
         assert tools == [{"name": "database"}, {"name": "web_search"}]
 
     async def test_call_tool_allowed_delegates_to_backend(self) -> None:
-        reg, engine = await _setup(DENY_NO_GRANT_TOOL)
+        reg, engine = await _setup(DENY_NO_GRANT_TOOL, ALLOW_ALL)
         backend = _FakeToolsGatewayBackend()
         tool_provider = GovernedToolProvider(engine, reg)
         gateway = GatewayToolProvider(
@@ -252,7 +254,7 @@ class TestGatewayToolProvider:
         against agent:-namespaced grants, not tool:-namespaced ones --
         proving mcp-gateway.md decision 1's separate grant namespace is
         actually enforced, not just documented."""
-        reg, engine = await _setup(DENY_NO_GRANT_TOOL)
+        reg, engine = await _setup(DENY_NO_GRANT_TOOL, ALLOW_ALL)
         backend = _FakeToolsGatewayBackend()
         tool_provider = GovernedToolProvider(engine, reg)
         gateway = GatewayToolProvider(
@@ -282,6 +284,7 @@ class TestGatewayToolProvider:
     async def test_call_tool_post_check_deny_raises(self) -> None:
         reg, engine = await _setup(
             DENY_NO_GRANT_TOOL,
+            ALLOW_ALL,
             PolicyRule(
                 name="block-error-results",
                 stage=EvaluationStage.POST_TOOL,
@@ -307,6 +310,7 @@ class TestGatewayToolProvider:
         a policy keyed on a bare "error" in result must still fire."""
         reg, engine = await _setup(
             DENY_NO_GRANT_TOOL,
+            ALLOW_ALL,
             PolicyRule(
                 name="block-error-results",
                 stage=EvaluationStage.POST_TOOL,

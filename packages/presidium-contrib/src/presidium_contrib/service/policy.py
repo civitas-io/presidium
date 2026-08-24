@@ -11,6 +11,7 @@ from presidium.model import (
     ActionRequest,
     AgentRecord,
     AgentStatus,
+    EnforcementMode,
     EvaluationContext,
     EvaluationStage,
     Grant,
@@ -26,15 +27,27 @@ class PolicyEvaluatorServer(GenServer):
 
     Call protocol:
         {"action": "evaluate", "stage": "pre_tool", "agent": {...}, "request": {...}}
-        → {"decision": "allow", "policy_name": null, "reason": "All policies passed"}
+        → {"decision": "deny", "policy_name": null, "reason": "No policy rule matched this
+           request (fail-closed default -- no implicit allow)"} when no loaded rule matches
+           (real default-deny, 2026-08-24 -- see docs/design/policy-engine.md P5)
 
         {"action": "load_policies", "rules": [...]}
         → {"loaded": N}
     """
 
-    def __init__(self, name: str = "presidium.policy", **kwargs: Any) -> None:
+    def __init__(
+        self,
+        name: str = "presidium.policy",
+        *,
+        allow_unmatched_requests: bool = False,
+        unmatched_enforcement: EnforcementMode = EnforcementMode.HARD,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(name, **kwargs)
-        self._engine = CelPolicyEngine()
+        self._engine = CelPolicyEngine(
+            allow_unmatched_requests=allow_unmatched_requests,
+            unmatched_enforcement=unmatched_enforcement,
+        )
 
     async def init(self) -> None:
         pass

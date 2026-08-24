@@ -200,8 +200,12 @@ class CelPolicyEngine:
         # 4. Evaluate grant conditions (grants with false conditions excluded)
         # 5. Evaluate each rule's expression in priority order
         # 6. First matching expression → return its PolicyResult
-        # 7. If CEL evaluation errors → DENY (fail-closed), log error
-        # 8. If no expression matches → ALLOW (all policies passed)
+        # 7. If CEL evaluation errors -> DENY (fail-closed), log error
+        # 8. If no expression matches -> DENY, real hard default (2026-08-24; was
+        #    ALLOW -- see "Design Decisions" P5 below for the real reasoning behind
+        #    the flip). allow_unmatched_requests=True restores the old behavior;
+        #    unmatched_enforcement lets a migrating deployment run this in ADVISORY
+        #    mode first (logged, not blocking) before committing to HARD.
         ...
 ```
 
@@ -437,7 +441,7 @@ Same pattern as GovernedModelProvider but evaluates `PRE_TOOL` stage and wraps `
 | P2 | Evaluation model | First-match-wins by priority, per-stage | All-rules evaluation, deny-overrides | Simple, deterministic, predictable. Operators control order via priority numbers. |
 | P3 | Fail-closed | CEL errors → DENY (non-configurable) | Configurable fail-open, skip-on-error | Security invariant. Prevents exception-based policy bypass. From AGT research. |
 | P4 | Enforcement modes | advisory/soft/hard per-policy | Global-only mode, no advisory | Per-policy modes enable gradual rollout. Advisory mode is essential for testing in production. From policy lifecycle pipeline pattern. |
-| P5 | Default behavior | No match → ALLOW | No match → DENY | The engine is generic. Grant enforcement is a policy at priority 100, not engine logic. This lets users customize the "default deny" behavior without modifying the engine. |
+| P5 | Default behavior | ~~No match → ALLOW~~ **Resolved, 2026-08-24: No match → DENY, hard, real default.** | No match → DENY | ~~The engine is generic. Grant enforcement is a policy at priority 100, not engine logic. This lets users customize the "default deny" behavior without modifying the engine.~~ **Real, empirical finding that overturned this**: this rationale assumed real policy authors would add their own catch-all default-deny rule if they wanted one. In practice, EVERY existing example/test policy set instead relied on the engine's own implicit ALLOW fallback as the structural "cleared `enforce-grants`, no more objections -> allow" step -- nobody ever wrote an explicit terminal ALLOW rule, because the engine already did that job silently. That's the exact default-allow anti-pattern this design was trying to avoid, just one level removed. See `docs/vision/roadmap.md`'s own dated entry for the full reasoning and the real migration this forced (every existing policy set given an explicit terminal ALLOW rule; new `allow_unmatched_requests`/`unmatched_enforcement` constructor params on `CelPolicyEngine` for deployments that need the old behavior or a gradual, audited migration). |
 | P6 | Grant integration | Grants are data, policies are logic | Grants as executable rules, grants as policies | Clean separation enables independent evolution. CEL reads grants as structured data. Don't conflate data with logic. |
 | P7 | Evaluation stages | 3 stages for M2 (pre_tool, pre_llm, registration). post_tool, post_llm, and pre_message added in M3. | Single stage, 8 stages (AGT-style) | M2: 3 stages cover enforcement points. M3 adds post-execution validation (post_tool for output PII/filtering, post_llm for response compliance) and pre_message (requires Civitas MessageBus hook). Post-execution uses the same CEL engine — governance checks, not content validation (NeMo/Guardrails AI are separate concerns). |
 

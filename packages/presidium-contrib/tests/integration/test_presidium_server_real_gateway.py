@@ -37,6 +37,7 @@ from presidium_contrib.server import (
     PresidiumGatewayAgent,
     build_check_grant_gateway_config,
 )
+from tests.policy_fixtures import ALLOW_ALL
 
 _PORT = 19443
 _BASE_URL = f"http://127.0.0.1:{_PORT}"
@@ -87,7 +88,7 @@ async def _running_gateway() -> AsyncGenerator[None]:
         )
     )
     engine = CelPolicyEngine()
-    engine.load_policies([DENY_NO_GRANT])
+    engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
     runtime = GovernedRuntime(registry=registry, engine=engine)
 
     gateway_config = build_check_grant_gateway_config(port=_PORT, require_mtls=False)

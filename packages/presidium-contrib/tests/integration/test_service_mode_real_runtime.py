@@ -115,11 +115,18 @@ class TestPolicyEvaluatorServerThroughRealSupervisor:
                             "expression": 'request.action == "write"',
                             "decision": "deny",
                             "reason": "writes forbidden",
-                        }
+                        },
+                        {
+                            "name": "allow-all",
+                            "stage": "pre_tool",
+                            "expression": "true",
+                            "decision": "allow",
+                            "priority": 0,
+                        },
                     ],
                 },
             )
-            assert load_result == {"loaded": 1}
+            assert load_result == {"loaded": 2}
 
             deny_result = await runtime.call(
                 "presidium.policy",
@@ -150,7 +157,12 @@ class TestPolicyEvaluatorServerThroughRealSupervisor:
         """Real, combined scenario: both GenServers wired into the same
         Supervisor, as they would be in a real distributed deployment."""
         registry_server = RegistryServer("presidium.registry")
-        policy_server = PolicyEvaluatorServer("presidium.policy")
+        # allow_unmatched_requests=True: this test is about two GenServers
+        # genuinely coexisting in one supervision tree, not about policy
+        # authoring -- no rules are loaded here at all, so the real,
+        # intended-production shortcut (an explicit ALLOW_ALL rule) would
+        # add nothing to what's actually under test.
+        policy_server = PolicyEvaluatorServer("presidium.policy", allow_unmatched_requests=True)
         runtime = await _start_runtime(registry_server, policy_server)
         try:
             await runtime.call(

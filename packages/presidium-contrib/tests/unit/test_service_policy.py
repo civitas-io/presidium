@@ -60,8 +60,24 @@ class TestHandleCallLoadPolicies:
 
 
 class TestHandleCallEvaluate:
-    async def test_evaluate_allow_when_no_rules_loaded(self) -> None:
+    async def test_evaluate_denies_when_no_rules_loaded_real_default_2026_08_24(self) -> None:
+        """Real, current default -- flipped from allow, see
+        docs/design/policy-engine.md's "Design Decisions" P5."""
         server = PolicyEvaluatorServer()
+        result = await server.handle_call(
+            {
+                "action": "evaluate",
+                "stage": "pre_tool",
+                "agent": _agent_payload(),
+                "request": {"resource": "tool:database", "action": "read"},
+            },
+            "sender",
+        )
+        assert result["decision"] == "deny"
+        assert result["policy_name"] is None
+
+    async def test_evaluate_allow_unmatched_requests_true_restores_old_behavior(self) -> None:
+        server = PolicyEvaluatorServer(allow_unmatched_requests=True)
         result = await server.handle_call(
             {
                 "action": "evaluate",
@@ -118,7 +134,14 @@ class TestHandleCallEvaluate:
                         ),
                         "decision": "deny",
                         "reason": "no matching grant",
-                    }
+                    },
+                    {
+                        "name": "allow-all",
+                        "stage": "pre_tool",
+                        "expression": "true",
+                        "decision": "allow",
+                        "priority": 0,
+                    },
                 ]
             }
         )

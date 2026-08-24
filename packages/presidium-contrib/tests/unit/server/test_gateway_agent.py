@@ -17,6 +17,7 @@ from presidium.policy.cel import CelPolicyEngine
 from presidium.registry.memory import InMemoryRegistry
 from presidium.runtime import GovernedRuntime
 from presidium_contrib.server import HealthCheckAgent, PresidiumGatewayAgent
+from tests.policy_fixtures import ALLOW_ALL
 
 DENY_NO_GRANT = PolicyRule(
     name="enforce-grants",
@@ -77,17 +78,17 @@ class TestHealthCheckAgent:
 
 class TestCheckGrant:
     async def test_allow_with_matching_grant(self) -> None:
-        runtime = await _make_runtime(DENY_NO_GRANT)
+        runtime = await _make_runtime(DENY_NO_GRANT, ALLOW_ALL)
         agent = PresidiumGatewayAgent(runtime=runtime)
         result = await agent.handle_call(
             {"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
             "sender",
         )
-        assert result == {
-            "decision": "allow",
-            "reason": "All policies passed",
-            "approval_context": None,
-        }
+        # Not asserting an exact reason string -- it now comes from the real
+        # explicit terminal ALLOW rule this test loads (ALLOW_ALL), not the
+        # engine's own old "All policies passed" no-match fallback text.
+        assert result["decision"] == "allow"
+        assert result["approval_context"] is None
 
     async def test_deny_without_matching_grant(self) -> None:
         runtime = await _make_runtime(DENY_NO_GRANT)

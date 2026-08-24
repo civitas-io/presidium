@@ -36,6 +36,13 @@ async def main():
     ))
 
     # 2. Define policies
+    #
+    # Presidium denies by default: if no policy rule matches a request, the
+    # request is denied (docs/design/policy-engine.md's "Design Decisions"
+    # P5) -- so a real policy set needs an explicit terminal ALLOW rule for
+    # "nothing else objected," not just DENY rules. This is deliberate:
+    # forgetting a DENY rule for something new should fail safe (denied),
+    # not silently permit it.
     engine = CelPolicyEngine()
     engine.load_policies([
         PolicyRule(
@@ -50,6 +57,14 @@ async def main():
             decision=PolicyDecision.DENY,
             reason="No matching grant for this resource/action",
             priority=100,
+        ),
+        PolicyRule(
+            name="allow-granted-actions",
+            stage=[EvaluationStage.PRE_TOOL, EvaluationStage.PRE_LLM],
+            expression="true",
+            decision=PolicyDecision.ALLOW,
+            reason="Cleared enforce-grants -- agent holds a matching grant",
+            priority=0,
         ),
     ])
 
@@ -91,6 +106,9 @@ presidium:
   registry:
     trust_domain: acme.com
 
+  # Presidium denies by default when no rule matches (real, deliberate --
+  # see docs/design/policy-engine.md P5) -- add an explicit terminal ALLOW
+  # rule for "nothing else objected," don't rely on an implicit allow.
   policies:
     - name: enforce-grants
       stage: [pre_tool, pre_llm]
@@ -102,6 +120,13 @@ presidium:
       decision: deny
       reason: "No matching grant"
       priority: 100
+
+    - name: allow-granted-actions
+      stage: [pre_tool, pre_llm]
+      expression: "true"
+      decision: allow
+      reason: "Cleared enforce-grants -- agent holds a matching grant"
+      priority: 0
 
     - name: trust-gate-writes
       stage: pre_tool
@@ -143,6 +168,24 @@ await rt.start()
 | **PolicyDecision** | ALLOW, DENY, or REQUIRE_APPROVAL |
 | **TrustScorer** | 0.0-1.0 trust with decay and 3 tiers (Trusted/Standard/Restricted) |
 | **GovernedRuntime** | Wires everything together, wraps Civitas Runtime |
+
+## Default-deny -- read this before writing your own policies
+
+**If no policy rule matches a request, Presidium denies it.** This is a real, deliberate design
+choice (see [Policy Engine design](../design/policy-engine.md)'s "Design Decisions" P5) -- not a
+bug, and not the old behavior (Presidium used to default to ALLOW when nothing matched; that
+changed 2026-08-24). Concretely: every real policy set needs an explicit terminal ALLOW rule
+(like `allow-granted-actions` above, `priority: 0` so it only fires after every real DENY/
+REQUIRE_APPROVAL rule has had a chance to fire first) for the "nothing else objected" case --
+otherwise every request to a stage with policies attached will be denied.
+
+Two real, explicit escape hatches exist if you need something else, both on `CelPolicyEngine`'s
+constructor:
+
+- `allow_unmatched_requests=True` -- restores the old always-ALLOW-on-no-match behavior outright.
+- `unmatched_enforcement=EnforcementMode.ADVISORY` -- keeps the DENY *decision* (so it shows up in
+  your real audit logs) while running in advisory mode (logged, not blocking) -- a real, gentle
+  migration path if you're not sure your policies are ready for hard enforcement yet.
 
 ## Enforcement Modes
 

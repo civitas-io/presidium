@@ -147,30 +147,36 @@ real, separate work, not automatically unblocked by this alone.
   not-yet-built future directions (see `agent-registry.md`'s updated section).
 - [ ] LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —
   real market flexibility; AgentGateway already covers the reference path so this isn't urgent.
-- [ ] **Default-deny for `CelPolicyEngine`'s no-rule-matched case — direction decided, implementation
-  deliberately deferred, not a style nit.** Today, no rule matching a stage silently defaults to
-  `ALLOW`. **Explicit real-world preference recorded 2026-08-22**: default DENY over default ALLOW
-  is the right posture, even at real UX cost, because it reduces blast radius — stated directly,
-  not inferred. **A real implementation attempt was made and reverted the same session**, on
-  purpose, once its actual blast radius became concrete: flipping `CelPolicyEngine`'s no-match
-  return from `ALLOW`/`"All policies passed"` to `DENY`/`HARD` broke **24 existing tests** across
-  `test_cel.py`, `test_governed_tool.py`, `test_governed_model.py`, and
-  `test_governed_runtime.py` — because Presidium's whole existing test suite (and, implicitly, its
-  whole current policy-authoring model) assumes an implicit allow-by-default; almost none of the
-  existing example/test policies declare an explicit terminal ALLOW rule. This is not a small,
-  local fix — it is a real change to how every Presidium deployment must author policies (an
-  allowlist model: explicit ALLOW + explicit DENY + explicit REQUIRE_APPROVAL, nothing implicit),
-  and needs its own dedicated design pass, not a one-line patch. **Real, scoped follow-up work
-  needed before implementing**: (1) decide whether this is a hard, unconditional default-deny
-  (matches the stated preference most directly) or a `default_decision`/`strict` constructor
-  parameter (safer migration path, more code); (2) update every existing example/test policy set
-  to add an explicit terminal ALLOW rule wherever one was previously implicit; (3) update
-  `docs/design/policy-engine.md`/`docs/quickstart.md`/any tutorial content that currently shows a
-  policy set without a terminal allow rule, since those examples would now deny everything;
-  (4) decide the exact `reason`/`policy_name` shape for the new default-deny `PolicyResult`
-  (already drafted once: `reason="No policy rule matched this request (fail-closed default — no
-  implicit allow)"`, worth reusing). Revisit as its own, dedicated piece of work — not bundled into
-  M7 or any other milestone by default.
+- [x] **Default-deny for `CelPolicyEngine`'s no-rule-matched case — DONE, 2026-08-24.** Was:
+  direction decided (default DENY over default ALLOW, reduces blast radius), a real
+  implementation attempt reverted the same earlier session after breaking 24 tests, needing its
+  own dedicated design pass before trying again. That design pass happened, with the user,
+  directly engaging the real question "is default-deny good practice, and should it be
+  configurable" -- resolved as: yes, hard default-deny, with two real, explicit, loud opt-in
+  knobs (`allow_unmatched_requests: bool = False`, `unmatched_enforcement: EnforcementMode =
+  HARD`), matching this codebase's own `allow_ungoverned`/`allow_unsandboxed` naming precedent
+  rather than a neutral, equally-weighted `default_decision` enum -- because an unopinionated
+  toggle would be picked by exactly the deployments (fast evaluation, no dedicated security
+  review) that most need the safe default, undermining the entire point.
+  **All four of the originally-scoped follow-up items done, not shortcut**: (1) hard,
+  unconditional default-deny chosen, PLUS the `unmatched_enforcement=ADVISORY` migration path as
+  a genuinely separate, real capability (not conflated with the security-relevant
+  `allow_unmatched_requests` toggle); (2) every existing example/test policy set given an
+  explicit terminal ALLOW rule across 10 test files (`test_cel.py`, `test_governed_tool.py`,
+  `test_governed_model.py`, `test_civitas_adapters.py`, `test_gateway_provider.py`,
+  `test_governed_runtime.py`, `test_service_policy.py`, `test_gateway_agent.py`,
+  `test_presidium_server_real_gateway.py`, `test_service_mode_real_runtime.py`) -- a new,
+  per-package `ALLOW_ALL` fixture in each `tests/policy_fixtures.py`, not a shortcut via
+  `allow_unmatched_requests=True` except where a test is genuinely orthogonal to policy content
+  (GenServer coexistence); (3) `docs/design/policy-engine.md`'s own P5 decision corrected in
+  place (struck through, not deleted, with the real empirical reasoning that overturned it) and
+  `docs/guides/getting-started.md`'s tutorial updated with a real, working explicit-ALLOW rule
+  plus a new "Default-deny" callout section; (4) the drafted reason string
+  (`"No policy rule matched this request (fail-closed default -- no implicit allow)"`) shipped
+  exactly as drafted. `presidium_contrib.service.policy.PolicyEvaluatorServer` also gained the
+  same two forwarded constructor knobs. 466 `presidium` tests pass (+8 net, several
+  renamed/split to genuinely test the new behavior, not just patched), 175 `presidium-contrib`
+  tests pass (+2), 100% coverage on both changed engine files, `ruff`/`mypy --strict` clean.
 - [x] **Trust ceiling propagation — DONE, real, shipped (2026-08-22).** Was: a real,
   currently-exploitable "trust washing" gap surfaced by a direct comparison against Microsoft's
   Agent Governance Toolkit (`microsoft/agent-governance-toolkit`)'s `AGENTMESH-IDENTITY-TRUST-1.0`

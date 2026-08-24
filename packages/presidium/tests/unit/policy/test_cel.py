@@ -19,6 +19,7 @@ from presidium.model import (
     TrustTier,
 )
 from presidium.policy.cel import CelPolicyEngine
+from tests.policy_fixtures import ALLOW_ALL
 
 
 def _make_context(
@@ -128,16 +129,43 @@ class TestCelPolicyEngineLoadPolicies:
 
 
 class TestCelPolicyEngineEvaluate:
-    async def test_allow_when_no_rules(self) -> None:
+    async def test_deny_when_no_rules_real_default_2026_08_24(self) -> None:
+        """The real, current default -- flipped from ALLOW, see
+        docs/design/policy-engine.md's "Design Decisions" P5 for the full
+        reasoning. This is the actual behavior under test now, not a
+        patched-to-keep-passing artifact.
+        """
         engine = CelPolicyEngine()
+        engine.load_policies([])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, _make_context())
+        assert result.decision == PolicyDecision.DENY
+        assert result.policy_name is None
+        assert result.enforcement == EnforcementMode.HARD
+        assert "fail-closed default" in (result.reason or "")
+
+    async def test_allow_unmatched_requests_true_restores_old_behavior(self) -> None:
+        """The real, explicit, loud opt-out -- matches this codebase's own
+        allow_ungoverned/allow_unsandboxed naming precedent, not a neutral
+        default_decision enum."""
+        engine = CelPolicyEngine(allow_unmatched_requests=True)
         engine.load_policies([])
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, _make_context())
         assert result.decision == PolicyDecision.ALLOW
         assert result.policy_name is None
 
+    async def test_unmatched_enforcement_advisory_for_gradual_migration(self) -> None:
+        """A migrating deployment can keep the real DENY decision (so it
+        shows up in real audit logs) while running in ADVISORY mode --
+        logged, not blocking -- before committing to HARD."""
+        engine = CelPolicyEngine(unmatched_enforcement=EnforcementMode.ADVISORY)
+        engine.load_policies([])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, _make_context())
+        assert result.decision == PolicyDecision.DENY
+        assert result.enforcement == EnforcementMode.ADVISORY
+
     async def test_allow_with_matching_grant(self) -> None:
         engine = CelPolicyEngine()
-        engine.load_policies([ENFORCE_GRANTS])
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
         ctx = _make_context(grants=[Grant(resources=["tool:database"], actions=["read"], id="g1")])
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
         assert result.decision == PolicyDecision.ALLOW
@@ -164,7 +192,7 @@ class TestCelPolicyEngineEvaluate:
 
     async def test_allow_high_trust_write(self) -> None:
         engine = CelPolicyEngine()
-        engine.load_policies([TRUST_GATE_WRITES])
+        engine.load_policies([TRUST_GATE_WRITES, ALLOW_ALL])
         ctx = _make_context(action="write", trust_value=0.8)
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
         assert result.decision == PolicyDecision.ALLOW
@@ -211,9 +239,25 @@ class TestCelPolicyEngineMultiStage:
         result_llm = await engine.evaluate(EvaluationStage.PRE_LLM, ctx)
         assert result_llm.decision == PolicyDecision.DENY
 
-    async def test_stage_without_rules_allows(self) -> None:
+    async def test_stage_without_rules_denies_by_default(self) -> None:
+        """Real, current behavior -- a stage with zero policies attached now
+        denies, matching the flat, no-implicit-exceptions default-deny
+        posture (a stage nobody bothered to write ANY policy for is not a
+        special, automatically-safe case).
+        """
         engine = CelPolicyEngine()
         engine.load_policies([ENFORCE_GRANTS])
+        ctx = _make_context()
+        result = await engine.evaluate(EvaluationStage.REGISTRATION, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_stage_without_rules_allows_with_explicit_allow_all(self) -> None:
+        """The real migration story for the case above: a deployment that
+        genuinely wants an unrestricted stage adds an explicit ALLOW rule
+        for it -- not silently relying on "nobody wrote a policy" meaning
+        safe."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
         ctx = _make_context()
         result = await engine.evaluate(EvaluationStage.REGISTRATION, ctx)
         assert result.decision == PolicyDecision.ALLOW
@@ -235,7 +279,7 @@ class TestCelPolicyEngineGrantFiltering:
 
     async def test_active_grants_not_filtered(self) -> None:
         engine = CelPolicyEngine()
-        engine.load_policies([ENFORCE_GRANTS])
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
         active_grant = Grant(
             resources=["tool:database"],
             actions=["read"],
@@ -248,7 +292,7 @@ class TestCelPolicyEngineGrantFiltering:
 
     async def test_no_expiry_grant_not_filtered(self) -> None:
         engine = CelPolicyEngine()
-        engine.load_policies([ENFORCE_GRANTS])
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
         grant = Grant(resources=["tool:database"], actions=["read"], id="nox")
         ctx = _make_context(grants=[grant])
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
@@ -300,7 +344,7 @@ class TestCelPolicyEnginePostExecution:
             decision=PolicyDecision.DENY,
             priority=80,
         )
-        engine.load_policies([rule])
+        engine.load_policies([rule, ALLOW_ALL])
         ctx = _make_context(result={"size_bytes": 500, "content": "small"})
         result = await engine.evaluate(EvaluationStage.POST_TOOL, ctx)
         assert result.decision == PolicyDecision.ALLOW
@@ -329,7 +373,7 @@ class TestCelPolicyEnginePostExecution:
             decision=PolicyDecision.DENY,
             priority=80,
         )
-        engine.load_policies([rule])
+        engine.load_policies([rule, ALLOW_ALL])
         ctx = _make_context(result={"content": "valid response", "tokens": 50})
         result = await engine.evaluate(EvaluationStage.POST_LLM, ctx)
         assert result.decision == PolicyDecision.ALLOW
@@ -377,7 +421,7 @@ class TestPreMessageStage:
             priority=90,
         )
         engine = CelPolicyEngine()
-        engine.load_policies([rule])
+        engine.load_policies([rule, ALLOW_ALL])
         ctx = _make_context(
             resource="message:task",
             action="send",
@@ -420,11 +464,15 @@ class TestPolicyHotReload:
         assert result.decision == PolicyDecision.DENY
 
         rule2 = PolicyRule(
-            name="allow-all",
+            name="allow-all-explicit",
             stage=EvaluationStage.PRE_TOOL,
-            expression="false",
-            decision=PolicyDecision.DENY,
-            reason="Never matches",
+            expression="true",
+            decision=PolicyDecision.ALLOW,
+            reason="Explicit allow -- real, unambiguous proof reload replaced rule1's own"
+            " always-DENY, not just fell through to it not matching. (Previously this test"
+            " used expression='false', an always-false rule that only proved this via the"
+            " old implicit-ALLOW fallback -- an accidental dependency on the very default"
+            " this file no longer has, not a real test of replacement.)",
             priority=100,
         )
         engine.load_policies([rule2])
@@ -451,15 +499,53 @@ class TestPolicyHotReload:
         )
         engine.load_policies([rule_tool, rule_llm])
 
-        engine.load_policies([rule_tool])
+        # Real, unambiguous proof rule_llm was actually cleared, not just
+        # "happened not to match": include an explicit ALLOW for PRE_LLM in
+        # the reload, then confirm PRE_LLM now allows -- if rule_llm (DENY,
+        # priority 100) were still active, its higher priority would still
+        # win and this would still deny.
+        engine.load_policies([rule_tool, ALLOW_ALL])
         ctx = _make_context()
         result = await engine.evaluate(EvaluationStage.PRE_LLM, ctx)
         assert result.decision == PolicyDecision.ALLOW
 
-    async def test_empty_reload(self) -> None:
+    async def test_reload_to_a_stage_with_no_new_rules_denies_by_default(self) -> None:
+        """Real, current behavior -- reloading with a rule set that no
+        longer covers a given stage now denies that stage by default,
+        matching test_stage_without_rules_denies_by_default's own real
+        finding, not a special case for reload specifically.
+        """
+        engine = CelPolicyEngine()
+        rule_tool = PolicyRule(
+            name="tool-block",
+            stage=EvaluationStage.PRE_TOOL,
+            expression="true",
+            decision=PolicyDecision.DENY,
+            reason="Blocked",
+            priority=100,
+        )
+        rule_llm = PolicyRule(
+            name="llm-block",
+            stage=EvaluationStage.PRE_LLM,
+            expression="true",
+            decision=PolicyDecision.DENY,
+            reason="Blocked",
+            priority=100,
+        )
+        engine.load_policies([rule_tool, rule_llm])
+        engine.load_policies([rule_tool])
+        ctx = _make_context()
+        result = await engine.evaluate(EvaluationStage.PRE_LLM, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_empty_reload_denies_by_default(self) -> None:
+        """Real, current behavior -- reloading with zero rules leaves the
+        engine with nothing to evaluate, so the real default-deny fallback
+        applies, same as if the engine had never had any policies at all.
+        """
         engine = CelPolicyEngine()
         engine.load_policies([ENFORCE_GRANTS])
         engine.load_policies([])
         ctx = _make_context(grants=[])
         result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
-        assert result.decision == PolicyDecision.ALLOW
+        assert result.decision == PolicyDecision.DENY

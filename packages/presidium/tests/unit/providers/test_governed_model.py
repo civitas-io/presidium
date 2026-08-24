@@ -17,6 +17,7 @@ from presidium.model import (
 from presidium.policy.cel import CelPolicyEngine
 from presidium.providers.model import GovernedModelProvider
 from presidium.registry.memory import InMemoryRegistry
+from tests.policy_fixtures import ALLOW_ALL
 
 
 async def _setup() -> tuple[InMemoryRegistry, CelPolicyEngine]:
@@ -85,17 +86,20 @@ SOFT_DENY = PolicyRule(
 class TestGovernedModelProviderAllow:
     async def test_allow_with_matching_grant(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([DENY_NO_GRANT])
+        engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
         provider = GovernedModelProvider(engine, reg)
         result = await provider.check("test", "claude-sonnet")
         assert result.decision == PolicyDecision.ALLOW
 
-    async def test_allow_when_no_rules(self) -> None:
+    async def test_denied_when_no_rules_real_default_2026_08_24(self) -> None:
+        """Real, current behavior -- check() raises PolicyDeniedError now,
+        matching the new default-deny fallback (docs/design/policy-engine.md
+        P5), not a patched-to-keep-passing artifact."""
         reg, engine = await _setup()
         engine.load_policies([])
         provider = GovernedModelProvider(engine, reg)
-        result = await provider.check("test", "claude-sonnet")
-        assert result.decision == PolicyDecision.ALLOW
+        with pytest.raises(PolicyDeniedError):
+            await provider.check("test", "claude-sonnet")
 
 
 class TestGovernedModelProviderDeny:
@@ -175,7 +179,7 @@ class _RecordingSink:
 class TestGovernedModelProviderAudit:
     async def test_emits_audit_event(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([])
+        engine.load_policies([ALLOW_ALL])
         sink = _RecordingSink()
         provider = GovernedModelProvider(engine, reg, audit_sink=sink)  # type: ignore[arg-type]
         await provider.check("test", "claude-sonnet")
@@ -199,7 +203,7 @@ BLOCK_EMPTY_RESPONSE = PolicyRule(
 class TestGovernedModelProviderPostCheck:
     async def test_post_check_allows_valid_response(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([BLOCK_EMPTY_RESPONSE])
+        engine.load_policies([BLOCK_EMPTY_RESPONSE, ALLOW_ALL])
         provider = GovernedModelProvider(engine, reg)
         result = await provider.post_check(
             "test", "claude-sonnet", {"content": "hello", "tokens": 5}

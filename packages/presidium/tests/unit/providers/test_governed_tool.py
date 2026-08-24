@@ -17,6 +17,7 @@ from presidium.model import (
 from presidium.policy.cel import CelPolicyEngine
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry.memory import InMemoryRegistry
+from tests.policy_fixtures import ALLOW_ALL
 
 
 async def _setup() -> tuple[InMemoryRegistry, CelPolicyEngine]:
@@ -74,17 +75,20 @@ ADVISORY_DENY = PolicyRule(
 class TestGovernedToolProviderAllow:
     async def test_allow_with_matching_grant(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([DENY_NO_GRANT])
+        engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
         provider = GovernedToolProvider(engine, reg)
         result = await provider.check("test", "database", "read")
         assert result.decision == PolicyDecision.ALLOW
 
-    async def test_allow_when_no_rules(self) -> None:
+    async def test_denied_when_no_rules_real_default_2026_08_24(self) -> None:
+        """Real, current behavior -- check() raises PolicyDeniedError now,
+        matching the new default-deny fallback (docs/design/policy-engine.md
+        P5), not a patched-to-keep-passing artifact."""
         reg, engine = await _setup()
         engine.load_policies([])
         provider = GovernedToolProvider(engine, reg)
-        result = await provider.check("test", "database")
-        assert result.decision == PolicyDecision.ALLOW
+        with pytest.raises(PolicyDeniedError):
+            await provider.check("test", "database")
 
 
 class TestGovernedToolProviderDeny:
@@ -186,7 +190,7 @@ class TestGovernedToolProviderCheckGrant:
 
     async def test_allow_returned_as_value(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([DENY_NO_GRANT])
+        engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
         provider = GovernedToolProvider(engine, reg)
         result = await provider.check_grant("test", "tool:database", "read")
         assert result.decision == PolicyDecision.ALLOW
@@ -280,7 +284,7 @@ class _RecordingSink:
 class TestGovernedToolProviderAudit:
     async def test_emits_audit_event(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([])
+        engine.load_policies([ALLOW_ALL])
         sink = _RecordingSink()
         provider = GovernedToolProvider(engine, reg, audit_sink=sink)  # type: ignore[arg-type]
         await provider.check("test", "database")
@@ -304,7 +308,7 @@ BLOCK_LARGE_RESULTS = PolicyRule(
 class TestGovernedToolProviderPostCheck:
     async def test_post_check_allows_small_result(self) -> None:
         reg, engine = await _setup()
-        engine.load_policies([BLOCK_LARGE_RESULTS])
+        engine.load_policies([BLOCK_LARGE_RESULTS, ALLOW_ALL])
         provider = GovernedToolProvider(engine, reg)
         result = await provider.post_check("test", "database", "read", {"size_bytes": 500})
         assert result.decision == PolicyDecision.ALLOW

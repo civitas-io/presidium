@@ -28,6 +28,7 @@ from presidium.providers.civitas_adapters import GovernedModelProviderAdapter, G
 from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry.memory import InMemoryRegistry
+from tests.policy_fixtures import ALLOW_ALL
 
 
 class _FakeModelBackend:
@@ -120,7 +121,7 @@ BLOCK_LARGE_RESPONSE = PolicyRule(
 
 class TestGovernedModelProviderAdapter:
     async def test_allowed_call_delegates_to_backend(self) -> None:
-        reg, engine = await _setup()
+        reg, engine = await _setup(ALLOW_ALL)
         backend = _FakeModelBackend()
         model_provider = GovernedModelProvider(engine, reg)
         adapter = GovernedModelProviderAdapter(
@@ -149,7 +150,7 @@ class TestGovernedModelProviderAdapter:
         """Confirms POST_LLM policies don't false-positive on the normal case
         (_FakeModelBackend's default tokens_out=5, well under any real
         limit) before the dedicated deny test below."""
-        reg, engine = await _setup(BLOCK_LARGE_RESPONSE)
+        reg, engine = await _setup(BLOCK_LARGE_RESPONSE, ALLOW_ALL)
         backend = _FakeModelBackend()
         model_provider = GovernedModelProvider(engine, reg)
         adapter = GovernedModelProviderAdapter(
@@ -160,7 +161,7 @@ class TestGovernedModelProviderAdapter:
         assert result.content == "hello"
 
     async def test_post_check_deny_with_large_output(self) -> None:
-        reg, engine = await _setup(BLOCK_LARGE_RESPONSE)
+        reg, engine = await _setup(BLOCK_LARGE_RESPONSE, ALLOW_ALL)
 
         class _LargeOutputBackend(_FakeModelBackend):
             async def chat(
@@ -195,7 +196,7 @@ class TestGovernedToolAdapter:
         assert adapter.schema == backend.schema
 
     async def test_allowed_call_delegates_to_backend(self) -> None:
-        reg, engine = await _setup(DENY_TOOL)
+        reg, engine = await _setup(DENY_TOOL, ALLOW_ALL)
         backend = _FakeToolBackend()
         tool_provider = GovernedToolProvider(engine, reg)
         adapter = GovernedToolAdapter(
@@ -223,7 +224,7 @@ class TestGovernedToolAdapter:
     async def test_non_dict_result_wrapped_for_post_check(self) -> None:
         """Real tool outputs aren't always dicts -- a bare string/list/number
         result must not crash post_check(), which expects dict[str, Any]."""
-        reg, engine = await _setup(DENY_TOOL)
+        reg, engine = await _setup(DENY_TOOL, ALLOW_ALL)
         backend = _FakeToolBackend(result="a bare string result")
         tool_provider = GovernedToolProvider(engine, reg)
         adapter = GovernedToolAdapter(
@@ -237,6 +238,7 @@ class TestGovernedToolAdapter:
     async def test_post_check_deny_raises(self) -> None:
         reg, engine = await _setup(
             DENY_TOOL,
+            ALLOW_ALL,
             PolicyRule(
                 name="block-error-results",
                 stage=EvaluationStage.POST_TOOL,
