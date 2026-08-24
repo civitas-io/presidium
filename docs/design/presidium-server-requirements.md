@@ -59,6 +59,19 @@ usage-ledger span attributes) MUST be serialized into `ActionRequest.parameters`
 MAY reference it (e.g. `request.parameters.tenant_id`) — Presidium does not interpret `scope`
 itself, matching Fabrica's own "opaque to the caller of `check_grant`" framing.
 
+**DONE, 2026-08-24 -- a real, previously-unfixed gap.** This requirement was documented from the
+start but never actually implemented: `PresidiumGatewayAgent.handle_call()` read `agent_id`/
+`action` from the request body but silently discarded `scope` entirely, and
+`GovernedToolProvider.check_grant()`/`check()`/`check_resource()` had no `parameters` parameter
+at all to receive it -- `ActionRequest.parameters` could only ever be `{}` on this path, even
+though the CEL engine's own activation already exposed `request.parameters` (it just had
+nothing in it). Fixed: all three methods gained an additive, optional `parameters: dict[str,
+Any] | None = None` (threaded through the shared `_evaluate()` helper); the HTTP handler now
+reads `payload.get("scope")`, validates it's a dict if present (fail-closed DENY otherwise, not
+a 5xx), and passes it straight through. Verified end to end, not just at the unit level: real
+tests prove a CEL policy referencing `request.parameters.tenant_id` sees the value that arrived
+in the HTTP request body's `scope` field.
+
 **FR-1.5**: On `PolicyDecision.REQUIRE_APPROVAL`, the server MUST return
 `{"decision": "require_approval", ...}` **immediately, without blocking** on approval resolution.
 This is a real, deliberate divergence from `GovernedToolProvider.check()`'s existing behavior

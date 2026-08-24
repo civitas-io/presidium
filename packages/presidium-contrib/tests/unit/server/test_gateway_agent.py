@@ -176,3 +176,72 @@ class TestCheckGrant:
             "sender",
         )
         assert result["decision"] == "allow"
+
+    async def test_scope_field_reaches_the_cel_policy_as_request_parameters(self) -> None:
+        """FR-1.4, real, closes a gap this handler previously had: `scope` in the request
+        body must actually reach `ActionRequest.parameters`, not be silently discarded.
+        Confirmed here through the whole real stack (handle_call -> check_grant ->
+        ActionRequest -> CEL evaluate), not just at the GovernedToolProvider unit level.
+        """
+        runtime = await _make_runtime(
+            PolicyRule(
+                name="tenant-gate",
+                stage=EvaluationStage.PRE_TOOL,
+                expression='request.parameters.tenant_id != "acme"',
+                decision=PolicyDecision.DENY,
+                reason="Wrong tenant",
+                priority=100,
+            ),
+            ALLOW_ALL,
+        )
+        agent = PresidiumGatewayAgent(runtime=runtime)
+
+        allowed = await agent.handle_call(
+            {
+                "agent_id": "presidium://acme.com/researcher",
+                "action": "code_mode",
+                "scope": {"tenant_id": "acme"},
+            },
+            "sender",
+        )
+        assert allowed["decision"] == "allow"
+
+        denied = await agent.handle_call(
+            {
+                "agent_id": "presidium://acme.com/researcher",
+                "action": "code_mode",
+                "scope": {"tenant_id": "other-corp"},
+            },
+            "sender",
+        )
+        assert denied["decision"] == "deny"
+        assert denied["reason"] == "Wrong tenant"
+
+    async def test_scope_omitted_is_not_an_error(self) -> None:
+        """A request with no `scope` field at all (most real callers, most of the time) must
+        keep working exactly as before -- `scope` is additive, not a new requirement.
+        """
+        runtime = await _make_runtime(DENY_NO_GRANT, ALLOW_ALL)
+        agent = PresidiumGatewayAgent(runtime=runtime)
+        result = await agent.handle_call(
+            {"agent_id": "presidium://acme.com/researcher", "action": "code_mode"},
+            "sender",
+        )
+        assert result["decision"] == "allow"
+
+    async def test_scope_wrong_type_denies_not_raises(self) -> None:
+        """Fail-closed on a malformed `scope` (e.g. a list or a string instead of an object),
+        matching this whole handler's own established "never raise, always deny" contract for
+        every other malformed-input case."""
+        runtime = await _make_runtime(DENY_NO_GRANT, ALLOW_ALL)
+        agent = PresidiumGatewayAgent(runtime=runtime)
+        result = await agent.handle_call(
+            {
+                "agent_id": "presidium://acme.com/researcher",
+                "action": "code_mode",
+                "scope": ["not", "an", "object"],
+            },
+            "sender",
+        )
+        assert result["decision"] == "deny"
+        assert "scope" in result["reason"]

@@ -123,6 +123,34 @@ packages' `src/` (the real, CI-gated scope).
 
 ---
 
+## Two P1 quick wins -- DONE, 2026-08-24
+
+**`AGENTS.md` corrected.** It had drifted significantly since 2026-06-16: described
+`litellm`/`kong`/`portkey`/`cloudflare_ai_gateway`/`helicone`/`truefoundry` as installable extras
+with stub modules -- none of that code or those `pyproject.toml` extras exist (only
+`AgentGateway` is a real, shipped `LLMGatewayBackend`). Also fixed: stale `presidium.protocols`/
+`presidium.models` module names (real: distributed Protocols + singular `presidium.model`), a
+stale "Pre-alpha (documentation-first phase)" status, a stale `Dependency Rules` claim
+(`presidium` now also depends on `pynacl`/`cryptography`, not just `civitas`/`cel-python`), and
+a monorepo tree missing `presidium.identity`/`presidium.lineage`/`presidium_contrib.spiffe`/
+`presidium_contrib.server` entirely.
+
+**`scope` (FR-1.4) now threaded through to `ActionRequest.parameters` -- a real, previously-
+unfixed gap, not a new feature.** `presidium-server-requirements.md` documented this requirement
+from the start, but `PresidiumGatewayAgent.handle_call()` read `agent_id`/`action` from the
+request body and silently discarded `scope` entirely; `GovernedToolProvider.check_grant()`/
+`check()`/`check_resource()` had no `parameters` parameter at all to receive it. Fixed: all three
+methods gained an additive, optional `parameters: dict[str, Any] | None = None` (threaded
+through the shared `_evaluate()` helper, so `check()`/`check_resource()` get it too, not just
+`check_grant()`); the HTTP handler now reads `payload.get("scope")`, fail-closed DENYs (not a
+5xx) if it's present but not a dict, and passes it straight through. Verified end to end, not
+just at the unit level: real tests prove a CEL policy referencing `request.parameters.tenant_id`
+actually sees the value that arrived in the HTTP request body's `scope` field, both allowing and
+denying correctly.
+
+469 `presidium` tests pass (+3), 178 `presidium-contrib` tests pass (+3), `ruff`/
+`ruff format --check`/`mypy --strict` clean on both packages.
+
 ## Real, working pre-commit hooks -- installed, verified, not just configured
 
 **2026-08-24**: `.pre-commit-config.yaml` existed here since June but the hook was never actually
@@ -213,9 +241,6 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
   evidence-based comparison exists, not built; explicitly not urgent (AgentGateway covers the
   reference path).
 - Composing the three MCP governance primitives (PII/poisoning/redaction) into one real pipeline.
-- Fix `AGENTS.md` documenting extras (`litellm`, `kong`, etc.) that don't exist in code yet.
-- `scope` (from `check_grant`'s own contract) isn't yet threaded through to `ActionRequest.
-  parameters` — CEL policies can't reference it from that path yet.
 - M4 (Autonomy Progression), M5 (SDK+CLI, docs site, examples — now genuinely unblocked given
   real releases exist), M6 (Cloud, commercial) — all designed, none built.
 - M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly

@@ -220,8 +220,16 @@ real, separate work, not automatically unblocked by this alone.
   above under M7), and CVE-feed integration (OSV API) against MCP servers in active use — AGT's
   `MCP-SECURITY-GATEWAY-1.0` spec covers all of these; none are committed here yet, listed as
   real candidates to evaluate, not a plan to copy wholesale.
-- [ ] Fix `AGENTS.md` documenting extras (`litellm`, `kong`, etc.) that don't exist in
-  `pyproject.toml` yet — cheap doc fix once the adapters above land.
+- [x] **DONE, 2026-08-24.** Fixed `AGENTS.md` — not by building the `litellm`/`kong`/`portkey`/
+  `cloudflare_ai_gateway`/`helicone`/`truefoundry` adapters (still not built, still the LiteLLM
+  item above), but by correcting the doc to state that plainly: it previously described them as
+  installable extras/stub modules, when none of that code or those `pyproject.toml` extras exist
+  at all. Also fixed: stale `presidium.protocols`/`presidium.models` module names (real names are
+  distributed Protocols + singular `presidium.model`), a stale "Pre-alpha (documentation-first
+  phase)" status line, a stale `Dependency Rules` claim (`presidium` depends on more than just
+  `civitas`/`cel-python` now — `pynacl`/`cryptography` too), and the monorepo tree missing
+  `presidium.identity`/`presidium.lineage`/`presidium_contrib.spiffe`/`presidium_contrib.server`
+  entirely (all real, shipped modules from this session, never added to this file).
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
 - [ ] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git tag"
@@ -497,9 +505,17 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   request/list/decide, credential resolution over the network — real, designed intents
   (`presidium-server.md`'s own "Deferred" section sketches how each would extend the same
   `PresidiumGatewayAgent` pattern), not built until something concretely needs them.
-- [ ] **(real, honest gap, not silently claimed done)** `scope` (FR-1.4) is not yet threaded
-  through to `ActionRequest.parameters` — CEL policies cannot yet reference `request.parameters`
-  from a `check_grant` call. Small, real follow-up.
+- [x] **DONE, 2026-08-24.** `scope` (FR-1.4) is now threaded through to `ActionRequest.parameters`
+  — `GovernedToolProvider.check_grant()`/`check()`/`check_resource()` gained an additive,
+  optional `parameters: dict[str, Any] | None = None`, and `PresidiumGatewayAgent.handle_call()`
+  (which previously read `agent_id`/`action` from the request body but silently discarded
+  `scope` entirely, despite FR-1.1's own documented request shape always including it) now reads
+  it, validates it's a dict (fail-closed DENY otherwise, not a 5xx), and passes it through. CEL
+  policies can now genuinely reference `request.parameters.<key>` from a `check_grant` call —
+  verified end to end with real tests proving a policy actually sees a value that arrived via the
+  HTTP request body's `scope` field, not just that the parameter is accepted. 469 `presidium`
+  tests pass (+3), 178 `presidium-contrib` tests pass (+3), `ruff`/`ruff format --check`/
+  `mypy --strict` clean on both packages.
 - [x] **(P0)** **Must satisfy `civitas-io/fabrica`'s `PresidiumClient.check_grant()` contract
   exactly**: synchronous REST, `agent_id` + `action` + `scope` in,
   `GrantResult(decision, reason, approval_context)` out (confirmed directly against

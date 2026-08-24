@@ -266,6 +266,67 @@ class TestGovernedToolProviderCheckGrant:
         assert len(sink.events) == 1
         assert sink.events[0]["event"] == "policy.evaluated"
 
+    async def test_parameters_reach_the_cel_policy_as_request_parameters(self) -> None:
+        """Real, closes the FR-1.4 gap: `parameters` (Presidium Server's `scope` field) must
+        actually be visible to a CEL policy as `request.parameters.<key>`, not just accepted
+        and silently dropped.
+        """
+        reg, engine = await _setup()
+        scope_gate = PolicyRule(
+            name="scope-gate",
+            stage=EvaluationStage.PRE_TOOL,
+            expression='request.parameters.tenant_id != "acme"',
+            decision=PolicyDecision.DENY,
+            reason="Wrong tenant",
+            priority=100,
+        )
+        engine.load_policies([scope_gate, ALLOW_ALL])
+        provider = GovernedToolProvider(engine, reg)
+
+        matching = await provider.check_grant(
+            "test", "tool:database", "read", parameters={"tenant_id": "acme"}
+        )
+        assert matching.decision == PolicyDecision.ALLOW
+
+        mismatching = await provider.check_grant(
+            "test", "tool:database", "read", parameters={"tenant_id": "other-corp"}
+        )
+        assert mismatching.decision == PolicyDecision.DENY
+        assert mismatching.policy_name == "scope-gate"
+
+    async def test_parameters_omitted_defaults_to_empty_not_an_error(self) -> None:
+        """A caller (e.g. Presidium Server when the incoming request has no `scope` field at
+        all) must be able to omit `parameters` entirely -- this is an additive parameter, not
+        a new requirement on every existing caller.
+        """
+        reg, engine = await _setup()
+        engine.load_policies([DENY_NO_GRANT, ALLOW_ALL])
+        provider = GovernedToolProvider(engine, reg)
+        result = await provider.check_grant("test", "tool:database", "read")
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_parameters_reach_check_and_check_resource_too(self) -> None:
+        """check()/check_resource() thread `parameters` through the same shared _evaluate()
+        path as check_grant() -- confirmed directly, not assumed just because they share code.
+        """
+        reg, engine = await _setup()
+        scope_gate = PolicyRule(
+            name="scope-gate",
+            stage=EvaluationStage.PRE_TOOL,
+            expression='request.parameters.tenant_id != "acme"',
+            decision=PolicyDecision.DENY,
+            reason="Wrong tenant",
+            priority=100,
+        )
+        engine.load_policies([scope_gate, DENY_NO_GRANT, ALLOW_ALL])
+        provider = GovernedToolProvider(engine, reg)
+
+        result = await provider.check("test", "database", "read", parameters={"tenant_id": "acme"})
+        assert result.decision == PolicyDecision.ALLOW
+
+        with pytest.raises(PolicyDeniedError):
+            await provider.check("test", "database", "read", parameters={"tenant_id": "other-corp"})
+
 
 class _RecordingSink:
     def __init__(self) -> None:

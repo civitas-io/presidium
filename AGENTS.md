@@ -1,7 +1,8 @@
 # AGENTS.md — Presidium
 
 > Machine-readable project reference for AI coding assistants.
-> Last updated: 2026-06-16
+> Last updated: 2026-08-24 — corrected to match the real, current code (see "Real vs. previously
+> documented" note below the monorepo tree; this file had drifted significantly since 2026-06-16).
 
 ## Project Identity
 
@@ -13,7 +14,11 @@ natively integrated into the Civitas agent runtime.
 - **Organization:** `civitas-io`
 - **License:** Apache 2.0
 - **Python:** ≥3.12
-- **Status:** Pre-alpha (documentation-first phase)
+- **Status:** Real, live, public PyPI packages —
+  [`presidium`](https://pypi.org/project/presidium/) and
+  [`presidium-contrib`](https://pypi.org/project/presidium-contrib/), 452+ and 179+ real tests
+  respectively. See [`HANDOFF.md`](HANDOFF.md) for the current, dated status; this file describes
+  structure and conventions, not point-in-time progress.
 
 ### The One-Line Separation
 
@@ -42,44 +47,56 @@ These are additive. A customer never chooses between a Civitas feature and a Pre
 
 ## Monorepo Structure
 
+**Real, verified directly against the current source tree (2026-08-24) -- do not trust an older
+copy of this section over `find packages/*/src -maxdepth 2`.**
+
 ```
 presidium/
 ├── packages/                        # Code packages (uv workspace members)
 │   ├── presidium/                   # Interface library (protocols, dataclasses, CEL engine)
 │   │   └── src/presidium/
-│   │       ├── policy/              # CEL policy engine (default implementation)
-│   │       ├── providers/           # GovernedModelProvider, GovernedToolProvider
-│   │       ├── registry/            # AgentRegistry Protocol + InMemory/Sqlite defaults
+│   │       ├── policy/              # CEL policy engine (default implementation), default-deny
+│   │       ├── providers/           # GovernedModelProvider/GovernedToolProvider (pure
+│   │       │                        #   authorization), GatewayModelProvider/GatewayToolProvider
+│   │       │                        #   (wraps a real gateway process), civitas_adapters.py
+│   │       │                        #   (direct in-process Civitas ModelProvider/ToolProvider)
+│   │       ├── registry/            # AgentRegistry Protocol + InMemory/Sqlite implementations
 │   │       ├── scoring/             # Domain-agnostic scoring library (events, functions, config, spec)
 │   │       ├── trust/               # Trust scoring (core, protocols, windowed, cold_start, telemetry)
 │   │       ├── bus.py               # GovernedMessageBus (PRE_MESSAGE enforcement)
-│   │       ├── model.py             # Shared dataclasses (AgentRecord, Policy, etc.)
+│   │       ├── model.py             # Shared dataclasses (AgentRecord, Policy, etc.) -- note:
+│   │       │                        #   singular `model.py`, not a `models/` package
 │   │       ├── errors.py            # PresidiumError hierarchy
 │   │       ├── approval.py          # ApprovalService Protocol + CallbackApprovalProvider
-│   │       ├── audit.py             # AuditEnricher Protocol + InProcessAuditEnricher
+│   │       ├── audit.py             # AuditSink/AuditEnricher Protocols + InProcessAuditEnricher
 │   │       ├── credentials.py       # CredentialProvider Protocol + Env/File defaults
+│   │       ├── identity.py          # verify_agent_signature() -- Ed25519 (default) + EC P-256
+│   │       │                        #   (SPIFFE SVID) dispatch on AgentRecord.public_key_algorithm
+│   │       ├── lineage.py           # Trust ceiling propagation + monotonic capability narrowing
 │   │       └── runtime.py           # GovernedRuntime (from_config, reload_policies)
 │   └── presidium-contrib/           # Adapters + reference implementations
 │       └── src/presidium_contrib/
 │           ├── opa/                 # OPA adapter (presidium-contrib[opa])
 │           ├── openbao/             # OpenBao credential backend (presidium-contrib[openbao])
-│           ├── agentgateway/        # AgentGateway adapter — LLM+MCP+A2A gateway backend (reference)
-│           ├── litellm/             # LiteLLM Proxy adapter — LLM-only backend (leading 2nd pick, not frozen)
-│           ├── kong/                # Kong AI Gateway adapter — LLM-only backend (stub)
-│           ├── portkey/             # Portkey adapter — LLM-only backend (stub)
-│           ├── cloudflare_ai_gateway/ # Cloudflare AI Gateway adapter — LLM-only backend (stub)
-│           ├── helicone/            # Helicone AI Gateway adapter — LLM-only backend (stub)
-│           ├── truefoundry/         # TrueFoundry AI Gateway adapter — LLM-only backend (stub)
+│           ├── agentgateway/        # AgentGateway adapter (presidium-contrib[agentgateway]) --
+│           │                        #   real MCP tool-side (list_tools/call_tool, Streamable
+│           │                        #   HTTP); delegate_to_agent() (A2A) explicitly raises
+│           │                        #   NotImplementedError, not yet built (see roadmap.md P1)
+│           ├── spiffe/              # SPIRE Workload API bridge (presidium-contrib[spiffe]) --
+│           │                        #   real X.509-SVID identity, sync + rotation
 │           ├── slack/               # Slack HITL adapter (presidium-contrib[slack])
 │           ├── webhook/             # Webhook approval adapter (presidium-contrib[webhook])
-│           ├── registry/            # Reference impl: PostgresAgentRegistry
+│           ├── registry/            # Reference impl: PostgresAgentRegistry (presidium-contrib[postgres])
 │           ├── mcp_gateway/         # Reference impl: tool poisoning, credential redaction, PII masking
 │           ├── trust/               # Reference impl: LearningTrustScorer
+│           ├── server/              # M7 Presidium Server (presidium-contrib[server]) -- real
+│           │                        #   REST+mTLS governance gateway (PresidiumGatewayAgent,
+│           │                        #   HealthCheckAgent) over an actual civitas.gateway.HTTPGateway
 │           └── service/             # Service mode: PolicyEvaluatorServer, RegistryServer (GenServer)
 ├── docs/                            # All documentation
 │   ├── vision/                      # Why — manifesto, positioning, roadmap
 │   ├── architecture/                # How — system design, package map
-│   ├── design/                      # What — per-component design docs
+│   ├── design/                      # What — per-component design docs (+ vendor research docs)
 │   ├── research/                    # Context — competitive analysis, market
 │   ├── rfcs/                        # RFCs for significant decisions
 │   └── guides/                      # Getting started, contributing
@@ -88,7 +105,14 @@ presidium/
 └── mkdocs.yml                       # Documentation site
 ```
 
----
+**Real vs. previously documented -- corrected 2026-08-24:** the `litellm`/`kong`/`portkey`/
+`cloudflare_ai_gateway`/`helicone`/`truefoundry` adapter modules and their matching
+`presidium-contrib` extras described in earlier revisions of this file **do not exist in code**.
+They were designed and evidence-compared (`docs/design/llm-gateway.md`), never built -- a real
+P1 backlog item, not a stub shipped under those names. `AgentGateway` is the one real, shipped
+`LLMGatewayBackend`/`ToolsGatewayBackend` reference adapter. Don't `pip install
+presidium-contrib[litellm]` expecting it to work -- it will fail; that extra was never declared.
+
 
 ## Conventions
 
@@ -131,9 +155,10 @@ from typing import Protocol
 # Third-party
 from civitas import AgentProcess, Runtime
 
-# Core interfaces and models
-from presidium.protocols import RegistryProtocol
-from presidium.models import AgentRecord
+# Core interfaces and models -- real, verified module names (not presidium.protocols/.models,
+# which don't exist)
+from presidium.registry import AgentRegistry
+from presidium.model import AgentRecord
 
 # Contrib adapter (optional extra)
 from presidium_contrib.registry import InMemoryRegistry
@@ -170,13 +195,22 @@ Order: stdlib → third-party → local. Enforced by Ruff `I` rules.
 
 ### `presidium` — Interface Library
 
-The core package. Contains only protocols, dataclasses, and the CEL policy engine (the one default implementation). Nothing else.
+The core package. Contains protocols, dataclasses, the CEL policy engine (the one default
+implementation), and identity/lineage logic that every deployment needs regardless of which
+contrib adapters it uses. Protocols are NOT centralized in a `presidium.protocols` module — that
+module doesn't exist. Each Protocol lives next to the component it describes (e.g. `AgentRegistry`
+in `registry/_base.py`, `PolicyEngine` in `policy/_base.py`, `LLMGatewayBackend`/
+`ToolsGatewayBackend` in `providers/gateway.py`). Dataclasses live in the singular `model.py`, not
+a `models/` package.
 
 | Module | Owns |
 |---|---|
-| `presidium.protocols` | Python `Protocol` classes for every component (Registry, PolicyEngine, LLMGateway, MCPGateway, Evaluator, CredentialStore) |
-| `presidium.models` | Shared dataclasses: `AgentRecord`, `Policy`, `Grant`, `TrustScore`, `LLMRequest`, `ToolCall`, etc. |
-| `presidium.policy` | CEL policy engine — the default `PolicyEngine` implementation. No other implementations live here. |
+| `presidium.model` | Shared dataclasses: `AgentRecord`, `Policy`, `Grant`, `TrustScore`, etc. |
+| `presidium.policy` | CEL policy engine — the default `PolicyEngine` implementation, default-deny on no match. No other implementations live here. |
+| `presidium.providers` | `GovernedModelProvider`/`GovernedToolProvider` (pure authorization), `GatewayModelProvider`/`GatewayToolProvider` (wraps a real, separate gateway process), `civitas_adapters` (direct in-process Civitas `ModelProvider`/`ToolProvider` wrapping) — three distinct composition patterns, not one |
+| `presidium.registry` | `AgentRegistry` Protocol + `InMemoryRegistry`/`SqliteRegistry` |
+| `presidium.identity` | `verify_agent_signature()` — dispatches on `AgentRecord.public_key_algorithm` (`"ed25519"` default, `"ec_p256"` for SPIFFE SVIDs) |
+| `presidium.lineage` | Trust ceiling propagation + monotonic capability narrowing across agent delegation |
 
 Install: `pip install presidium`
 
@@ -190,27 +224,40 @@ All concrete implementations. Organized into two categories:
 |---|---|---|
 | `[opa]` | `presidium_contrib.opa` | Open Policy Agent — for teams already running OPA |
 | `[openbao]` | `presidium_contrib.openbao` | OpenBao (Vault-compatible, MPL 2.0, OpenSSF) — credential management |
-| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — reference `LLMGatewayBackend` + `ToolsGatewayBackend` (LLM + MCP + A2A) with CEL policies |
-| `[litellm]` | `presidium_contrib.litellm` | LiteLLM Proxy — `LLMGatewayBackend` only. Leading 2nd-adapter pick (2026-07-07 market research), **not frozen** — see `docs/design/llm-gateway.md` |
-| `[kong]`, `[portkey]`, `[cloudflare_ai_gateway]`, `[helicone]`, `[truefoundry]` | `presidium_contrib.{name}` | `LLMGatewayBackend` stubs — interface-conformant, `NotImplementedError`. Reserve the extras name; not built |
+| `[agentgateway]` | `presidium_contrib.agentgateway` | AgentGateway (Linux Foundation) — reference `LLMGatewayBackend` + `ToolsGatewayBackend`. **Real, shipped: MCP tool-side** (`list_tools()`/`call_tool()` over Streamable HTTP). **Not yet built: A2A delegation** — `delegate_to_agent()` explicitly raises `NotImplementedError` (needs a new `a2a-sdk` dependency; tracked as a P1 roadmap item, not a silent gap) |
+| `[spiffe]` | `presidium_contrib.spiffe` | SPIRE Workload API (`spiffe` SDK) — real X.509-SVID identity sync + rotation into an `AgentRegistry`, opt-in alongside the Ed25519 default |
 | `[slack]` | `presidium_contrib.slack` | Slack — human-in-the-loop approvals |
+| `[webhook]` | `presidium_contrib.webhook` | Generic webhook — human-in-the-loop approvals |
+| `[postgres]` | `presidium_contrib.registry` | `PostgresAgentRegistry` — a durable `AgentRegistry` backend |
+| `[server]` | `presidium_contrib.server` | M7 Presidium Server — real REST+mTLS governance gateway over an actual `civitas.gateway.HTTPGateway` (wraps `civitas[http]`, not a third-party product, but genuinely optional) |
+
+**Not yet built, despite earlier documentation implying otherwise — corrected 2026-08-24**: no
+`litellm`/`kong`/`portkey`/`cloudflare_ai_gateway`/`helicone`/`truefoundry` modules or extras
+exist. They were designed and evidence-compared in `docs/design/llm-gateway.md`; AgentGateway is
+the one real, shipped `LLMGatewayBackend`, and covers the reference path for now (not urgent per
+`docs/vision/roadmap.md`'s own P1 list).
 
 **Reference Implementations** (components with no standalone library to wrap):
 
 | Module | Implements | Why here |
 |---|---|---|
-| `presidium_contrib.registry` | `RegistryProtocol` | Agent Registry with grants + trust scores — prior art exists (Google Gemini, AGT) but not as a swappable library |
-| `presidium_contrib.mcp_gateway` | `MCPGatewayProtocol` | MCP governance — existing gateways (incl. AGT) aren't standalone libraries to wrap |
-| `presidium_contrib.trust` | `TrustScoringProtocol` | Trust scoring engine — mature models exist (e.g. AGT) but none ship as a reusable library |
+| `presidium_contrib.registry` | `AgentRegistry` | Agent Registry with grants + trust scores — prior art exists (Google Gemini, AGT) but not as a swappable library |
+| `presidium_contrib.mcp_gateway` | MCP governance | Tool poisoning detection, credential redaction, PII masking — existing gateways (incl. AGT) aren't standalone libraries to wrap |
+| `presidium_contrib.trust` | `TrustScorer` | Trust scoring engine (`LearningTrustScorer`) — mature models exist (e.g. AGT) but none ship as a reusable library |
 
 Install: `pip install presidium-contrib[opa,openbao]` (mix and match extras)
 
 ### Dependency Rules
 
-1. `presidium` may depend on `civitas` and `cel-python` only
+1. `presidium` core dependencies are `civitas`, `cel-python`, `pynacl`, and `cryptography` —
+   the last two back Ed25519 (default) and EC P-256 (SPIFFE) identity verification respectively.
+   Both are real, hard, always-installed dependencies, lazily imported at the call site for
+   graceful degradation, never a separate optional extra — same precedent for both.
 2. `presidium` must not depend on `presidium-contrib` or any adapter library
 3. `presidium-contrib` depends on `presidium` (for protocols and models)
-4. `presidium-contrib` adapter extras depend on their respective backends (opa, hvac/openbao, agentgateway, slack-sdk) as optional dependencies
+4. `presidium-contrib` adapter extras depend on their respective backends (opa, hvac/openbao,
+   mcp/agentgateway, spiffe, slack-sdk, asyncpg/postgres, civitas[http]/server) as optional
+   dependencies
 5. No circular dependencies
 6. No package should import from another package's `_internal` modules
 

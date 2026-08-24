@@ -64,9 +64,19 @@ class GovernedToolProvider:
         await self._audit_sink.emit(event)
 
     async def _evaluate(
-        self, agent_name: str, resource: str, action: str
+        self,
+        agent_name: str,
+        resource: str,
+        action: str,
+        parameters: dict[str, Any] | None = None,
     ) -> tuple[PolicyResult, AgentRecord | None]:
         """Shared lookup + PRE_TOOL evaluation + audit emission.
+
+        ``parameters`` (default ``None`` -> ``{}``) is carried into ``ActionRequest.parameters``
+        untouched -- Presidium never interprets it, only makes it available to CEL policies
+        (``request.parameters.<key>``), per presidium-server-requirements.md's FR-1.4 for the
+        ``scope`` field specifically. This method doesn't know or care whether the caller is
+        passing a "scope" or anything else -- it's a plain passthrough bag.
 
         Takes a fully-built ``resource`` string -- callers each construct
         their own resource-naming convention before calling this (``check()``
@@ -97,7 +107,7 @@ class GovernedToolProvider:
 
         context = EvaluationContext(
             agent=record,
-            request=ActionRequest(resource=resource, action=action),
+            request=ActionRequest(resource=resource, action=action, parameters=parameters or {}),
             time=datetime.now(UTC),
         )
         result = await self._engine.evaluate(EvaluationStage.PRE_TOOL, context)
@@ -105,9 +115,19 @@ class GovernedToolProvider:
         return result, record
 
     async def check_grant(
-        self, agent_name: str, resource: str, action: str = "invoke"
+        self,
+        agent_name: str,
+        resource: str,
+        action: str = "invoke",
+        parameters: dict[str, Any] | None = None,
     ) -> PolicyResult:
         """Like check(), but never blocks on approval and never raises.
+
+        ``parameters`` closes FR-1.4: Presidium Server's ``check_grant`` HTTP endpoint
+        deserializes the request body's ``scope`` field (Fabrica's own cross-surface ``Scope``
+        type) straight into this parameter, so a CEL policy can reference
+        ``request.parameters.<key>`` -- Presidium never interprets ``scope`` itself, matching
+        Fabrica's own "opaque to the caller of check_grant" framing.
 
         ``resource`` is used exactly as given -- NOT prefixed with
         ``"tool:"`` the way ``check()``'s ``tool`` parameter is. Callers
@@ -124,19 +144,34 @@ class GovernedToolProvider:
         other fail-closed-as-a-return-value contract) never needs a
         try/except here.
         """
-        result, _record = await self._evaluate(agent_name, resource, action)
+        result, _record = await self._evaluate(agent_name, resource, action, parameters)
         return result
 
-    async def check(self, agent_name: str, tool: str, action: str = "invoke") -> Any:
+    async def check(
+        self,
+        agent_name: str,
+        tool: str,
+        action: str = "invoke",
+        parameters: dict[str, Any] | None = None,
+    ) -> Any:
         """Evaluate PRE_TOOL policies for a tool target. Returns PolicyResult.
 
         Thin wrapper over check_resource() with the tool: prefix -- see check_resource()'s own
         docstring for the full raise/approval/enforcement-mode behavior this delegates to.
         """
-        return await self.check_resource(agent_name, f"tool:{tool}", action)
+        return await self.check_resource(agent_name, f"tool:{tool}", action, parameters)
 
-    async def check_resource(self, agent_name: str, resource: str, action: str = "invoke") -> Any:
+    async def check_resource(
+        self,
+        agent_name: str,
+        resource: str,
+        action: str = "invoke",
+        parameters: dict[str, Any] | None = None,
+    ) -> Any:
         """Evaluate PRE_TOOL policies against a resource string used verbatim (no tool: prefix).
+
+        ``parameters`` is passed straight through to ``ActionRequest.parameters`` -- see
+        ``_evaluate()``'s own docstring.
 
         Real reuse point, not a duplicate of check(): lets a caller outside the tool: namespace
         (e.g. GatewayToolProvider.delegate_to_agent()'s agent:<name> resource, per
@@ -148,7 +183,7 @@ class GovernedToolProvider:
         Raises PolicyDeniedError on DENY, an unresolvable agent_name, or a denied
         REQUIRE_APPROVAL. Returns the PolicyResult on ALLOW, ADVISORY, or SOFT.
         """
-        result, record = await self._evaluate(agent_name, resource, action)
+        result, record = await self._evaluate(agent_name, resource, action, parameters)
         if record is None:
             raise PolicyDeniedError(result.reason, result.policy_name)
 

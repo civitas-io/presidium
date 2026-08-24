@@ -67,11 +67,24 @@ class PresidiumGatewayAgent(GenServer):
         """
         agent_id = payload.get("agent_id")
         action = payload.get("action")
+        # FR-1.4: `scope` (Fabrica's own cross-surface Scope type) is opaque to Presidium --
+        # deserialized straight through into ActionRequest.parameters so a CEL policy MAY
+        # reference it (e.g. `request.parameters.tenant_id`); never interpreted here. A real,
+        # previously-unfixed gap: this field used to be silently discarded -- FR-1.1's own
+        # documented request body has always included it, but nothing downstream ever read it.
+        scope = payload.get("scope")
 
         if not agent_id or not action:
             return {
                 "decision": "deny",
                 "reason": "Missing required field: 'agent_id' and 'action' are both required",
+                "approval_context": None,
+            }
+
+        if scope is not None and not isinstance(scope, dict):
+            return {
+                "decision": "deny",
+                "reason": "Invalid field: 'scope' must be an object if present",
                 "approval_context": None,
             }
 
@@ -86,7 +99,7 @@ class PresidiumGatewayAgent(GenServer):
         # FR-1.3 ("Option 2, refined"): resource = action verbatim,
         # Presidium's own `action` field is the fixed, generic verb "invoke".
         result = await self._runtime.tool_provider.check_grant(
-            record.name, resource=action, action="invoke"
+            record.name, resource=action, action="invoke", parameters=scope
         )
 
         approval_context: dict[str, Any] | None = None
