@@ -59,6 +59,4 @@ class TestExtractPublicKey:
             _extract_public_key(private_key.public_key())
 
         assert exc_info.value.key_type is not None
-        assert "presidium-contrib[spiffe] currently supports EC P-256 only" in str(
-            exc_info.value
-        )
+        assert "presidium-contrib[spiffe] currently supports EC P-256 only" in str(exc_info.value)

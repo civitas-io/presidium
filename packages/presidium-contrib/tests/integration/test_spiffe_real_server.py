@@ -64,6 +64,7 @@ class TestSpiffeIdentitySourceRealServer:
         finally:
             source.close()
 
+
 def test_property_access_before_start_raises_without_needing_a_real_socket() -> None:
     """Deliberately NOT under _requires_real_socket -- this is a pure
     precondition check, it never touches the Workload API at all, so it
