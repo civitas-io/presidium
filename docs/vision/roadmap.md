@@ -123,8 +123,21 @@ real, separate work, not automatically unblocked by this alone.
   `presidium-contrib` tests pass (+5), 452 `presidium` tests pass (+13), `ruff`/`mypy --strict`
   clean. Any AgentGateway pin must be `>=1.4.0` (GHSA-mvgg-jvj2-4frq, a real HIGH-severity
   security advisory, is fixed exactly there).
-- [ ] Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — the "full" version of the P0 Ed25519
-  item above, once the basic binding is fixed. Tracked under M7.
+- [x] **Build `presidium-contrib[spiffe]` (real SPIRE SVIDs) — DONE, 2026-08-24.** Real vendor
+  research (`docs/design/spiffe-vendor-research-2026-08.md`), a real design pass
+  (`docs/design/agent-registry.md`'s updated "M3+ upgrade path" section), and real implementation,
+  verified end to end against an actual running SPIRE v1.15.3 server + agent on the homelab (not
+  mocked). `AgentRecord` gained `public_key_algorithm` (additive, Ed25519 stays default);
+  `presidium.identity.verify_agent_signature()` is now algorithm-aware (`cryptography` added as a
+  real, hard core dependency, matching `pynacl`'s own precedent); `AgentRegistry.update_identity()`
+  added across all three backends for real SVID rotation (two real double-`_save()`-omission bugs
+  found and fixed during implementation, before they shipped); new
+  `presidium_contrib.spiffe.SpiffeIdentitySource`/`bind_identity_to_registry()`, a real async
+  bridge over the official `spiffe` SDK's own blocking, thread-based Workload API client. 462
+  `presidium` tests pass (+10), 174 `presidium-contrib` tests pass (+5, all passing for real on
+  the homelab, 4 correctly hardware-gated-skipped elsewhere), `ruff`/`mypy --strict` clean.
+  Certificate-based mTLS between agents and cross-deployment federation remain real, separate,
+  not-yet-built future directions (see `agent-registry.md`'s updated section).
 - [ ] LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —
   real market flexibility; AgentGateway already covers the reference path so this isn't urgent.
 - [ ] **Default-deny for `CelPolicyEngine`'s no-rule-matched case — direction decided, implementation
@@ -506,12 +519,11 @@ to it fully, but treat "build a new server" as the fallback, not the default.
   `civitas>=0.11.3`, removed both `xfail` markers — all 4 handshake scenarios now pass for real
   against the real, published dependency, no local override, no workaround. 439 `presidium` + 162
   `presidium-contrib` tests pass, 3x stable, `ruff`/`mypy --strict` clean.
-- [ ] **(P1)** Build `presidium-contrib[spiffe]` — real SPIRE-issued X.509-SVIDs, auto-rotation,
-  cross-deployment federation via trust domain bundles. **Real, pre-existing doc drift this
-  resolves**: `docs/design/agent-registry.md` already describes this extra as an "M3+ upgrade
-  path" but it **does not exist anywhere in the real codebase** — no module, no pyproject
-  extra, not even a stub. This milestone is where it would actually need to get built. Sequenced
-  after the basic Ed25519 binding above, not instead of it.
+- [x] **(P1)** Build `presidium-contrib[spiffe]` — **DONE, 2026-08-24**, real SPIRE-issued
+  X.509-SVIDs, real auto-rotation via a real Workload API subscription. See the "real vendor
+  research done" entry above (Implementation Priority §P1) for full detail. Cross-deployment
+  federation via trust domain bundles remains a real, separate, not-yet-built future direction,
+  not silently dropped.
 - [ ] **(P1)** Rate limiting / backpressure at the network boundary — a real concern for a shared
   network service that doesn't exist for an in-process library call
 

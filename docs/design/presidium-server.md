@@ -33,7 +33,8 @@ check_grant()` — a fully-specified, implementation-ready contract — has noth
 - A true distributed GenServer mesh recomposing `PolicyEvaluatorServer`/`RegistryServer` for
   `check_grant` — `GovernedRuntime`'s existing in-process composition already does this correctly.
 - `presidium-contrib[spiffe]` (real SPIRE SVIDs) — a separate, later upgrade to agent-level
-  identity, not required for this milestone's service-level mTLS.
+  identity, not required for this milestone's service-level mTLS. **Shipped 2026-08-24** — still
+  genuinely separate from this milestone's own mTLS, as predicted here.
 - Implementing the default-deny direction for `CelPolicyEngine`'s no-match case — a real, decided,
   but separately-tracked piece of work (see `docs/vision/roadmap.md`).
 

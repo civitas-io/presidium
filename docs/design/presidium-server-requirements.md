@@ -178,6 +178,8 @@ changes needed to this milestone's own code.
   designed, not built).
 - Implementing the default-deny direction itself (NFR-3; recorded, deferred, tracked separately).
 - `presidium-contrib[spiffe]` (real SPIRE-issued SVIDs) — a real, separate, later upgrade to the
-  *agent-level* identity story, not required for this milestone's mTLS.
+  *agent-level* identity story, not required for this milestone's mTLS. **Shipped 2026-08-24**
+  (`docs/design/spiffe-vendor-research-2026-08.md`) — still genuinely separate from and does not
+  touch this milestone's own mTLS, confirming the boundary stated here was correct.
 - A true distributed GenServer mesh for `check_grant` (Option B) — real future value, not needed
   for the first real consumer.

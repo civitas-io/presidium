@@ -48,6 +48,40 @@ fed directly into a real design pass (`docs/design/mcp-gateway.md`'s "Design dec
 167 presidium-contrib tests pass (was 162, +5 real new ones), 452 presidium tests pass (was 439,
 +13 new), `ruff`/`mypy --strict` clean on both packages' `src/`.
 
+**`presidium-contrib[spiffe]` -- DONE, 2026-08-24.** Real vendor research
+([`docs/design/spiffe-vendor-research-2026-08.md`](docs/design/spiffe-vendor-research-2026-08.md))
+into a real design pass and implementation, verified end to end against an actual running SPIRE
+v1.15.3 server + agent on the homelab -- not mocked:
+
+- **`AgentRecord` gained `public_key_algorithm`** (`"ed25519"` default, `"ec_p256"` additive) --
+  `presidium.identity.verify_agent_signature()` now dispatches on it; the Ed25519 path is
+  completely untouched. `cryptography>=41` added as a real, hard core `presidium` dependency,
+  matching `pynacl`'s own exact precedent (lazily imported for graceful degradation, but a real
+  declared dependency, not a new optional extra).
+- **New `AgentRegistry.update_identity()`** across all three backends (`InMemoryRegistry`,
+  `SqliteRegistry`, `PostgresAgentRegistry`) -- real rotation support, since nothing before this
+  could ever update an existing agent's stored identity at all.
+- **Two real bugs caught and fixed DURING implementation, before they shipped**: `SqliteRegistry`
+  and `PostgresAgentRegistry`'s shared `_save()` helper never included `public_key`/
+  `public_key_algorithm` in its `UPDATE` statement at all -- harmless before now (the key was
+  immutable), but would have made `update_identity()` silently no-op on both backends.
+- **New `presidium_contrib.spiffe`** (`SpiffeIdentitySource`, `bind_identity_to_registry()`) --
+  a real async bridge over the official `spiffe` SDK's Workload API client, which is itself a
+  **blocking, thread-based API, confirmed directly against its own source, not asyncio-native**
+  (unlike everything else in this org's codebase). The blocking constructor runs via
+  `asyncio.to_thread()`; the SDK's own synchronous rotation callback is bridged back via
+  `asyncio.run_coroutine_threadsafe()`.
+- **Verified for real on the homelab**: a real SPIRE v1.15.3 server + agent, a real registration
+  entry, a real fetched X.509-SVID confirmed as genuine EC P-256 with the SPIFFE ID as its SAN
+  URI -- exactly as predicted by the vendor research, not assumed. 5 real end-to-end tests pass
+  there (correctly hardware-gated-skipped elsewhere, matching Fabrica's own `srt`-availability
+  precedent), plus 4 new pure-function tests (no server needed) for the key-extraction logic.
+- **Explicitly NOT built, named not hidden**: certificate-based mTLS between agents and
+  cross-deployment federation via trust domain bundles -- real, separate future directions.
+
+462 `presidium` tests pass (+10), 174 `presidium-contrib` tests pass (+5, all real on the
+homelab), `ruff`/`mypy --strict` clean on both packages' `src/`.
+
 ---
 
 ## Status as of 2026-08-22: **presidium and presidium-contrib are real, live, public PyPI packages**

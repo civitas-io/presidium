@@ -121,15 +121,15 @@ presidium://local/researcher                       # dev/local (no trust domain 
 presidium://partner.org/prod/their-agent            # federated (different org)
 ```
 
-**Cryptographic binding**: each agent's identity is bound to its Ed25519 keypair. The `public_key` field on `AgentRecord` enables verification — an agent proves it IS this identity by signing with its corresponding private key. Civitas already provisions Ed25519 keypairs for message signing (M4.2a); Presidium reuses them for identity.
+**Cryptographic binding**: each agent's identity is bound to a keypair -- `AgentRecord.public_key` plus the new (2026-08-24) `public_key_algorithm` field (`"ed25519"` default, `"ec_p256"` for a real SPIFFE identity). `presidium.identity.verify_agent_signature()` dispatches on it, so verification is algorithm-aware, not hardcoded to Ed25519. Civitas already provisions Ed25519 keypairs for message signing (M4.2a); Presidium reuses them for identity by default.
 
-**SPIFFE compatibility**: the `presidium://` scheme follows the same structural conventions as `spiffe://` URIs (trust domain + hierarchical path). When the user upgrades to `presidium-contrib[spiffe]`, the identity can be backed by real SPIFFE SVIDs (X.509 certificates with 24-hour auto-rotation) without changing the URI format. This aligns with CNCF standards for enterprise interoperability.
+**SPIFFE compatibility**: the `presidium://` scheme follows the same structural conventions as `spiffe://` URIs (trust domain + hierarchical path) -- confirmed as a direct, unmodified mapping against a real SPIRE server (`presidium://{trust_domain}{path}`, `path` already carrying its own leading slash). When the user installs `presidium-contrib[spiffe]`, the identity is backed by a real SPIFFE X.509-SVID without changing the URI format. This aligns with CNCF standards for enterprise interoperability.
 
 **Trust domain configuration**: the `trust_domain` is set via `presidium.registry.trust_domain` in topology YAML (default: `"local"`). It forms the authority portion of the `presidium://` URI: `presidium://{trust_domain}/{path}`.
 
 **M2 behavior**: identities are generated locally from `{trust_domain}/{runtime}/{agent_name}` using configuration from topology YAML. Ed25519 signing provides cryptographic verification. No CA or SPIRE infrastructure required.
 
-**M3+ upgrade path**: `presidium-contrib[spiffe]` issues real X.509-SVIDs via SPIRE, enabling certificate-based mTLS between agents, automatic credential rotation, and cross-deployment federation via trust domain bundles.
+**M3+ upgrade path -- real, shipped, 2026-08-24**: `presidium-contrib[spiffe]` (`presidium_contrib.spiffe.SpiffeIdentitySource` + `bind_identity_to_registry()`) issues real X.509-SVIDs via SPIRE, with real automatic credential rotation (`X509Source.subscribe_for_updates()`, bridged into this codebase's own asyncio world -- the real `spiffe` SDK's own Workload API client is a blocking, thread-based API, confirmed directly, not asyncio-native). Verified end to end against a real, running SPIRE v1.15.3 server + agent, including a real fetched SVID's leaf certificate confirmed as genuine EC P-256 with the SPIFFE ID as its SAN URI, exactly as `docs/design/spiffe-vendor-research-2026-08.md` predicted. **Certificate-based mTLS between agents and cross-deployment federation via trust domain bundles remain real, separate, NOT-yet-built future directions** -- this milestone is agent-level identity binding + rotation only, not a replacement for or extension of Civitas's own gateway-level mTLS (M7, already shipped, a genuinely separate mechanism -- see `presidium-server-requirements.md` FR-3.2).
 
 ### Agent States
 
