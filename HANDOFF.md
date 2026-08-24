@@ -14,10 +14,20 @@ mirrors everything below in more narrative form, kept in sync after every real c
 ## Status as of 2026-08-24: **presidium v0.3.0 and presidium-contrib v0.3.0 are real, live on PyPI**
 
 ```
-pip install presidium          # 0.3.0
-pip install presidium-contrib  # 0.6.0
-pip install "presidium-contrib[agentgateway,spiffe,server]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server + rate limiting + registry CRUD + approval list/decide
+pip install presidium          # 0.4.0
+pip install presidium-contrib  # 0.7.0
+pip install "presidium-contrib[agentgateway,spiffe,server,sqlite]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server (check_grant + rate limiting + registry CRUD + approval list/decide), the presidium CLI's registry list command
 ```
+
+**M5 (SDK + CLI) started, 2026-08-24: the first real `presidium` CLI, released.**
+[`v0.4.0`](https://github.com/civitas-io/presidium/releases/tag/v0.4.0) /
+[`contrib-v0.7.0`](https://github.com/civitas-io/presidium/releases/tag/contrib-v0.7.0) --
+`presidium version`, `registry list`, `policy validate`, `trust replay`, confirmed via a real
+fresh-venv install against the actual published PyPI packages. **A real CI failure caught and
+fixed the same session, not left broken**: a CLI test asserted on Rich-rendered text that wraps
+differently on CI's narrower terminal than locally, splitting a filename itself across a line
+break -- fixed with a real, general `unwrapped()` test helper (strips Rich's own wrap newlines
+before any substring check), not a narrow one-off patch.
 
 Confirmed via a real fresh-venv install against the actual published PyPI packages (not local
 source) -- base imports, the new `providers.gateway`/`identity`/`lineage` modules,
