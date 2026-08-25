@@ -1524,3 +1524,39 @@ tests pass against the upgraded, real, current dependency floors. `ruff`/`ruff f
 `docs/index.md`, `docs/vision/roadmap.md`, `docs/design/trust-scoring-requirements.md`,
 `CHANGELOG.md`, `HANDOFF.md`, `civitas-io/fabrica`'s `pyproject.toml`/`uv.lock`/`HANDOFF.md`,
 `civitas-io/.github` org profile README, `civitas-io/context` wiki, `docs/log.md` (this entry).
+
+## [2026-08-25] fix | Grant.condition really evaluated -- reported by an external audit
+
+**Trigger:** A coding agent working on a different, downstream project (a real consumer of
+`civitas-io` products) audited this codebase and reported three real findings. Verified all three
+directly against source before agreeing with any of them -- this entry covers the first, highest-
+severity one.
+
+**What changed:** `Grant.condition` was documented ("CEL expression evaluated at policy time")
+but `CelPolicyEngine` never compiled or ran it -- only serialized it and injected it into the CEL
+activation as an inert string (`_build_activation()`'s `"condition": g.condition or ""`). Any
+grant with a `condition` set was unconditionally active regardless of what it said, including a
+syntactically invalid string. `docs/design/policy-engine.md`'s own "Grant Integration" section had
+specified the correct, real behavior all along -- the implementation just never caught up.
+
+Fixed to match the design exactly: `_build_activation()` now compiles (cached by expression text,
+since grants are runtime registry data, not load-time policy) and evaluates each grant's
+`condition` against a minimal `agent`/`request`/`time` activation -- deliberately excluding
+`agent.grants` (self-referential) and `result` (conditions gate activity identically regardless of
+stage) -- excluding the grant from `active_grants` on a falsy result, a compile error, or a raised
+exception. Fail-closed, reusing the engine's existing invariant for rule-expression errors, not a
+new one. A bad condition string is warned about once, not once per request.
+
+**Real, deliberate behavioral change, no opt-out**: any existing grant with a non-empty
+`condition` is now actually enforced. Unlike the CEL default-deny flip (0.3.0), there is no
+toggle to restore the old behavior -- it was a straightforward bug, not a legitimate posture.
+
+**Verification:** 478 `presidium` tests pass (+9 new, covering true/false/missing/malformed/
+raising conditions, request-field references, the compile cache, and the deliberate
+`agent.grants` exclusion), 100% coverage on `presidium/policy/cel.py`, `ruff`/`mypy --strict`
+clean. Released as `presidium` v0.5.0 (`presidium-contrib` unchanged, stays v0.7.0).
+
+**Pages updated:** `packages/presidium/src/presidium/model.py` (docstring),
+`packages/presidium/src/presidium/policy/cel.py`, `packages/presidium/tests/unit/policy/
+test_cel.py`, `docs/design/policy-engine.md` (new P8 Design Decision row), `CHANGELOG.md`,
+`HANDOFF.md`, `docs/log.md` (this entry).

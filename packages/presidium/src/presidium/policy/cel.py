@@ -68,6 +68,16 @@ class CelPolicyEngine:
         self._rules_by_stage: dict[EvaluationStage, list[_CompiledRule]] = {}
         self._allow_unmatched_requests = allow_unmatched_requests
         self._unmatched_enforcement = unmatched_enforcement
+        # Grant.condition (2026-08-25 fix) -- compiled lazily, not at load_policies()
+        # time, since grants are runtime *data* (registry-held), not policy-file
+        # rules known up front. Cached by expression text: the same condition string
+        # commonly recurs across many evaluations of the same (or identically
+        # configured) grant, and compilation is not free. `None` is a real cached
+        # value meaning "this string failed to compile" -- distinct from "not yet
+        # seen" (absent key) -- so a bad condition is only ever (re)compiled once,
+        # not once per request.
+        self._condition_programs: dict[str, celpy.Runner | None] = {}
+        self._warned_bad_conditions: set[str] = set()
 
     def load_policies(self, rules: list[PolicyRule]) -> None:
         new_rules: dict[EvaluationStage, list[_CompiledRule]] = {}
@@ -99,11 +109,86 @@ class CelPolicyEngine:
 
         self._rules_by_stage = new_rules
 
+    def _grant_condition_holds(self, condition: str, context: EvaluationContext) -> bool:
+        """Real evaluation of Grant.condition (2026-08-25 fix -- was previously a
+        documented-but-dead field, see docs/design/policy-engine.md's "Design
+        Decisions" for the full writeup).
+
+        Evaluated against a minimal activation -- ``agent``/``request``/``time`` only,
+        matching the field's own documented example (``"agent.trust.value >= 0.7"``).
+        Deliberately excludes ``agent.grants`` (this grant's own membership in that
+        list is exactly what's being decided -- referencing it here would be a
+        self-referential, ill-defined check) and ``result`` (conditions gate whether
+        a grant is active for a request, evaluated identically regardless of stage;
+        POST-stage-only data has no meaning here).
+
+        Fails closed: a condition that fails to compile or raises during evaluation
+        makes the grant inactive for this request (as if it had expired), not an
+        engine-wide error and not silently-always-active. A warning is logged once
+        per distinct bad condition string, not once per request, to avoid log spam
+        for a persistently-misconfigured grant.
+        """
+        if condition not in self._condition_programs:
+            try:
+                ast = self._env.compile(condition)
+                self._condition_programs[condition] = self._env.program(ast)
+            except celpy.CELParseError as exc:  # type: ignore[attr-defined]
+                if condition not in self._warned_bad_conditions:
+                    logger.warning(
+                        "Grant.condition failed to compile -- grant treated as "
+                        "inactive (fail-closed): %r (%s)",
+                        condition,
+                        exc,
+                    )
+                    self._warned_bad_conditions.add(condition)
+                self._condition_programs[condition] = None
+
+        program = self._condition_programs[condition]
+        if program is None:
+            return False
+
+        activation: Any = celpy.json_to_cel(  # type: ignore[attr-defined]
+            {
+                "agent": {
+                    "name": context.agent.name,
+                    "agent_id": context.agent.agent_id,
+                    "owner": context.agent.owner or "",
+                    "status": context.agent.status.value,
+                    "trust": {
+                        "value": context.agent.trust_value,
+                        "tier": context.agent.trust_tier.value,
+                    },
+                },
+                "request": {
+                    "resource": context.request.resource,
+                    "action": context.request.action,
+                    "parameters": context.request.parameters,
+                },
+                "time": context.time.isoformat(),
+            }
+        )
+        try:
+            result = program.evaluate(activation)
+        except Exception as exc:
+            if condition not in self._warned_bad_conditions:
+                logger.warning(
+                    "Grant.condition raised during evaluation -- grant treated as "
+                    "inactive (fail-closed): %r (%s)",
+                    condition,
+                    exc,
+                )
+                self._warned_bad_conditions.add(condition)
+            return False
+
+        return str(result) == "True"
+
     def _build_activation(self, context: EvaluationContext) -> Any:
         now = context.time
         active_grants: list[dict[str, Any]] = []
         for g in context.agent.grants:
             if g.expires_at is not None and g.expires_at < now:
+                continue
+            if g.condition and not self._grant_condition_holds(g.condition, context):
                 continue
             active_grants.append(
                 {

@@ -6,6 +6,43 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This pr
 
 ---
 
+## [presidium 0.5.0] - 2026-08-25
+
+**Real security-relevant fix, reported by a downstream consumer's own coding-agent audit of
+this codebase, not caught internally first**: `Grant.condition` was documented ("CEL expression
+evaluated at policy time, e.g. `agent.trust.value >= 0.7`") but never actually compiled or
+evaluated -- it was only ever serialized/deserialized and injected into the CEL activation as an
+inert string. A grant with any `condition` set, including a syntactically invalid one, was
+unconditionally active as long as its `resources`/`actions`/`scope` matched. Anyone relying on
+per-grant conditions for fine-grained authorization had a false sense of enforcement.
+
+### Fixed
+
+- **`CelPolicyEngine` now really evaluates `Grant.condition`.** `_build_activation()` already had
+  the right precedent (expired grants are filtered from `active_grants` before any rule sees
+  them) -- `condition` now follows the identical pattern: compiled (cached by expression text,
+  since grants are runtime data, not load-time policy) and evaluated against a minimal
+  `agent`/`request`/`time` activation (deliberately excluding `agent.grants` itself -- a grant
+  deciding its own membership from its own list would be self-referential -- and `result`,
+  since conditions gate grant activity identically regardless of stage). A falsy result, a
+  compile error, or a raised exception during evaluation all exclude the grant from
+  `active_grants` for that request -- fail-closed, matching this engine's existing invariant for
+  rule-expression errors, not a new one. Warnings for a bad condition string are logged once,
+  not once per request. This exactly matches `docs/design/policy-engine.md`'s own "Grant
+  Integration" section, which had specified this behavior correctly all along -- only the
+  implementation was missing.
+- `Grant.condition`'s docstring updated to document the real activation shape it's evaluated
+  against, and that `None`/`""` means "always active" (unchanged).
+
+**Real, deliberate behavioral change**: any existing grant with a non-empty `condition` will now
+be actually enforced. There is no opt-out toggle -- the previous silent-no-op behavior was a bug,
+not a legitimate deployment posture, unlike the CEL default-deny flip in 0.3.0 which did get one.
+
+478 `presidium` tests pass (+9), 100% coverage on `presidium/policy/cel.py`, `ruff`/
+`mypy --strict` clean.
+
+---
+
 ## [presidium 0.4.0 / presidium-contrib 0.7.0] - 2026-08-24
 
 Start of M5 (SDK + CLI) -- the first real CLI, `presidium`, mirroring `civitas-io/python-civitas`'s

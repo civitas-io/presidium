@@ -299,6 +299,134 @@ class TestCelPolicyEngineGrantFiltering:
         assert result.decision == PolicyDecision.ALLOW
 
 
+class TestGrantConditionRealEvaluation:
+    """Grant.condition (2026-08-25 fix) -- was previously a documented-but-dead
+    field: serialized/deserialized, injected into the activation as an inert
+    string, never compiled or executed. These prove it's real now."""
+
+    async def test_true_condition_keeps_grant_active(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read"],
+            id="conditional",
+            condition="agent.trust.value >= 0.4",
+        )
+        ctx = _make_context(grants=[grant], trust_value=0.5)
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_false_condition_excludes_grant(self) -> None:
+        """The load-bearing case the original report described: a grant whose
+        condition isn't met must NOT unconditionally authorize the request."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read"],
+            id="conditional",
+            condition="agent.trust.value >= 0.9",
+        )
+        ctx = _make_context(grants=[grant], trust_value=0.5)
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_condition_can_reference_request(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read", "write"],
+            id="conditional",
+            condition='request.action != "write"',
+        )
+        ctx = _make_context(grants=[grant], action="write")
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_none_condition_always_active(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
+        grant = Grant(resources=["tool:database"], actions=["read"], id="unconditional")
+        ctx = _make_context(grants=[grant])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_empty_string_condition_always_active(self) -> None:
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
+        grant = Grant(
+            resources=["tool:database"], actions=["read"], id="unconditional", condition=""
+        )
+        ctx = _make_context(grants=[grant])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.ALLOW
+
+    async def test_uncompilable_condition_fails_closed_not_a_crash(self) -> None:
+        """A syntactically invalid condition must not silently pass (the original
+        bug) nor blow up the whole evaluation -- the grant is simply inactive."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read"],
+            id="broken",
+            condition="this is not valid CEL !!!",
+        )
+        ctx = _make_context(grants=[grant])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_condition_referencing_unknown_field_fails_closed(self) -> None:
+        """Compiles fine, raises at evaluation time (unknown field access) --
+        must also fail closed, not propagate an exception out of evaluate()."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read"],
+            id="broken",
+            condition="agent.nonexistent_field > 0",
+        )
+        ctx = _make_context(grants=[grant])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+    async def test_condition_compiled_once_cached_across_evaluations(self) -> None:
+        """Same expression text across two different grants/requests should hit
+        the compile cache, not recompile -- observable via the cache dict itself."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS, ALLOW_ALL])
+        condition = "agent.trust.value >= 0.4"
+        grant = Grant(resources=["tool:database"], actions=["read"], id="a", condition=condition)
+        ctx = _make_context(grants=[grant], trust_value=0.5)
+        await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert condition in engine._condition_programs
+        cached_program = engine._condition_programs[condition]
+
+        grant2 = Grant(resources=["tool:database"], actions=["read"], id="b", condition=condition)
+        ctx2 = _make_context(grants=[grant2], trust_value=0.5)
+        await engine.evaluate(EvaluationStage.PRE_TOOL, ctx2)
+        assert engine._condition_programs[condition] is cached_program
+
+    async def test_condition_cannot_see_agent_grants(self) -> None:
+        """Deliberately excluded from the condition's own activation -- a grant
+        deciding its own activity from its own list membership would be
+        self-referential and ill-defined."""
+        engine = CelPolicyEngine()
+        engine.load_policies([ENFORCE_GRANTS])
+        grant = Grant(
+            resources=["tool:database"],
+            actions=["read"],
+            id="broken",
+            condition="agent.grants.size() > 0",
+        )
+        ctx = _make_context(grants=[grant])
+        result = await engine.evaluate(EvaluationStage.PRE_TOOL, ctx)
+        assert result.decision == PolicyDecision.DENY
+
+
 class TestCelPolicyEngineFailClosed:
     async def test_eval_error_returns_deny(self) -> None:
         engine = CelPolicyEngine()

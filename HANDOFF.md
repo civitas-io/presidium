@@ -11,10 +11,10 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 `civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
 
-## Status as of 2026-08-24: **presidium v0.3.0 and presidium-contrib v0.3.0 are real, live on PyPI**
+## Status as of 2026-08-25: **presidium v0.5.0 and presidium-contrib v0.7.0 are real, live on PyPI**
 
 ```
-pip install presidium          # 0.4.0
+pip install presidium          # 0.5.0
 pip install presidium-contrib  # 0.7.0
 pip install "presidium-contrib[agentgateway,spiffe,server,sqlite]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server (check_grant + rate limiting + registry CRUD + approval list/decide), the presidium CLI's registry list command
 ```
@@ -51,6 +51,30 @@ documented "wait and re-check via the JSON API" precedent, not a real release bu
 **Everything in this file below the CHANGELOG-summarized entries is now genuinely live and
 installable**, not just committed to `main` -- see `CHANGELOG.md`'s `[0.3.0]` entry for the
 single, comprehensive summary of what shipped since v0.2.1/v0.2.0.
+
+## `Grant.condition` is now really evaluated -- DONE, 2026-08-25
+
+**Real security gap, reported by a downstream consumer's own coding-agent audit of this codebase
+-- not caught internally first.** `Grant.condition` was documented ("CEL expression evaluated at
+policy time") but `CelPolicyEngine` never actually compiled or ran it -- only serialized it and
+injected it into the activation as an inert string. Any grant with a `condition` set was
+unconditionally active regardless of what the condition said, including a syntactically invalid
+one. `docs/design/policy-engine.md`'s own "Grant Integration" section had specified the correct
+real behavior all along; the implementation just never caught up to the design.
+
+Fixed to match: `_build_activation()` now compiles (cached by expression text) and evaluates each
+grant's `condition` against a minimal `agent`/`request`/`time` activation, excluding the grant
+from `active_grants` on a falsy result, a compile error, or a raised exception -- fail-closed,
+reusing this engine's existing invariant, not a new one. No opt-out toggle: the old behavior was
+a bug, not a legitimate posture. Released as `presidium` v0.5.0 (`presidium-contrib` unchanged,
+stays v0.7.0). See `docs/log.md` and `CHANGELOG.md`'s `[presidium 0.5.0]` entry for the full
+detail. 478 tests pass (+9), 100% coverage on `presidium/policy/cel.py`.
+
+**Two more real findings from the same external audit, not yet fixed** (tracked in "What's next"
+below): `fabrica.scope.Scope` has no slot for arbitrary action-specific parameters even though
+the server side already accepts them; `civitas.supervisor.DynamicSupervisor.on_spawn_requested`
+has no reference Presidium integration, so a dynamically-spawned child agent is approved-by-
+default at the spawn boundary today.
 
 **GH #26 (Streamable HTTP MCP transport, python-civitas/fabrica) -- DONE, closed, benchmarked.**
 See either of those repos' own `HANDOFF.md` for the real detail.
@@ -481,6 +505,16 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 
 ## What's next — the real, current P1 list (see roadmap.md for the full detail on each)
 
+- **`civitas.supervisor.DynamicSupervisor.on_spawn_requested` has no Presidium reference
+  integration** -- a real, external finding (2026-08-25). The hook exists and works, but no
+  adapter connects it to `GovernedToolProvider`, so a dynamically-spawned child agent is
+  approved-by-default at the spawn boundary today, independent of whatever policy would say.
+  Plan: `governed_spawn_check()` + `GovernedDynamicSupervisor` in `presidium.providers.
+  civitas_adapters` (already the right home -- see that module's own docstring), using
+  `check_grant(spawner, resource=f"agent:{agent_class.__name__}", action="spawn", ...)`.
+- **`fabrica.scope.Scope` has no slot for arbitrary action-specific parameters** -- also from the
+  2026-08-25 external audit, tracked and to be fixed in `civitas-io/fabrica`, not this repo (the
+  server side already accepts arbitrary `scope` keys; the client type is the gap).
 - **M5 (SDK + CLI) -- started, not finished.** Real, named remaining pieces: `presidium run`
   (bootstrap a `GovernedRuntime` from topology YAML, mirroring `civitas run`); registry
   list/policy validate against a *live* `presidium-server`'s HTTP endpoints (`--server-url`

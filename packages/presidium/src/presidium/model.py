@@ -122,7 +122,15 @@ class Grant:
     """Optional scope constraints, e.g. {"environment": "prod"}."""
 
     condition: str | None = None
-    """CEL expression evaluated at policy time, e.g. "agent.trust.value >= 0.7"."""
+    """CEL expression gating whether this grant is active for a given request, e.g.
+    "agent.trust.value >= 0.7". **Really evaluated** (CelPolicyEngine, 2026-08-25) --
+    a falsy, non-compiling, or raising condition makes the grant invisible to policy
+    rules for that request, exactly like an expired grant. Evaluated against a
+    minimal activation: ``agent`` (name/agent_id/owner/status/trust) and ``request``
+    (resource/action/parameters) and ``time`` -- NOT ``agent.grants`` (this grant's
+    own membership is what's being decided) and NOT ``result`` (conditions gate
+    grant activity identically across stages, before any POST-stage result exists).
+    ``None`` or ``""`` means always active (no gate), same as today."""
 
     expires_at: datetime | None = None
     """When this grant expires. None means no expiry."""
