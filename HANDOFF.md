@@ -81,6 +81,18 @@ remains correctly out of scope.**
 harness), not a behavioral or API change to either package. `presidium`/`presidium-contrib`
 versions are unchanged.
 
+**Real, separate follow-up also closed the same day**: M8's own checklist named MCP governance's
+regex-based scanning (`PIIDetector`/`PoisoningDetector`/`redact_dict`) as a second, unbenchmarked
+GIL-bound cost center -- "not assumed fine by proximity." Now benchmarked too (`docs/design/
+performance-research.md` §8, harness added to the same `benchmarks/` directory:
+`mcp_governance_microbench.py`, `mcp_pipeline_e2e_bench.py`, `redos_check.py`). **Real,
+previously-unmeasured finding**: `PIIDetector.scan_dict()`/`mask_dict()` scale linearly with
+tool-OUTPUT size (not rule count) -- a 1MB tool result costs **60-115ms** of real regex
+processing, a genuinely larger cost than CEL evaluation at any realistic rule count. A real,
+honest ReDoS smoke test on the `credit_card` pattern found no catastrophic backtracking (with a
+real theoretical explanation: the `{13,19}` bound caps worst-case partitioning), explicitly not
+claimed as an exhaustive proof. No package release for this either -- pure research.
+
 ## Spawn-time governance -- DONE, 2026-08-25 (third and final fix from the external audit)
 
 `civitas.supervisor.DynamicSupervisor.on_spawn_requested` -- a real, working veto hook Civitas
@@ -581,11 +593,10 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
   prerequisite for M5's own `trust show`/`trust events` CLI commands** (not yet built for
   exactly this reason): a durable, queryable trust-event history, arguably M4's own FR-4.5
   (decision journal).
-- **M8 is DONE** (see the section above) -- real, current remaining follow-ups from it:
-  MCP governance's regex-based scanning (`PIIDetector`/`PoisoningDetector`/redaction) was never
-  benchmarked (a second, real, GIL-bound cost center, not assumed fine by proximity); Option C
-  (a Rust-backed CEL evaluator) was not prototyped, only grounded in directional evidence --
-  worth a contained spike if Option A's horizontal scaling proves insufficient for a real
+- **M8 is DONE, including its own MCP-governance regex-scanning follow-up** (see the two
+  sections above) -- real, current remaining follow-up: Option C (a Rust-backed CEL evaluator)
+  was not prototyped, only grounded in directional evidence -- worth a contained spike if
+  Option A's horizontal scaling proves insufficient for a real
   deployment's throughput needs.
 
 ## Working conventions established this session, worth continuing
