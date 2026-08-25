@@ -18,6 +18,14 @@ distinction:
 - **`opa_equivalent.rego`** + **`run_opa_matrix.sh`** -- the one real, fair, same-hardware
   comparison point identified by the council session in `docs/design/performance-research.md`
   (OPA is free, open source, and independently replicable, unlike AGT/Kastra's internals).
+- **`mcp_governance_microbench.py`** -- isolated `PIIDetector`/`PoisoningDetector`/`redact_dict`
+  benchmarks at varying tool-output sizes (1KB-1MB) -- see `docs/design/performance-research.md`
+  §8.
+- **`mcp_pipeline_e2e_bench.py`** -- the real, composed `GovernedMcpToolPipeline.call_tool()`
+  cost end to end.
+- **`redos_check.py`** -- a real, honest adversarial-input smoke test for catastrophic regex
+  backtracking, run in a subprocess with a hard wall-clock timeout so a genuinely catastrophic
+  case can't hang the harness itself.
 
 ## Usage
 

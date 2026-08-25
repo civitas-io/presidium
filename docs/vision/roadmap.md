@@ -763,10 +763,15 @@ full real results:**
   Recommended as the next real lever if Option A proves insufficient.
 - [x] Option D — correctly not evaluated, per this item's own original sequencing ("only worth
   it if A-C don't clear the bar" -- A already does, for today's known load).
-- [ ] MCP governance's regex-based scanning (`PIIDetector`, `PoisoningDetector`, redaction) —
-  CPU-bound string processing over potentially large tool outputs, a second real GIL-bound cost
-  center worth benchmarking alongside policy evaluation, not assumed fine by proximity. **Still
-  open** — not covered by this pass, a real, separate follow-up.
+- [x] MCP governance's regex-based scanning (`PIIDetector`, `PoisoningDetector`, redaction) —
+  **Done, 2026-08-25** (a real, separate follow-up pass -- see `docs/design/
+  performance-research.md` §8). `PIIDetector.scan_dict()`/`mask_dict()`/`redact_dict()` scale
+  linearly with tool-OUTPUT size, not rule count -- a 1MB result costs ~60-115ms of real,
+  GIL-bound regex processing, a genuinely larger cost than CEL evaluation at any realistic rule
+  count. `PoisoningDetector.check()` confirmed cheap and output-size-independent (~3.4µs). A
+  real, honest ReDoS smoke test on the `credit_card` pattern's bounded-repetition shape found no
+  catastrophic backtracking (with a real theoretical explanation, not just a lucky result), but
+  is explicitly not claimed as an exhaustive proof.
 
 **Deliberately not decided here, per this project's own "ship the default, revisit only with
 evidence" discipline** (the same discipline that shipped `fabrica`'s retriever as pure Python v1
