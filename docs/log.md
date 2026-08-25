@@ -1560,3 +1560,50 @@ clean. Released as `presidium` v0.5.0 (`presidium-contrib` unchanged, stays v0.7
 `packages/presidium/src/presidium/policy/cel.py`, `packages/presidium/tests/unit/policy/
 test_cel.py`, `docs/design/policy-engine.md` (new P8 Design Decision row), `CHANGELOG.md`,
 `HANDOFF.md`, `docs/log.md` (this entry).
+
+## [2026-08-25] feat | Spawn-time governance -- third and final fix from the external audit
+
+**Trigger:** Third of three findings reported by a coding agent working on a different,
+downstream project's own audit of this codebase (see the two entries above for #1 and #2).
+Verified directly against source before agreeing: grepped the whole `python-civitas` codebase
+for `presidium`/`Presidium`/`check_grant` in `supervisor.py` -- zero hits.
+
+**What changed:** `civitas.supervisor.DynamicSupervisor.on_spawn_requested` -- a real, working
+governance veto hook Civitas already ships -- had no reference integration to Presidium's policy
+engine anywhere. A dynamically-spawned child agent was approved-by-default at the spawn boundary
+regardless of what policy would say, unless a caller hand-wrote their own subclass.
+
+New `presidium.providers.civitas_adapters.governed_spawn_check()`: calls `GovernedToolProvider.
+check_grant(spawner, resource=f"agent:{agent_class.__name__}", action="spawn",
+parameters={"name": name, **config})`, matching the existing `agent:<name>` grant namespace
+convention (`GatewayToolProvider.delegate_to_agent()`). Uses `check_grant()`, not `check()`/
+`check_resource()` (which raise) -- matching `on_spawn_requested`'s own bool-returning contract,
+the same reasoning `civitas-io/fabrica`'s own `execute_in_sandbox` already follows for exactly
+this kind of value-based caller. ADVISORY/SOFT enforcement never blocks (only logs), matching
+`check_resource()`'s own established semantics; REQUIRE_APPROVAL is treated as deny under HARD
+enforcement (no synchronous suspend/resume mechanism available at this call site). An
+unattributed spawner (`current_spawner == ""`) needs no special-casing -- `check_grant()`'s
+existing "agent not found in registry" path already fails closed for free. New
+`GovernedDynamicSupervisor` -- a ready-to-use subclass for the common case.
+
+**Real, second instance of the same "documented, never built" bug class found in the same
+audit, in a different file**: `docs/design/agent-registry.md`'s own "Dynamic Spawning
+Integration" section had a DIFFERENT never-implemented `on_spawn_requested` pseudocode (subset-
+grant privilege containment, FR-4.2/FR-4.5 in `agent-registry-requirements.md`) -- `_is_subset`/
+`SpawnError`/`self.spawner_name` do not exist anywhere in this codebase. Corrected both design
+docs in place: the new mechanism is genuinely complementary (policy-based authorization of the
+spawn act itself), not a replacement for FR-4.2/4.5's privilege-containment check, which remains
+a real, separate, still-unbuilt follow-up.
+
+**Verification:** 487 `presidium` tests pass (+9: allowed/denied/unattributed-spawner/unmatched-
+default-deny/advisory-non-blocking/config-visible-to-policy/supervisor-delegation/other-kwargs-
+still-work), 100% coverage on `presidium/providers/civitas_adapters.py`, `ruff`/`mypy --strict`
+clean. Released as `presidium` v0.6.0 (`presidium-contrib` unchanged, stays v0.7.0).
+
+**All three findings from the external audit are now closed** (`Grant.condition`,
+`fabrica.scope.Scope`, spawn-time governance).
+
+**Pages updated:** `packages/presidium/src/presidium/providers/civitas_adapters.py`,
+`packages/presidium/tests/unit/providers/test_civitas_adapters.py`, `docs/design/
+agent-registry.md`, `docs/design/agent-registry-requirements.md`, `AGENTS.md`, `README.md`,
+`CHANGELOG.md`, `HANDOFF.md`, `docs/log.md` (this entry).

@@ -29,13 +29,18 @@ keep from raising across.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from civitas.plugins.model import ModelProvider, ModelResponse
 from civitas.plugins.tools import ToolProvider
+from civitas.supervisor import DynamicSupervisor
 
+from presidium.model import EnforcementMode, PolicyDecision
 from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
+
+logger = logging.getLogger(__name__)
 
 
 class GovernedModelProviderAdapter:
@@ -133,3 +138,109 @@ class GovernedToolAdapter:
         await self._tool_provider.post_check(self._agent_name, self.name, "invoke", result_data)
 
         return result
+
+
+async def governed_spawn_check(
+    *,
+    tool_provider: GovernedToolProvider,
+    spawner: str,
+    agent_class: type,
+    name: str,
+    config: dict[str, Any],
+) -> bool:
+    """Real, reusable ``on_spawn_requested()`` logic (`civitas.supervisor.
+    DynamicSupervisor`'s own governance veto hook) -- closes a real, external gap:
+    the hook exists and works, but nothing wired it to Presidium's policy engine.
+
+    Call this directly from a custom ``DynamicSupervisor`` subclass's own
+    ``on_spawn_requested`` override (for a caller who already has other
+    overrides to combine with); use :class:`GovernedDynamicSupervisor` below
+    instead for the common case of "just gate every spawn through Presidium."
+
+    ``resource`` is ``f"agent:{agent_class.__name__}"`` -- authorizing by the
+    KIND of agent being spawned, matching the existing ``agent:<name>`` grant
+    namespace (``GatewayToolProvider.delegate_to_agent()``,
+    ``check_resource()``'s own docstring) -- not the caller-chosen, unpredictable
+    runtime ``name``, which is instead passed through as ``parameters["name"]``
+    alongside the rest of ``config`` for a CEL policy to inspect if it wants
+    finer-grained control (e.g. deny a specific dangerous config flag).
+
+    ``spawner`` is ``DynamicSupervisor.current_spawner`` -- read it INSIDE your
+    ``on_spawn_requested`` override, where the property is valid, and pass it
+    here (this function does not have access to the supervisor instance
+    itself). An empty string (`DynamicSupervisor`'s own default for an
+    unattributed/administrative spawn request -- see
+    ``civitas/supervisor.py``'s ``_handle_spawn``) needs no special-casing
+    here: ``check_grant()``'s own existing "agent not found in registry"
+    path already fails closed for an empty/unrecognized name, for free.
+
+    Uses ``check_grant()``, not ``check()``/``check_resource()`` -- deliberately:
+    ``on_spawn_requested``'s own contract is bool-returning, not exception-based,
+    the same reasoning ``civitas-io/fabrica``'s own ``execute_in_sandbox`` already
+    follows for exactly this kind of value-based caller. REQUIRE_APPROVAL is
+    treated as a deny under HARD enforcement -- there is no suspend/resume
+    mechanism available at this call site to block a spawn pending approval
+    (`on_spawn_requested` must resolve synchronously to a bool); ADVISORY/SOFT
+    enforcement never blocks the spawn, only logs, matching
+    ``check_resource()``'s own established enforcement-mode semantics.
+    """
+    result = await tool_provider.check_grant(
+        spawner,
+        resource=f"agent:{agent_class.__name__}",
+        action="spawn",
+        parameters={"name": name, **config},
+    )
+
+    if result.enforcement in (EnforcementMode.ADVISORY, EnforcementMode.SOFT):
+        if result.decision != PolicyDecision.ALLOW:
+            logger.info(
+                "spawn.%s spawner=%s agent_class=%s name=%s policy=%s "
+                "(enforcement=%s, not blocking)",
+                result.decision.value,
+                spawner,
+                agent_class.__name__,
+                name,
+                result.policy_name,
+                result.enforcement.value,
+            )
+        return True
+
+    if result.decision != PolicyDecision.ALLOW:
+        logger.warning(
+            "spawn.%s spawner=%s agent_class=%s name=%s policy=%s reason=%s",
+            result.decision.value,
+            spawner,
+            agent_class.__name__,
+            name,
+            result.policy_name,
+            result.reason,
+        )
+
+    return result.decision == PolicyDecision.ALLOW
+
+
+class GovernedDynamicSupervisor(DynamicSupervisor):
+    """Ready-to-use ``DynamicSupervisor`` for the common case: gate every
+    dynamic spawn through Presidium with no custom subclass of your own.
+
+    ``spawner_allowlist``/``max_children``/etc. (any other real
+    ``DynamicSupervisor`` constructor argument) still work unchanged --
+    forwarded via ``**kwargs``, evaluated BEFORE this class's own
+    ``on_spawn_requested`` override runs (`civitas/supervisor.py`'s own
+    ``_handle_spawn`` checks those first).
+    """
+
+    def __init__(self, name: str, *, tool_provider: GovernedToolProvider, **kwargs: Any) -> None:
+        super().__init__(name, **kwargs)
+        self._presidium_tool_provider = tool_provider
+
+    async def on_spawn_requested(
+        self, agent_class: type, name: str, config: dict[str, Any]
+    ) -> bool:
+        return await governed_spawn_check(
+            tool_provider=self._presidium_tool_provider,
+            spawner=self.current_spawner or "",
+            agent_class=agent_class,
+            name=name,
+            config=config,
+        )

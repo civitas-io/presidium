@@ -73,6 +73,16 @@ Each agent has a trust score that reflects its behavioral reliability. Trust inf
 
 ### FR-4: Dynamic Spawning Integration
 
+**Real status, 2026-08-25**: FR-4.2/FR-4.5 (subset-grant check) are still not built -- an
+external audit found this whole `on_spawn_requested` integration had zero real wiring to
+Presidium at all (`docs/design/agent-registry.md`'s own "Dynamic Spawning Integration" section
+had the identical pseudocode for years, never implemented). What IS now real and shipped:
+`presidium.providers.civitas_adapters.governed_spawn_check()`/`GovernedDynamicSupervisor` -- a
+different, complementary policy-based gate on whether the spawn act itself is authorized at all,
+not the FR-4.2 subset-grant check specifically. FR-4.1/4.3/4.4 (registration, independent trust,
+lineage tracking) are the registry's own existing, real, already-tested behavior, unaffected by
+either mechanism.
+
 When agents are spawned dynamically via Civitas's DynamicSupervisor, the registry must enforce governance rules.
 
 **FR-4.1**: A dynamically spawned child agent MUST be registered in the registry before it can participate in governed operations.

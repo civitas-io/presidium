@@ -31,8 +31,12 @@ pip install presidium-contrib      # adapters: OPA, OpenBao, Slack, Postgres, th
 > change from earlier releases). Trust ceiling propagation and monotonic capability narrowing on
 > delegation/spawn are shipped. **M5 (SDK + CLI) started the same day**: a real `presidium`
 > command (`pip install presidium-contrib[sqlite]`) -- `presidium version`, `registry list`,
-> `policy validate`, `trust replay` -- mirroring `civitas`'s own CLI shape exactly. 725 tests
-> (469 `presidium` + 256 `presidium-contrib`), mypy strict, ruff clean. Only credential
+> `policy validate`, `trust replay` -- mirroring `civitas`'s own CLI shape exactly. `Grant.
+> condition` is now really evaluated (was a documented dead field) and
+> `presidium.providers.civitas_adapters` gained `governed_spawn_check()`/
+> `GovernedDynamicSupervisor`, gating `DynamicSupervisor.on_spawn_requested` -- both real,
+> external findings, verified and fixed the same day they were reported. 743 tests
+> (487 `presidium` + 256 `presidium-contrib`), mypy strict, ruff clean. Only credential
 > resolution remains undone from M7's original scope.
 
 ## What Is Presidium?

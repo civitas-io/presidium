@@ -282,16 +282,29 @@ class RegistryAuth(Protocol):
 
 ## Dynamic Spawning Integration
 
-When `DynamicSupervisor` receives a spawn request, the registry enforces:
+**Real status, corrected 2026-08-25 -- this section's own pseudocode below was aspirational and
+was never built, exactly the same class of gap as `Grant.condition` (documented, never
+implemented) -- caught by the same external audit that found that one.** Two genuinely different,
+complementary mechanisms belong here, not one:
 
-1. **Subset grant check (fail-fast)**: child's requested grants must be a subset of parent's grants. If not, spawn fails immediately with `SpawnError`.
+1. **Real, built 2026-08-25**: `presidium.providers.civitas_adapters.governed_spawn_check()` /
+   `GovernedDynamicSupervisor` -- policy-based authorization of the spawn ACT itself ("is this
+   spawner allowed to create an agent of this class, with this config, at all"), using the exact
+   same `GovernedToolProvider.check_grant()` mechanism as every other PRE_TOOL decision in this
+   codebase (`resource=f"agent:{agent_class.__name__}"`, `action="spawn"`,
+   `parameters={"name": name, **config}`). This is what's actually implemented and tested today.
 
-2. **Registration**: child is registered with `parent_agent_id` set to spawner's agent_id.
-
-3. **Independent trust**: child starts at `default_initial_trust` (0.5), not inherited from parent.
+2. **Still not built -- a genuinely different, complementary check, not superseded by #1**:
+   privilege containment specifically -- a spawned child's OWN requested grants (if any are part
+   of `config`) must never exceed its parent's own grants, independent of whether the spawn
+   itself is policy-authorized. The pseudocode below sketches this; it was never implemented
+   (`_is_subset`/`SpawnError`/`self.spawner_name` do not exist anywhere in this codebase) and
+   remains a real, named follow-up, not something #1 replaces or makes unnecessary:
 
 ```python
-# Enforcement via RegistryListener hook on DynamicSupervisor
+# NOT YET BUILT -- a real, separate follow-up to governed_spawn_check() above,
+# not an alternative to it. Privilege containment (no grant escalation via
+# spawning) is a different concern than "is this spawn authorized at all."
 async def on_spawn_requested(self, agent_class, name, config):
     parent_record = await self.registry.lookup(self.spawner_name)
     requested_grants = config.get("grants", [])
@@ -302,6 +315,11 @@ async def on_spawn_requested(self, agent_class, name, config):
 
     return True  # approved
 ```
+
+Registration/trust behavior once a spawn IS approved (by either or both mechanisms above):
+
+- **Registration**: child is registered with `parent_agent_id` set to spawner's agent_id.
+- **Independent trust**: child starts at `default_initial_trust` (0.5), not inherited from parent.
 
 **Lineage in identity**: when a child is spawned, its `agent_id` encodes the parent path:
 - Parent: `presidium://acme.com/prod/orchestrator`
@@ -401,7 +419,7 @@ AuditEvent(
 | `AgentProcess.on_stop` | Update status to STOPPED |
 | `AgentProcess.on_error` | Record FAILURE trust event |
 | `EvalAgent.on_eval_event` | Record trust events based on eval results |
-| `DynamicSupervisor.on_spawn_requested` | Subset grant check + register child |
+| `DynamicSupervisor.on_spawn_requested` | Policy authorization (real, `governed_spawn_check()`) + register child; subset grant check still not built (see "Dynamic Spawning Integration" above) |
 | `AuditSink.emit` | Forward governance audit events |
 
 ---

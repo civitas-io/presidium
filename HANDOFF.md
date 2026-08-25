@@ -11,10 +11,10 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 `civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
 
-## Status as of 2026-08-25: **presidium v0.5.0 and presidium-contrib v0.7.0 are real, live on PyPI**
+## Status as of 2026-08-25: **presidium v0.6.0 and presidium-contrib v0.7.0 are real, live on PyPI**
 
 ```
-pip install presidium          # 0.5.0
+pip install presidium          # 0.6.0
 pip install presidium-contrib  # 0.7.0
 pip install "presidium-contrib[agentgateway,spiffe,server,sqlite]"  # real MCP+A2A gateway client, real SPIRE identity, M7 server (check_grant + rate limiting + registry CRUD + approval list/decide), the presidium CLI's registry list command
 ```
@@ -52,6 +52,34 @@ documented "wait and re-check via the JSON API" precedent, not a real release bu
 installable**, not just committed to `main` -- see `CHANGELOG.md`'s `[0.3.0]` entry for the
 single, comprehensive summary of what shipped since v0.2.1/v0.2.0.
 
+## Spawn-time governance -- DONE, 2026-08-25 (third and final fix from the external audit)
+
+`civitas.supervisor.DynamicSupervisor.on_spawn_requested` -- a real, working veto hook Civitas
+already ships -- had no reference integration to Presidium at all: a dynamically-spawned child
+was approved-by-default at the spawn boundary regardless of policy. Fixed:
+`presidium.providers.civitas_adapters.governed_spawn_check()` (real, reusable logic --
+`check_grant(spawner, resource=f"agent:{agent_class.__name__}", action="spawn", parameters=
+{"name": name, **config})`, matching the existing `agent:<name>` grant namespace) and
+`GovernedDynamicSupervisor` (a ready-to-use subclass for the common case). Uses `check_grant()`,
+not `check()`, matching `on_spawn_requested`'s own bool-returning contract -- the same reasoning
+`civitas-io/fabrica`'s `execute_in_sandbox` already follows. An unattributed spawner needs no
+special-casing: `check_grant()`'s existing "agent not found" path already fails closed for free.
+
+**Real, second instance of the same "documented, never built" class of bug found in the same
+audit**: `docs/design/agent-registry.md`'s own "Dynamic Spawning Integration" section had a
+different, never-implemented `on_spawn_requested` pseudocode (subset-grant privilege
+containment, FR-4.2/FR-4.5) that's been dead since the doc was written. Corrected in place --
+this release's mechanism is genuinely complementary, not a replacement; FR-4.2/4.5 remain a real,
+separate, still-unbuilt follow-up.
+
+487 tests pass (+9), 100% coverage on `presidium/providers/civitas_adapters.py`. Released as
+`presidium` v0.6.0 (`presidium-contrib` unchanged, stays v0.7.0). See `CHANGELOG.md`'s
+`[presidium 0.6.0]` entry and `docs/log.md` for the full detail.
+
+**All three findings from the external audit are now closed.** See the three dated sections
+above/below for #1 (`Grant.condition`) and #2 (`fabrica.scope.Scope`, fixed in
+`civitas-io/fabrica`, not this repo).
+
 ## `Grant.condition` is now really evaluated -- DONE, 2026-08-25
 
 **Real security gap, reported by a downstream consumer's own coding-agent audit of this codebase
@@ -70,11 +98,9 @@ a bug, not a legitimate posture. Released as `presidium` v0.5.0 (`presidium-cont
 stays v0.7.0). See `docs/log.md` and `CHANGELOG.md`'s `[presidium 0.5.0]` entry for the full
 detail. 478 tests pass (+9), 100% coverage on `presidium/policy/cel.py`.
 
-**Two more real findings from the same external audit, not yet fixed** (tracked in "What's next"
-below): `fabrica.scope.Scope` has no slot for arbitrary action-specific parameters even though
-the server side already accepts them; `civitas.supervisor.DynamicSupervisor.on_spawn_requested`
-has no reference Presidium integration, so a dynamically-spawned child agent is approved-by-
-default at the spawn boundary today.
+**Two more real findings from the same external audit -- both now closed too**:
+`fabrica.scope.Scope`'s missing `extra` field (fixed in `civitas-io/fabrica` v0.3.0, not this
+repo) and spawn-time governance (fixed here, see the section above this one).
 
 **GH #26 (Streamable HTTP MCP transport, python-civitas/fabrica) -- DONE, closed, benchmarked.**
 See either of those repos' own `HANDOFF.md` for the real detail.
@@ -505,16 +531,11 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
 
 ## What's next — the real, current P1 list (see roadmap.md for the full detail on each)
 
-- **`civitas.supervisor.DynamicSupervisor.on_spawn_requested` has no Presidium reference
-  integration** -- a real, external finding (2026-08-25). The hook exists and works, but no
-  adapter connects it to `GovernedToolProvider`, so a dynamically-spawned child agent is
-  approved-by-default at the spawn boundary today, independent of whatever policy would say.
-  Plan: `governed_spawn_check()` + `GovernedDynamicSupervisor` in `presidium.providers.
-  civitas_adapters` (already the right home -- see that module's own docstring), using
-  `check_grant(spawner, resource=f"agent:{agent_class.__name__}", action="spawn", ...)`.
-- **`fabrica.scope.Scope` has no slot for arbitrary action-specific parameters** -- also from the
-  2026-08-25 external audit, tracked and to be fixed in `civitas-io/fabrica`, not this repo (the
-  server side already accepts arbitrary `scope` keys; the client type is the gap).
+- **FR-4.2/FR-4.5 subset-grant privilege containment for dynamic spawning** -- a real, separate,
+  still-unbuilt follow-up surfaced while fixing spawn-time governance above (not the same
+  mechanism, not superseded by it): a spawned child's own requested grants should never exceed
+  its parent's, independent of whether the spawn act itself is policy-authorized. See
+  `docs/design/agent-registry.md`'s "Dynamic Spawning Integration" section.
 - **M5 (SDK + CLI) -- started, not finished.** Real, named remaining pieces: `presidium run`
   (bootstrap a `GovernedRuntime` from topology YAML, mirroring `civitas run`); registry
   list/policy validate against a *live* `presidium-server`'s HTTP endpoints (`--server-url`

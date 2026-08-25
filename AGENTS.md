@@ -15,8 +15,8 @@ natively integrated into the Civitas agent runtime.
 - **License:** Apache 2.0
 - **Python:** ≥3.12
 - **Status:** Real, live, public PyPI packages —
-  [`presidium`](https://pypi.org/project/presidium/) (v0.4.0) and
-  [`presidium-contrib`](https://pypi.org/project/presidium-contrib/) (v0.7.0), 469 and 256 real
+  [`presidium`](https://pypi.org/project/presidium/) (v0.6.0) and
+  [`presidium-contrib`](https://pypi.org/project/presidium-contrib/) (v0.7.0), 487 and 256 real
   tests respectively, including a real CLI (`presidium version`/`registry list`/`policy
   validate`/`trust replay`). See [`HANDOFF.md`](HANDOFF.md) for the current, dated status; this
   file describes structure and conventions, not point-in-time progress -- exact test counts and
@@ -62,7 +62,9 @@ presidium/
 │   │       ├── providers/           # GovernedModelProvider/GovernedToolProvider (pure
 │   │       │                        #   authorization), GatewayModelProvider/GatewayToolProvider
 │   │       │                        #   (wraps a real gateway process), civitas_adapters.py
-│   │       │                        #   (direct in-process Civitas ModelProvider/ToolProvider)
+│   │       │                        #   (direct in-process Civitas ModelProvider/ToolProvider,
+│   │       │                        #   plus governed_spawn_check()/GovernedDynamicSupervisor
+│   │       │                        #   for DynamicSupervisor.on_spawn_requested)
 │   │       ├── registry/            # AgentRegistry Protocol + InMemory/Sqlite implementations
 │   │       ├── scoring/             # Domain-agnostic scoring library (events, functions, config, spec)
 │   │       ├── trust/               # Trust scoring (core, protocols, windowed, cold_start, telemetry)
@@ -215,7 +217,7 @@ a `models/` package.
 |---|---|
 | `presidium.model` | Shared dataclasses: `AgentRecord`, `Policy`, `Grant`, `TrustScore`, etc. |
 | `presidium.policy` | CEL policy engine — the default `PolicyEngine` implementation, default-deny on no match. No other implementations live here. |
-| `presidium.providers` | `GovernedModelProvider`/`GovernedToolProvider` (pure authorization), `GatewayModelProvider`/`GatewayToolProvider` (wraps a real, separate gateway process), `civitas_adapters` (direct in-process Civitas `ModelProvider`/`ToolProvider` wrapping) — three distinct composition patterns, not one |
+| `presidium.providers` | `GovernedModelProvider`/`GovernedToolProvider` (pure authorization), `GatewayModelProvider`/`GatewayToolProvider` (wraps a real, separate gateway process), `civitas_adapters` (direct in-process Civitas `ModelProvider`/`ToolProvider` wrapping, plus `governed_spawn_check()`/`GovernedDynamicSupervisor` gating `DynamicSupervisor.on_spawn_requested`) — three distinct composition patterns, not one |
 | `presidium.registry` | `AgentRegistry` Protocol + `InMemoryRegistry`/`SqliteRegistry` |
 | `presidium.identity` | `verify_agent_signature()` — dispatches on `AgentRecord.public_key_algorithm` (`"ed25519"` default, `"ec_p256"` for SPIFFE SVIDs) |
 | `presidium.lineage` | Trust ceiling propagation + monotonic capability narrowing across agent delegation |

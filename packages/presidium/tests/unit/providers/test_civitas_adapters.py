@@ -17,6 +17,7 @@ from civitas.plugins.model import ModelResponse
 from presidium.errors import PolicyDeniedError
 from presidium.model import (
     AgentRecord,
+    EnforcementMode,
     EvaluationStage,
     Grant,
     PolicyDecision,
@@ -24,11 +25,21 @@ from presidium.model import (
     TrustTier,
 )
 from presidium.policy.cel import CelPolicyEngine
-from presidium.providers.civitas_adapters import GovernedModelProviderAdapter, GovernedToolAdapter
+from presidium.providers.civitas_adapters import (
+    GovernedDynamicSupervisor,
+    GovernedModelProviderAdapter,
+    GovernedToolAdapter,
+    governed_spawn_check,
+)
 from presidium.providers.model import GovernedModelProvider
 from presidium.providers.tool import GovernedToolProvider
 from presidium.registry.memory import InMemoryRegistry
 from tests.policy_fixtures import ALLOW_ALL
+
+
+class _WorkerAgent:
+    """Stands in for a real class dynamically spawned via DynamicSupervisor --
+    only its __name__ matters (used to build the "agent:<class name>" resource)."""
 
 
 class _FakeModelBackend:
@@ -259,3 +270,196 @@ class TestGovernedToolAdapter:
         # The real backend WAS called -- post-execution validation inspects
         # the real output, it doesn't skip calling the tool.
         assert len(backend.calls) == 1
+
+
+ALLOW_SPAWN = PolicyRule(
+    name="allow-spawn",
+    stage=EvaluationStage.PRE_TOOL,
+    expression='request.resource == "agent:_WorkerAgent" && request.action == "spawn"',
+    decision=PolicyDecision.ALLOW,
+    reason="Spawner may spawn workers",
+    priority=100,
+)
+
+DENY_SPAWN = PolicyRule(
+    name="deny-spawn",
+    stage=EvaluationStage.PRE_TOOL,
+    expression='request.resource == "agent:_WorkerAgent" && request.action == "spawn"',
+    decision=PolicyDecision.DENY,
+    reason="Not allowed to spawn workers",
+    priority=100,
+)
+
+ADVISORY_DENY_SPAWN = PolicyRule(
+    name="advisory-deny-spawn",
+    stage=EvaluationStage.PRE_TOOL,
+    expression='request.resource == "agent:_WorkerAgent" && request.action == "spawn"',
+    decision=PolicyDecision.DENY,
+    reason="Discouraged but not blocked",
+    priority=100,
+    enforcement=EnforcementMode.ADVISORY,
+)
+
+
+class TestGovernedSpawnCheck:
+    """governed_spawn_check() -- closes a real, externally-reported gap:
+    DynamicSupervisor.on_spawn_requested had no Presidium reference
+    integration at all."""
+
+    async def test_allowed_spawn_returns_true(self) -> None:
+        reg, engine = await _setup(ALLOW_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        approved = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={"task": "scrape"},
+        )
+
+        assert approved is True
+
+    async def test_denied_spawn_returns_false(self) -> None:
+        reg, engine = await _setup(DENY_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        approved = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={},
+        )
+
+        assert approved is False
+
+    async def test_unattributed_spawner_denied_via_existing_registry_miss(self) -> None:
+        """No special-casing needed: an unattributed spawner ("" -- civitas's
+        own DynamicSupervisor default for an administrative spawn request)
+        naturally fails closed via check_grant()'s existing "agent not found
+        in registry" path."""
+        reg, engine = await _setup(ALLOW_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        approved = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={},
+        )
+
+        assert approved is False
+
+    async def test_unmatched_request_denies_by_default(self) -> None:
+        """No policy at all -> CelPolicyEngine's real, current fail-closed
+        default (DENY) -- spawning is not silently approved just because
+        nobody wrote a spawn-specific rule."""
+        reg, engine = await _setup()
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        approved = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={},
+        )
+
+        assert approved is False
+
+    async def test_advisory_deny_never_blocks_the_spawn(self) -> None:
+        """ADVISORY/SOFT enforcement never blocks -- matches check_resource()'s
+        own established enforcement-mode semantics exactly."""
+        reg, engine = await _setup(ADVISORY_DENY_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        approved = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={},
+        )
+
+        assert approved is True
+
+    async def test_config_and_name_are_visible_to_the_policy(self) -> None:
+        """The spawned instance's caller-chosen name and config are threaded
+        into request.parameters, not just the agent_class resource string --
+        lets a policy make finer-grained decisions than "class name alone."""
+        reg, engine = await _setup(
+            PolicyRule(
+                name="deny-dangerous-config",
+                stage=EvaluationStage.PRE_TOOL,
+                expression='request.resource == "agent:_WorkerAgent" '
+                "&& request.parameters.dangerous == true",
+                decision=PolicyDecision.DENY,
+                reason="Dangerous config flag set",
+                priority=100,
+            ),
+            ALLOW_SPAWN,
+        )
+        tool_provider = GovernedToolProvider(engine, reg)
+
+        safe = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-1",
+            config={"dangerous": False},
+        )
+        dangerous = await governed_spawn_check(
+            tool_provider=tool_provider,
+            spawner="researcher",
+            agent_class=_WorkerAgent,
+            name="worker-2",
+            config={"dangerous": True},
+        )
+
+        assert safe is True
+        assert dangerous is False
+
+
+class TestGovernedDynamicSupervisor:
+    """The ready-to-use subclass -- delegates to governed_spawn_check() using
+    self.current_spawner, exactly the way a hand-written on_spawn_requested
+    override would."""
+
+    async def test_delegates_to_governed_spawn_check(self) -> None:
+        reg, engine = await _setup(ALLOW_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+        supervisor = GovernedDynamicSupervisor("sup", tool_provider=tool_provider)
+
+        # Simulate being inside on_spawn_requested's call window, the same
+        # way civitas/supervisor.py's own _handle_spawn does.
+        supervisor._current_spawner = "researcher"
+        try:
+            approved = await supervisor.on_spawn_requested(_WorkerAgent, "worker-1", {})
+        finally:
+            supervisor._current_spawner = None
+
+        assert approved is True
+
+    async def test_denied_spawn_via_supervisor(self) -> None:
+        reg, engine = await _setup(DENY_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+        supervisor = GovernedDynamicSupervisor("sup", tool_provider=tool_provider)
+
+        supervisor._current_spawner = "researcher"
+        try:
+            approved = await supervisor.on_spawn_requested(_WorkerAgent, "worker-1", {})
+        finally:
+            supervisor._current_spawner = None
+
+        assert approved is False
+
+    async def test_other_dynamicsupervisor_kwargs_still_work(self) -> None:
+        """Real DynamicSupervisor constructor args (max_children, etc.) pass
+        through **kwargs unaffected -- this subclass doesn't shadow them."""
+        reg, engine = await _setup(ALLOW_SPAWN)
+        tool_provider = GovernedToolProvider(engine, reg)
+        supervisor = GovernedDynamicSupervisor("sup", tool_provider=tool_provider, max_children=5)
+
+        assert supervisor.max_children == 5
