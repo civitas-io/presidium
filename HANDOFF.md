@@ -52,6 +52,35 @@ documented "wait and re-check via the JSON API" precedent, not a real release bu
 installable**, not just committed to `main` -- see `CHANGELOG.md`'s `[0.3.0]` entry for the
 single, comprehensive summary of what shipped since v0.2.1/v0.2.0.
 
+## M8 (Performance Research) -- DONE, 2026-08-25. Real benchmarks, real recommendation, no code release
+
+Real benchmarks against a real, standalone M7 server, on real hardware (a MacBook + a separate
+Linux host over a direct Tailscale network connection), plus a real, same-hardware comparison
+against OPA. Full results, methodology, and a competitor/benchmark-comparison analysis (which
+surfaced a real, previously-untracked competitor, Kastra, via a structured `llm-council` session):
+[`docs/design/performance-research.md`](docs/design/performance-research.md). Real, reusable
+harness checked in at `benchmarks/` (not deleted after use).
+
+**Headline findings, corrected and new**: the previously-cited "~88µs/eval" baseline undercounted
+the real worst case -- a new, reproducible microbenchmark measured **~1,314µs at 20 rules**
+(clean, linear, ~67µs/rule). Real HTTP endpoint throughput is **flat regardless of concurrency**,
+confirming the GIL hypothesis directly rather than by inference. **Option A (horizontal scaling)
+confirmed working, close to linearly, zero code changes** -- two independent processes sustained
+~650 combined req/sec vs. ~355 for one; recommended as the real default scaling story for M7 now.
+**Option B (free-threaded CPython) does NOT help today**, for two independent, real reasons found
+during testing: `cel-python`'s `google-re2` dependency isn't free-threading-safe (the GIL
+auto-re-enables on import -- confirmed directly), and even forced off,
+`civitas.gateway.HTTPGateway`'s single-asyncio-thread architecture has no multi-thread GIL
+contention to relieve in the first place (confirmed: throughput was statistically unchanged).
+**Option C (a Rust-backed CEL evaluator) is the real next lever**, grounded now in a real,
+maintained Rust CEL crate and a real 15-140x directional comparison against OPA on identical,
+same-hardware workloads -- not prototyped this pass, per the milestone's own scope. **Option D
+remains correctly out of scope.**
+
+**No package release** -- this was a research/benchmarking pass (a design doc + a `benchmarks/`
+harness), not a behavioral or API change to either package. `presidium`/`presidium-contrib`
+versions are unchanged.
+
 ## Spawn-time governance -- DONE, 2026-08-25 (third and final fix from the external audit)
 
 `civitas.supervisor.DynamicSupervisor.on_spawn_requested` -- a real, working veto hook Civitas
@@ -552,9 +581,12 @@ not ALLOW -- the actual flip this doc used to describe as blocked by a 24-test b
   prerequisite for M5's own `trust show`/`trust events` CLI commands** (not yet built for
   exactly this reason): a durable, queryable trust-event history, arguably M4's own FR-4.5
   (decision journal).
-- M8 (Performance Research: Rust vs. Python at the CEL policy-eval hot path) — correctly
-  sequenced *after* M7 ships (which it now has), not before; real baseline numbers already
-  measured (~88μs/~11,400 evals/sec per core, pure Python, GIL-bound — see roadmap.md).
+- **M8 is DONE** (see the section above) -- real, current remaining follow-ups from it:
+  MCP governance's regex-based scanning (`PIIDetector`/`PoisoningDetector`/redaction) was never
+  benchmarked (a second, real, GIL-bound cost center, not assumed fine by proximity); Option C
+  (a Rust-backed CEL evaluator) was not prototyped, only grounded in directional evidence --
+  worth a contained spike if Option A's horizontal scaling proves insufficient for a real
+  deployment's throughput needs.
 
 ## Working conventions established this session, worth continuing
 

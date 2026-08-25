@@ -1607,3 +1607,74 @@ clean. Released as `presidium` v0.6.0 (`presidium-contrib` unchanged, stays v0.7
 `packages/presidium/tests/unit/providers/test_civitas_adapters.py`, `docs/design/
 agent-registry.md`, `docs/design/agent-registry-requirements.md`, `AGENTS.md`, `README.md`,
 `CHANGELOG.md`, `HANDOFF.md`, `docs/log.md` (this entry).
+
+## [2026-08-25] research | M8 Performance Research -- real benchmarks, real recommendation
+
+**Trigger:** M8 became actionable once M7 shipped, per the roadmap's own sequencing. Scoped
+conversationally with the user first (which real infra to use, how deep to go), then a real
+council session (the newly-installed `llm-council` skill) on the adjacent question of Presidium's
+real competitors and what a credible benchmark should compare against, before writing any code.
+
+**What changed:** Built a real, reusable benchmark harness (`benchmarks/` -- `cel_microbench.py`,
+`serve_m7.py`, `run_matrix.sh`, `gen_opa_policy.py`/`run_opa_matrix.sh`), not a throwaway script.
+
+**Real, honest correction found**: the previously-cited "~88µs/eval" baseline in `docs/vision/
+roadmap.md` had no reusable script backing it and, when reproduced properly against the
+worst-case "scan every loaded rule" scenario its own text describes, the real number is
+materially higher -- ~1,314µs at 20 rules, clean and linear at ~67µs/rule, confirmed against
+`cel-python`'s own raw `program.evaluate()` cost directly. Not a regression; the first time this
+number has been measured by a checked-in, re-runnable script rather than ad hoc.
+
+**Real infrastructure used**: a real, standalone M7 server (real `HTTPGateway`/
+`PresidiumGatewayAgent`/`civitas.Runtime`, not a pytest fixture), benchmarked with Apache Bench
+(a real, separate process/connection per request) in two real environments -- local Mac loopback,
+and a real cross-host network hop (MacBook -> `darkenergy`, a separate Linux homelab host, direct
+Tailscale connection, ~4-6ms RTT, not loopback). Confirmed directly, not assumed: throughput is
+flat regardless of concurrency at every rule count, in both environments -- the GIL hypothesis
+holds at the real HTTP layer, not just by inference from the isolated CEL number.
+
+**Option A (horizontal scaling)**: confirmed working, close to linearly, zero code changes -- two
+independent server processes on the same host sustained ~650 combined req/sec vs. ~355 for one.
+Recommended as the real default scaling story for M7 deployments now.
+
+**Option B (free-threaded CPython)**: does not help today, for two independent real reasons found
+during testing, not assumed beforehand. First, a real ecosystem-immaturity finding: installing
+under free-threaded CPython required real extra native-dependency work (`abseil`, `re2`,
+`pybind11`) that normal CPython doesn't need, and `cffi` refuses to build under free-threaded
+3.13 outright (works under 3.14). Second, and more fundamentally: `cel-python`'s `google-re2`
+dependency hasn't declared free-threading safety, so CPython automatically re-enables the GIL at
+runtime the moment it's imported (confirmed directly, with the exact warning CPython emits).
+Forcing it off anyway (`PYTHON_GIL=0`, at real, acknowledged risk) confirmed the GIL genuinely
+stays off -- but made **no measurable throughput difference**, because `civitas.gateway.
+HTTPGateway` serves requests on a single asyncio event loop/OS thread, which was never contending
+with itself for the GIL in the first place. A real, honest, load-bearing finding: Option B can't
+help until the serving architecture itself uses multiple OS threads, at which point the benefit
+would look architecturally like Option A, just inside one process. **Real, live mistake caught
+and fixed during this work**: a `uv pip install --python /tmp/venv/bin/python` invocation
+accidentally recreated the repo's own committed `.venv` under the free-threaded interpreter
+instead of the target ephemeral one -- caught via `git status`/`pyvenv.cfg` inspection, fixed
+with `rm -rf .venv && uv sync`, confirmed the full 487-test suite still passes before continuing.
+
+**Option C (a Rust-backed CEL evaluator)**: not prototyped, per the milestone's own scope, but
+grounded in two new, real facts: an actively-maintained Rust CEL crate already exists
+(`cel-interpreter`, crates.io, 547k+ downloads) as a real PyO3-binding starting point, and a real,
+same-hardware, same-workload comparison against OPA (§ below) gives concrete directional evidence
+for the plausible magnitude of a compiled-evaluator speedup.
+
+**The real, fair OPA comparison** (the specific recommendation from the earlier council session
+on comparison methodology): a Rego policy generated with the identical logical shape as
+Presidium's own benchmark rule set, run via a real `opa run --server` instance, benchmarked
+identically (same `ab` matrix, same hardware). Result: OPA sustained **15-140x** Presidium's own
+throughput at equivalent rule counts, with the gap widening as rule count grows (OPA's compiled
+evaluation barely slows down; Presidium's interpreted cost scales roughly linearly). Cross-checked
+against the isolated CEL number: the CEL-eval cost itself, not incidental HTTP/registry/dispatch
+overhead, accounts for the large majority of the gap.
+
+**Verification**: 487 `presidium` tests still pass (no library code changed), `ruff`/`ruff
+format`/`mypy --strict` clean on the new `benchmarks/` scripts (checked directly, since the
+committed pre-commit hooks don't cover that directory). No package release -- pure research/docs.
+
+**Pages updated:** `benchmarks/` (new: `README.md`, `rule_gen.py`, `cel_microbench.py`,
+`serve_m7.py`, `run_matrix.sh`, `gen_opa_policy.py`, `run_opa_matrix.sh`, `opa_policy/`),
+`docs/design/performance-research.md` (new), `docs/vision/roadmap.md` (M8 section + Timeline +
+Implementation Priority all marked complete), `HANDOFF.md`, `docs/log.md` (this entry).

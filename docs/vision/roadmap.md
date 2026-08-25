@@ -274,7 +274,8 @@ real, separate work, not automatically unblocked by this alone.
   git tags/GitHub Releases). **The CLI half started, 2026-08-24** -- see the full M5 section
   below for real detail (`presidium version`/`registry list`/`policy validate`/`trust replay`
   shipped; docs site/examples/v1.0.0/`presidium run`/live-server CLI mode remain).
-- [ ] M8: Performance Research — correctly sequenced after M7, not before (see M8 below).
+- [x] M8: Performance Research — **Complete, 2026-08-25.** Real benchmarks, real comparison,
+  real recommendation (see M8 below and `docs/design/performance-research.md`).
 
 ### P2 — deferred by design, commercial, or dependent on things outside our control
 
@@ -684,6 +685,24 @@ unblocks Fabrica's `PresidiumClient` real implementation, and the technical foun
 
 ## M8: Performance Research — Rust vs. Python at the governance hot path
 
+**Status: Complete, 2026-08-25.** Real benchmarks against a real M7 server, on real, separate,
+network-connected hardware (a MacBook + a remote Linux host over a direct Tailscale connection),
+plus a real, same-hardware comparison against OPA. Full results, methodology, and a market-
+comparison analysis: [`docs/design/performance-research.md`](../design/performance-research.md).
+**Headline findings**: the original "~88µs/eval" baseline below undercounted the real,
+worst-case cost -- a new, reproducible microbenchmark measured ~1,314µs at 20 rules (linear,
+~67µs/rule). Real HTTP-endpoint throughput is flat regardless of concurrency (confirming the GIL
+hypothesis directly, not just by inference). **Option A (horizontal scaling) confirmed working,
+close to linearly, zero code changes -- recommended as the real default scaling story for M7
+deployments now.** **Option B (free-threaded CPython) does NOT help today**, for two independent
+reasons: `cel-python`'s `google-re2` dependency isn't free-threading-safe (CPython auto-
+re-enables the GIL on import) and, even forced off, `civitas.gateway.HTTPGateway`'s
+single-asyncio-thread architecture has no multi-thread GIL contention to relieve in the first
+place. **Option C (a Rust-backed CEL evaluator) is the real next lever** if Option A proves
+insufficient -- not prototyped this pass, but grounded in a real, maintained Rust CEL crate and a
+real 15-140x directional comparison against OPA on identical, same-hardware workloads. Option D
+remains correctly out of scope, per this section's own original sequencing.
+
 **Priority: P1, and only after M7 ships** — this only becomes load-bearing once Presidium is a
 real multi-tenant network service. See "Implementation Priority" above.
 
@@ -722,36 +741,44 @@ specifically once M7 exists** — a shared, multi-tenant, externally-callable se
 place Presidium has the same concurrent-request profile AgentGateway/LiteLLM actually have.
 Sequenced after M7 for this reason, not because it's unimportant.
 
-**Research questions, not answers pre-decided:**
+**Research questions -- answered, 2026-08-25, see `docs/design/performance-research.md` for the
+full real results:**
 
-- [ ] Benchmark realistic Presidium call paths (not isolated micro-benchmarks) under real
+- [x] Benchmark realistic Presidium call paths (not isolated micro-benchmarks) under real
   concurrent load against an actual M7 server, once it exists — rule-set sizes and concurrency
-  levels drawn from a real or realistic deployment, not synthetic worst cases
-- [ ] Option A — horizontal scaling only (multiple `presidium-server` OS processes/replicas
-  behind a load balancer), zero code changes, cheapest engineering cost. Does this alone clear a
-  realistic target QPS?
-- [ ] Option B — free-threaded CPython (PEP 703, the `3.13t`/`3.14t` builds). Presidium already
-  targets 3.12/3.13/3.14. Does removing the GIL alone close the gap without introducing Rust at
-  all? A real, current option that didn't exist when AgentGateway/LiteLLM made their original
-  language choices.
-- [ ] Option C — a Rust-backed CEL evaluator behind the same `PolicyEngine` Protocol (e.g. a
-  `cel-rust` + PyO3 binding), keeping the rest of `presidium` pure Python. Matches this
-  project's own interface-library discipline: swap the implementation, not the Protocol.
-- [ ] Option D — a fuller Rust rewrite of the M7 network-facing layer specifically (the part
-  structurally equivalent to AgentGateway), leaving `presidium`/`presidium-contrib` as pure-Python
-  libraries for embedded/library-mode use. Most invasive; only worth it if A-C don't clear the bar.
+  levels drawn from a real or realistic deployment, not synthetic worst cases. **Done**: real
+  standalone M7 server, real `ab` load, real network hop to a separate host, 5/20/50/100 rule
+  sizes, concurrency 1-100.
+- [x] Option A — horizontal scaling only. **Confirmed working, close to linearly, zero code
+  changes** — two independent processes sustained ~650 combined req/sec vs. ~355 for one.
+  Recommended as the real default scaling story for M7 deployments now.
+- [x] Option B — free-threaded CPython. **Does NOT help today**, for two independent real
+  reasons: `cel-python`'s `google-re2` dependency isn't free-threading-safe (the GIL is
+  auto-re-enabled on import, confirmed directly); even forced off, `civitas.gateway.HTTPGateway`'s
+  single-asyncio-thread architecture has no multi-thread GIL contention to relieve in the first
+  place (confirmed: forced-off-GIL throughput was statistically indistinguishable from normal).
+- [x] Option C — a Rust-backed CEL evaluator. **Not prototyped** (per this milestone's own
+  scope), but grounded in a real, maintained Rust CEL crate (`cel-interpreter`, crates.io) and a
+  real 15-140x directional comparison against OPA on identical, same-hardware workloads.
+  Recommended as the next real lever if Option A proves insufficient.
+- [x] Option D — correctly not evaluated, per this item's own original sequencing ("only worth
+  it if A-C don't clear the bar" -- A already does, for today's known load).
 - [ ] MCP governance's regex-based scanning (`PIIDetector`, `PoisoningDetector`, redaction) —
   CPU-bound string processing over potentially large tool outputs, a second real GIL-bound cost
-  center worth benchmarking alongside policy evaluation, not assumed fine by proximity.
+  center worth benchmarking alongside policy evaluation, not assumed fine by proximity. **Still
+  open** — not covered by this pass, a real, separate follow-up.
 
 **Deliberately not decided here, per this project's own "ship the default, revisit only with
 evidence" discipline** (the same discipline that shipped `fabrica`'s retriever as pure Python v1
-rather than pre-optimizing in Rust): no component gets rewritten in Rust as part of this
-milestone. The deliverable is a design doc with real numbers and a recommendation, not code.
+rather than pre-optimizing in Rust): no component was rewritten in Rust as part of this
+milestone. The deliverable was a design doc with real numbers and a recommendation, not code --
+delivered.
 
-**Deliverable:** `docs/design/performance-research.md` — real benchmark results against an actual
-M7 deployment, a clear recommendation (which option, if any, and why), and either a follow-up
-implementation milestone or an explicit "pure Python is sufficient, revisit if X changes" call.
+**Deliverable, shipped:** [`docs/design/performance-research.md`](../design/performance-research.md)
+— real benchmark results against an actual M7 deployment (two real environments: local loopback
+and a real cross-host network hop), a real, same-hardware comparison against OPA, a
+competitive-landscape/benchmark-methodology analysis, and a clear recommendation (ship Option A
+now; don't pursue B; C is the next real lever if needed; D stays out of scope).
 
 ---
 
@@ -783,4 +810,4 @@ M-section itself, not just this table, if in doubt.
 | M5: SDK + CLI | Q1 2027 | **Started 2026-08-24** -- the first real `presidium` CLI shipped (version/registry list/policy validate/trust replay); docs site, examples, v1.0.0 remain |
 | M6: Cloud | 2027+ | Future -- not started, explicitly commercial |
 | M7: Presidium Server | TBD | **Complete for its P0 scope + 3 of 4 "Deferred" extensions** (check_grant, registry CRUD, rate limiting, approval list/decide -- real, shipped, released as of 2026-08-24). Only credential resolution remains, deliberately unsketched |
-| M8: Performance Research (Rust vs. Python) | After M7 | Planning -- not started; now genuinely unblocked, M7 exists to benchmark against |
+| M8: Performance Research (Rust vs. Python) | After M7 | **Complete, 2026-08-25** -- real benchmarks against a real M7 server + a real OPA comparison; Option A (horizontal scaling) recommended now, Option B ruled out, Option C is the next real lever if needed |
