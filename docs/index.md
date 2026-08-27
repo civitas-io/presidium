@@ -2,13 +2,16 @@
 
 > Content catalog for the Presidium knowledge base.
 > AI assistants: read this file first to find relevant pages before drilling in.
-> Last updated: 2026-07-07
+> Content structure last updated: 2026-07-07 — for current milestone/test-count status, see
+> [`docs/vision/roadmap.md`](vision/roadmap.md)'s milestone table and [`HANDOFF.md`](../HANDOFF.md),
+> not the prose below (a hand-maintained snapshot on this page drifted for 7+ weeks before being
+> caught — see `docs/log.md`).
 
-**The governed agent platform built on [Civitas](https://github.com/civitas-io/civitas-forge).**
+**The governed agent platform built on [Civitas](https://github.com/civitas-io/python-civitas).**
 
 Runtime + governance as one architecture — not bolted on, not a sidecar, native.
 
-**Status:** Pre-alpha. M2 (core interfaces) complete. M3 (contrib adapters + trust scoring) complete. 442 tests, 95%+ coverage.
+**Status:** see [`docs/vision/roadmap.md`](vision/roadmap.md) for the current, maintained milestone table (M1-M3 complete, M4 not started, M5 started 2026-08-24, M7 complete for its P0 scope) and [`HANDOFF.md`](../HANDOFF.md) for current test counts and release status.
 
 ---
 

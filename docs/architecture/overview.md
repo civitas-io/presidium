@@ -44,10 +44,14 @@ LLM and MCP gateways are implemented as Civitas plugins (`ModelProvider`, `ToolP
 
 ### 4. Audit as External Accountability
 
-`presidium-audit` aggregates governance metrics and exports them to external platforms. It does not replace Civitas's `EvalLoop` (which handles agent self-correction signals). These are distinct streams:
+`AuditSink`/`AuditEnricher` (in `presidium`, not a separate `presidium-audit` package — an early
+naming idea from this project's initial RFC that was never built as its own package, see
+`docs/rfcs/001-presidium-scope.md`) aggregate governance metrics and export them to external
+platforms. This does not replace Civitas's `EvalLoop` (which handles agent self-correction
+signals). These are distinct streams:
 
 - `EvalLoop` (Civitas): Did the agent produce a good output? Internal quality signal.
-- `presidium-audit` (Presidium): Did the agent comply with policy? External accountability signal.
+- `AuditSink`/`AuditEnricher` (Presidium): Did the agent comply with policy? External accountability signal.
 
 Compliance, trust drift, denial counts, and budget utilization are the audit layer's outputs — consumed by Fiddler, Arize, Langfuse, or any SIEM for dashboarding and compliance reporting.
 
@@ -60,8 +64,8 @@ Presidium extends Civitas at exactly eight surfaces. Outside these points, the t
 | # | Hook | Civitas Provides | Presidium Consumes |
 |---|------|-----------------|-------------------|
 | 1 | `RegistryListener` | Async callback on every agent register/deregister, carrying name + capability tags | Populates `AgentRecord` in persistent Agent Registry |
-| 2 | `ModelProvider` protocol | `chat(messages, agent_name, **kwargs) → ModelResponse` | `GovernedModelProvider` wraps any provider with rate limits, cost tracking, grant checks |
-| 3 | `ToolProvider` protocol | Interface for tool calls via MCP client | `GovernedToolProvider` wraps with tool ACLs, poisoning detection, credential redaction |
+| 2 | `ModelProvider` protocol | `chat(model, messages, tools=None) → ModelResponse` | `GovernedModelProvider` does the authorization check (rate limits, cost tracking, grant checks); `presidium.providers.civitas_adapters.GovernedModelProviderAdapter` is the class that actually implements this protocol, composing the check with a real backend |
+| 3 | `ToolProvider` protocol | Interface for tool calls via MCP client | `GovernedToolProvider` does the authorization check (tool ACLs, poisoning detection, credential redaction); `presidium.providers.civitas_adapters.GovernedToolAdapter` is the class that actually implements this protocol, wrapping one real backend tool |
 | 4 | `AuditSink` | Pipeline: agent emits structured audit events | Audit sink aggregates, enriches with governance context, exports to external platforms |
 | 5 | `ExportBackend` | Interface for telemetry export | Presidium implements: `FiddlerExporter`, `ArizeExporter`, `LangfuseExporter` |
 | 6 | `EvalLoop` hooks | Correction signal infrastructure for agent self-improvement | Presidium attaches governance metrics alongside self-correction signals (distinct streams) |
@@ -134,7 +138,7 @@ CEL evaluation happens inline — no external call, no network hop. The policy c
 
 1. **Registry loads** — agent definitions from YAML topology or programmatic config
 2. **Policies load** — CEL expressions compiled and attached to registry entries
-3. **Gateways initialize** — `GovernedModelProvider` and `GovernedToolProvider` register as Civitas plugins
+3. **Gateways initialize** — `GovernedModelProviderAdapter`/`GovernedToolAdapter` (composing `GovernedModelProvider`/`GovernedToolProvider`'s authorization checks with a real backend) register as Civitas plugins
 4. **Civitas Runtime starts** — supervision trees built from registry + policy config
 5. **Agents start** — each agent gets its registered identity, policies, and capabilities
 6. **Eval loop starts** — begins collecting governance metrics

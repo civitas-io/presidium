@@ -267,6 +267,39 @@ real, separate work, not automatically unblocked by this alone.
   fresh `pip install presidium-contrib` silently resolve an incompatible `presidium`. `presidium`
   tagged/published first, confirmed live via PyPI's JSON API, before tagging `presidium-contrib`
   — order matters given the new floor.
+- [ ] **Documentation reliability follow-ups** — opened 2026-08-27, same council-reviewed
+  exercise already run on `python-civitas` (see that repo's `docs/milestones.md`), scoped down
+  here because the council found Presidium's doc risk shape is different: ~10,000 lines of
+  `docs/design/`, `docs/research/`, `docs/vision/`, `docs/rfcs/` content is Draft/speculative by
+  design, not stale reference material, so most of the python-civitas playbook doesn't transfer
+  as-is. **Done, 2026-08-27** (see `docs/log.md` for full detail) — the wrong `civitas-forge`
+  upstream repo name in 5 files, the stale `docs/index.md` status header contradicting its own
+  linked roadmap, plus three real inaccuracies found reading the current-reference tier end to
+  end: a phantom `presidium-audit` package described as real in `docs/architecture/overview.md`,
+  a fabricated `ModelProvider.chat()` signature in the same file's Integration Points table, a
+  `README.md` claim that directly contradicted `AGENTS.md` about whether `GovernedModelProvider`/
+  `GovernedToolProvider` are drop-in Civitas protocol implementations (they're not — the real
+  Adapter classes are), fabricated Protocol method names for those same two classes in
+  `docs/architecture/packages.md`, and a fully aspirational, never-implemented YAML config schema
+  across `docs/architecture/stack.md`'s three deployment scenarios. Still open, in the council's
+  own priority order:
+  - A minimal required frontmatter status field (Draft/Proposed/Shipped/Superseded) on every doc
+    under `docs/design/`, `docs/research/`, `docs/vision/`, `docs/rfcs/`, lint-checked in CI —
+    the council's core finding was that the real gap here is a reader (human or agent) having no
+    way to tell "how it works" from "what we're thinking about" without opening every file.
+  - A mechanical currency check (not hand-maintained prose) comparing `docs/index.md`'s milestone
+    claims against `docs/vision/roadmap.md`'s actual state, so this exact bug class can't recur.
+  - A code-fence import checker (mirroring `python-civitas`'s
+    `tests/integration/test_docs_codeblocks.py`) scoped ONLY to `docs/index.md`,
+    `docs/architecture/*`, `docs/guides/getting-started.md`, and `README.md` — explicitly
+    excluding `docs/design/research/vision/rfcs`, where forcing Draft code sketches to import-check
+    against current source would produce false positives and train people to ignore the check.
+  - `mkdocs build --strict` in the docs deploy workflow, after fixing whatever real broken
+    links/anchors it finds first.
+  - An explicit archive/delete-vs-label decision for any design docs clearly superseded by a
+    shipped milestone, rather than defaulting to "label everything in place" forever.
+  - AGENTS.md needs no thin-router rework — it's already 389 lines with its own documented
+    self-correction history (2026-08-24). Deliberately not manufacturing work there.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
   usable without it (trust tiers work fine statically in the meantime).
 - [~] M5: SDK + CLI, docs site, example applications. **The "real first PyPI release + git

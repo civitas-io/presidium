@@ -71,7 +71,18 @@ Presidium generates telemetry that external platforms consume:
 
 ![Deployment Modes](../assets/deployment-modes.svg)
 
-Presidium components have two modes: library (in-process) and service (separate process, Civitas bus or HTTP). You can mix them. Start with everything in-process, then move individual components to service mode as your deployment grows. The application code doesn't change — only the topology config.
+Presidium components have two modes: library (in-process) and service (separate process, Civitas bus or HTTP). You can mix them. Start with everything in-process, then move individual components to service mode as your deployment grows. The application code doesn't change.
+
+> **Current implementation status**: the `presidium:` YAML blocks below illustrate the target
+> architecture across three deployment tiers, but `GovernedRuntime.from_config()` today only
+> reads `registry.trust_domain`/`registry.key_dir`, `policies` (a list of CEL rules), and
+> `agents` (per-agent owner/grants) from YAML — verified directly against
+> `presidium/runtime.py`. There is no `policy.type`/`credentials.type`/`trust.type`/`audit.type`
+> YAML switch yet: which policy engine, credential provider, trust scorer, and audit sink to use
+> is chosen today via `GovernedRuntime(...)`'s Python constructor arguments (`engine=`,
+> `credentials=`, `audit_sink=`), not the topology file. The scenarios below describe which
+> concrete implementation you'd wire up at each tier; treat the YAML as directional, not
+> copy-paste-ready.
 
 ### Scenario 1: Developer Laptop (Library Mode)
 

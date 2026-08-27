@@ -26,7 +26,10 @@ pip install presidium-contrib      # adapters: OPA, OpenBao, Slack, Postgres, th
 > (`presidium-contrib[agentgateway]`) speaks real MCP tool calls AND real A2A agent delegation
 > over Streamable HTTP, not LLM routing alone. `presidium-contrib[spiffe]` adds real SPIRE-issued
 > X.509-SVID identity alongside the default Ed25519 binding. `GovernedModelProvider`/
-> `GovernedToolProvider` are real, drop-in Civitas `ModelProvider`/`ToolProvider` implementations.
+> `GovernedToolProvider` are real, pure-authorization wrappers (`check()`/`check_grant()`, not
+> `chat()`/`execute()` themselves) — `presidium.providers.civitas_adapters`'s
+> `GovernedModelProviderAdapter`/`GovernedToolAdapter` are the real, drop-in Civitas
+> `ModelProvider`/`ToolProvider` implementations that compose them with a real backend.
 > `CelPolicyEngine` fails closed on no policy match by default (a real, documented breaking
 > change from earlier releases). Trust ceiling propagation and monotonic capability narrowing on
 > delegation/spawn are shipped. **M5 (SDK + CLI) started the same day**: a real `presidium`

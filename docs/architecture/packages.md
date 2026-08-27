@@ -317,17 +317,13 @@ Presidium doesn't own the audit destination. It enriches events with governance 
 ### LLM Gateway
 
 ```python
-class GovernedModelProvider(Protocol):
-    """Wraps civitas.ModelProvider with grant checks and rate limiting."""
-    async def complete(
-        self,
-        agent: str,
-        messages: list[Message],
-        model: str | None = None,
-    ) -> Completion: ...
-
-    async def check_grants(self, agent: str, model: str) -> bool: ...
-    async def remaining_budget(self, agent: str) -> float | None: ...
+class GovernedModelProvider:
+    """A concrete class (not a Protocol) doing pure PRE_LLM/POST_LLM authorization -- it does
+    NOT implement civitas.ModelProvider itself (no chat()). presidium.providers.civitas_adapters.
+    GovernedModelProviderAdapter is the real, drop-in civitas.ModelProvider that composes this
+    check with a real backend."""
+    async def check(self, agent_name: str, model: str) -> Any: ...  # raises PolicyDeniedError on DENY, else PolicyResult
+    async def post_check(self, agent_name: str, model: str, result_data: dict[str, Any]) -> Any: ...
 
 class LLMGatewayBackend(Protocol):
     """Pluggable operations layer GovernedModelProvider delegates to after authorization passes.
@@ -344,16 +340,14 @@ class LLMGatewayBackend(Protocol):
 ### MCP Governance
 
 ```python
-class GovernedToolProvider(Protocol):
-    """Wraps civitas.ToolProvider with ACL checks and audit logging."""
-    async def call(
-        self,
-        agent: str,
-        tool: str,
-        params: dict[str, Any],
-    ) -> ToolResult: ...
-
-    async def check_access(self, agent: str, tool: str) -> bool: ...
+class GovernedToolProvider:
+    """A concrete class (not a Protocol) doing pure PRE_TOOL/POST_TOOL authorization for
+    possibly many tools -- it does NOT implement civitas.ToolProvider itself.
+    presidium.providers.civitas_adapters.GovernedToolAdapter is the real, drop-in
+    civitas.ToolProvider that wraps exactly one real backend tool with this check."""
+    async def check(self, agent_name: str, tool: str, action: str = "invoke",
+                     parameters: dict[str, Any] | None = None) -> Any: ...  # raises PolicyDeniedError on DENY, else PolicyResult
+    async def check_grant(self, agent_name: str, resource: str, action: str) -> Any: ...
 
 class ToolsGatewayBackend(Protocol):
     """Pluggable operations layer GovernedToolProvider delegates to. call_tool() is deliberately

@@ -6,7 +6,7 @@
 
 ## Project Identity
 
-**Presidium** is a governance layer for AI agent systems, built on [Civitas](https://github.com/civitas-io/civitas-forge).
+**Presidium** is a governance layer for AI agent systems, built on [Civitas](https://github.com/civitas-io/python-civitas).
 It provides policy enforcement, agent identity, authorization, gateways, and compliance audit —
 natively integrated into the Civitas agent runtime.
 
@@ -126,9 +126,9 @@ presidium-contrib[litellm]` expecting it to work -- it will fail; that extra was
 
 ## Conventions
 
-### Matching civitas-forge Patterns
+### Matching python-civitas Patterns
 
-This repo follows the conventions established in `civitas-io/civitas-forge`:
+This repo follows the conventions established in `civitas-io/python-civitas`:
 
 | Convention | Standard |
 |---|---|

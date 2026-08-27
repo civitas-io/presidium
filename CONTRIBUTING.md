@@ -62,7 +62,7 @@ cd packages/presidium-contrib && uv run pytest tests/ && cd -
 
 ## Standards
 
-This project follows conventions established in `civitas-io/civitas-forge`:
+This project follows conventions established in `civitas-io/python-civitas`:
 
 - **Python:** ≥3.12
 - **Linting:** Ruff, 100 char line length

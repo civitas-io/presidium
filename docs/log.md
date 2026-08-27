@@ -1678,3 +1678,89 @@ committed pre-commit hooks don't cover that directory). No package release -- pu
 `serve_m7.py`, `run_matrix.sh`, `gen_opa_policy.py`, `run_opa_matrix.sh`, `opa_policy/`),
 `docs/design/performance-research.md` (new), `docs/vision/roadmap.md` (M8 section + Timeline +
 Implementation Priority all marked complete), `HANDOFF.md`, `docs/log.md` (this entry).
+
+## [2026-08-27] fix | Docs reliability pass (LLM-council-scoped) -- wrong upstream repo name, stale wiki-index status header, phantom package name, and three fabricated API/config surfaces in the architecture docs
+
+**Trigger**: same council-reviewed documentation-reliability exercise just run on `python-civitas`
+(see that repo's own `docs/milestones.md`), extended here. Council explicitly flagged that
+Presidium's doc risk shape differs from python-civitas's: ~10,000 lines of `docs/design/`,
+`docs/research/`, `docs/vision/`, `docs/rfcs/` content is Draft/speculative-by-design, not stale
+reference material, so the fix here is narrower than the python-civitas one -- verify and fix the
+current-reference surface only (this file, `AGENTS.md`, `docs/index.md`, `docs/architecture/*`,
+`docs/guides/getting-started.md`, `CONTRIBUTING.md`, `README.md`), not a rewrite of the design/
+research/vision corpus.
+
+**Found and fixed**: `civitas-forge` -- a repo name that has never existed under `civitas-io`; the
+real upstream is `civitas-io/python-civitas` -- had drifted, unfixed, into `docs/index.md`,
+`AGENTS.md` (twice), `CONTRIBUTING.md`, and a source docstring
+(`packages/presidium-contrib/src/presidium_contrib/cli/__init__.py`). Grepped the entire repo
+(all docs, source, config) rather than trusting the two occurrences the council's own scan had
+already found -- exactly the corpus-wide verification step the council's synthesis called out as
+missing from its own advisors' scoping. The one remaining `civitas-forge` mention, in this log's
+own `[2026-04-30] init` entry, is left as-is: it is a dated, historical record of what was decided
+that day, not a current claim, and this log is append-only by its own header convention (corrections
+get a new entry, not a silent rewrite of history) -- whether "civitas-forge" was ever a real
+transient working name at project inception, or simply wrong from day one, is now unknowable and
+not worth re-litigating; the point of this entry is that it is wrong *today* everywhere it still
+functions as a current claim, and those places are now fixed.
+
+Also fixed: `docs/index.md`'s header claimed "Last updated: 2026-07-07" and "Status: Pre-alpha,
+M2/M3 complete" while linking to its own `docs/vision/roadmap.md` one row below, which already
+showed M5 started and M7 complete for its P0 scope as of 2026-08-24 -- a real contradiction
+between a wiki index and the page it summarizes, live for roughly seven weeks. Per the council's
+explicit recommendation to prefer mechanical currency over hand-maintained prose snapshots,
+`docs/index.md` no longer restates a point-in-time status; it now points to `docs/vision/
+roadmap.md`'s milestone table and `HANDOFF.md` as the maintained sources of truth.
+
+**Found and fixed, same pass, going deeper than the two council-flagged bugs** -- read the full
+current-reference tier end to end (`README.md`, `AGENTS.md`, `docs/architecture/{overview,
+packages,stack}.md`, `docs/guides/getting-started.md`) and verified every checkable claim against
+real source, not just the bugs already in hand:
+
+- `docs/architecture/overview.md` described `presidium-audit` as a real, existing package
+  aggregating governance metrics. It never shipped as a separate package -- `docs/rfcs/
+  001-presidium-scope.md` itself already documents the rename `presidium-eval` → `presidium-audit`
+  as abandoned in favor of `AuditSink`/`AuditEnricher` living inside `presidium` core. `AGENTS.md`
+  already had this right (line 377); `overview.md` didn't. Fixed.
+- The same file's "Eight Integration Points" table showed `ModelProvider.chat()` with a fabricated
+  signature (`chat(messages, agent_name, **kwargs)`) that doesn't match `civitas.plugins.model.
+  ModelProvider`'s real one (`chat(model, messages, tools=None)`, no `agent_name` parameter at
+  all). Fixed.
+- `README.md` claimed `GovernedModelProvider`/`GovernedToolProvider` "are real, drop-in Civitas
+  `ModelProvider`/`ToolProvider` implementations" -- directly contradicting `AGENTS.md`'s own
+  correct framing (line 220: "pure authorization", distinct from the classes that actually wrap
+  a real backend). Verified against source: `GovernedModelProvider`/`GovernedToolProvider` have no
+  `chat()`/`execute()` method at all -- only `check()`/`check_grant()`/`post_check()`. The real
+  drop-in Protocol implementations are `presidium.providers.civitas_adapters.
+  GovernedModelProviderAdapter`/`GovernedToolAdapter`, which compose the check with a real
+  backend. Fixed `README.md` and the same mischaracterization in `docs/architecture/overview.md`
+  (the Integration Points table and the startup-sequence bullet).
+- `docs/architecture/packages.md` showed `GovernedModelProvider(Protocol)`/`GovernedToolProvider
+  (Protocol)` code blocks with entirely fabricated method names (`complete()`, `check_grants()`,
+  `remaining_budget()`, `call()`, `check_access()`) that exist nowhere in the real, concrete (not
+  Protocol) classes. Replaced with the real `check()`/`check_grant()`/`post_check()` shapes and an
+  explicit note pointing at the real Adapter classes. (`LLMGatewayBackend`/`ToolsGatewayBackend`
+  and the registry/credential/trust/approval/audit Protocol blocks in the same file were checked
+  against source too and found accurate -- not touched.)
+- `docs/architecture/stack.md`'s three deployment-scenario YAML blocks (`presidium: {policy:
+  {type: cel/opa}, credentials: {type: env/vault}, trust: {type: rule_based/remote}, audit:
+  {type: console/otel}, ...}`) describe a pluggable-backend YAML schema that
+  `GovernedRuntime.from_config()` does not implement -- verified directly against
+  `presidium/runtime.py`: the real, only YAML keys read are `registry.trust_domain`/
+  `registry.key_dir`, `policies` (a list), and `agents`. Which policy engine/credential provider/
+  trust scorer/audit sink to use is chosen via `GovernedRuntime(...)`'s Python constructor
+  arguments today, not YAML. Added an explicit "current implementation status" note above the
+  scenarios rather than deleting the conceptual content -- the three-tier deployment story is
+  real and useful, the copy-paste-ready YAML just wasn't real yet.
+
+**Deliberately not done** (per the council's synthesis, to avoid the "capitalize on this as a
+marketing/investor asset" scope creep every peer reviewer flagged as the weakest idea raised):
+no frontmatter status taxonomy across `docs/design/`/`docs/research/`/`docs/vision/`/`docs/rfcs/`
+yet, no CI mechanism enforcing `docs/index.md`'s currency against `docs/vision/roadmap.md`, and no
+archive/delete pass over superseded design docs. These are real, separate follow-up items, not
+abandoned -- tracked as open work, not silently dropped.
+
+**Pages updated:** `docs/index.md`, `AGENTS.md`, `CONTRIBUTING.md`, `README.md`,
+`docs/architecture/overview.md`, `docs/architecture/packages.md`, `docs/architecture/stack.md`,
+`docs/vision/roadmap.md` (new P1 backlog item), `HANDOFF.md`,
+`packages/presidium-contrib/src/presidium_contrib/cli/__init__.py`, `docs/log.md` (this entry).

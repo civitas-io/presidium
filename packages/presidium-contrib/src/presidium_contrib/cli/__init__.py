@@ -3,7 +3,7 @@
 Built with Typer + Rich, mirroring `civitas-io/python-civitas`'s own `civitas.cli` package
 directly -- same shared-`app.py`/one-module-per-command-group structure, same always-core
 (not extra-gated) typer/rich dependency, matching this project's own AGENTS.md commitment to
-following civitas-forge conventions.
+following python-civitas conventions.
 
 Lives in `presidium_contrib`, not `presidium` core: the core package is interface-only
 (protocols, dataclasses, the one CEL policy engine exception) per this project's own established

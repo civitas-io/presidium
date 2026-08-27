@@ -11,6 +11,16 @@ linearly. Deep, dated engineering history (every finding, every real decision, w
 `civitas-io/context` repo is the cross-repo reasoning substrate -- `projects/presidium.md` there
 mirrors everything below in more narrative form, kept in sync after every real change.
 
+**Docs reliability fix, 2026-08-27** (no package release, docs-only): a council-reviewed audit
+(scoped down from the identical exercise run on `python-civitas`, see that repo's
+`docs/milestones.md`) found and fixed a wrong upstream repo name (`civitas-forge`, which never
+existed -- the real repo is `civitas-io/python-civitas`) drifted into `docs/index.md`,
+`AGENTS.md` (twice), `CONTRIBUTING.md`, and a source docstring, plus a `docs/index.md` status
+header that had contradicted its own linked `docs/vision/roadmap.md` for ~7 weeks. Full detail
+and remaining follow-up items (a status taxonomy for `docs/design/`/`research/`/`vision/`/`rfcs/`,
+a mechanical currency check, a scoped code-fence import checker, `mkdocs --strict`) are tracked in
+`docs/vision/roadmap.md`'s P1 section and `docs/log.md`'s `[2026-08-27]` entry.
+
 ## Status as of 2026-08-25: **presidium v0.6.0 and presidium-contrib v0.7.0 are real, live on PyPI**
 
 ```
