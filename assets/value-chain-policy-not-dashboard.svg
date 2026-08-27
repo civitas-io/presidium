@@ -1,0 +1,66 @@
+<svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">Value as Policy, Not Dashboard</text>
+
+  <!-- Left: Observability approach -->
+  <text x="200" y="60" text-anchor="middle" font-size="13" font-weight="600" fill="#94a3b8">Observability Approach (Langfuse, Fiddler)</text>
+
+  <rect x="60" y="80" width="280" height="36" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="200" y="103" text-anchor="middle" font-size="11" fill="#64748b">Agent deployed (no requirements)</text>
+
+  <line x1="200" y1="116" x2="200" y2="130" stroke="#cbd5e1" stroke-width="1.2" marker-end="url(#arrowLightGray)"/>
+
+  <rect x="60" y="130" width="280" height="36" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="200" y="153" text-anchor="middle" font-size="11" fill="#64748b">Events collected passively</text>
+
+  <line x1="200" y1="166" x2="200" y2="180" stroke="#cbd5e1" stroke-width="1.2" marker-end="url(#arrowLightGray)"/>
+
+  <rect x="60" y="180" width="280" height="36" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="200" y="203" text-anchor="middle" font-size="11" fill="#64748b">Dashboards show cost trends</text>
+
+  <line x1="200" y1="216" x2="200" y2="230" stroke="#cbd5e1" stroke-width="1.2" marker-end="url(#arrowLightGray)"/>
+
+  <rect x="60" y="230" width="280" height="36" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="200" y="253" text-anchor="middle" font-size="11" fill="#92400e">❓ No baseline → ROI unknowable</text>
+
+  <!-- Right: Governance approach -->
+  <text x="600" y="60" text-anchor="middle" font-size="13" font-weight="600" fill="#16a34a">Governance Approach (Presidium)</text>
+
+  <rect x="460" y="80" width="280" height="36" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="98" text-anchor="middle" font-size="11" fill="#166534">REGISTRATION policy enforces:</text>
+  <text x="600" y="110" text-anchor="middle" font-size="9" fill="#16a34a" font-style="italic">OutcomeBinding + ValueBaseline required</text>
+
+  <line x1="600" y1="116" x2="600" y2="130" stroke="#16a34a" stroke-width="1.2" marker-end="url(#arrowDarkGreen)"/>
+
+  <rect x="460" y="130" width="280" height="36" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="153" text-anchor="middle" font-size="11" fill="#166534">Cost + value captured at policy hooks</text>
+
+  <line x1="600" y1="166" x2="600" y2="180" stroke="#16a34a" stroke-width="1.2" marker-end="url(#arrowDarkGreen)"/>
+
+  <rect x="460" y="180" width="280" height="36" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="198" text-anchor="middle" font-size="11" fill="#166534">ROI computed via scoring library</text>
+  <text x="600" y="210" text-anchor="middle" font-size="9" fill="#16a34a" font-style="italic">spec-hashed, replayable</text>
+
+  <line x1="600" y1="216" x2="600" y2="230" stroke="#16a34a" stroke-width="1.2" marker-end="url(#arrowDarkGreen)"/>
+
+  <rect x="460" y="230" width="280" height="36" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="600" y="253" text-anchor="middle" font-size="11" fill="#065f46">✓ CFO-grade: baseline → actual → delta</text>
+
+  <!-- Divider -->
+  <line x1="400" y1="70" x2="400" y2="280" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Bottom callout -->
+  <rect x="100" y="295" width="600" height="50" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="400" y="317" text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">The difference: enforcement, not observation</text>
+  <text x="400" y="335" text-anchor="middle" font-size="11" fill="#6d28d9">Observability says "here's what happened." Governance says "you can't start without declaring what should happen."</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowLightGray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#cbd5e1"/>
+    </marker>
+    <marker id="arrowDarkGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#16a34a"/>
+    </marker>
+  </defs>
+</svg>

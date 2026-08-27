@@ -1,0 +1,66 @@
+<svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">The Measurement Gap</text>
+
+  <!-- Left: Broken loop (current state) -->
+  <text x="200" y="65" text-anchor="middle" font-size="13" font-weight="600" fill="#dc2626">Current State (95% of deployments)</text>
+
+  <rect x="80" y="80" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="200" y="105" text-anchor="middle" font-size="12" fill="#991b1b">Deploy agents (no baseline)</text>
+
+  <line x1="200" y1="120" x2="200" y2="140" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+  <rect x="80" y="140" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="200" y="165" text-anchor="middle" font-size="12" fill="#991b1b">Costs accumulate (unattributed)</text>
+
+  <line x1="200" y1="180" x2="200" y2="200" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+  <rect x="80" y="200" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="200" y="225" text-anchor="middle" font-size="12" fill="#991b1b">CFO asks "what's the ROI?"</text>
+
+  <line x1="200" y1="240" x2="200" y2="260" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+  <rect x="80" y="260" width="240" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="200" y="285" text-anchor="middle" font-size="12" fill="#991b1b">No answer → budget cut</text>
+
+  <line x1="130" y1="300" x2="70" y2="340" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <text x="60" y="355" font-size="11" fill="#dc2626">↻ Repeat</text>
+
+  <!-- Right: Closed loop (with Presidium) -->
+  <text x="600" y="65" text-anchor="middle" font-size="13" font-weight="600" fill="#16a34a">With Agent Value Chain</text>
+
+  <rect x="480" y="80" width="240" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="100" text-anchor="middle" font-size="11" fill="#166534">Declare outcome + baseline</text>
+  <text x="600" y="113" text-anchor="middle" font-size="10" fill="#166534" font-style="italic">(enforced at registration)</text>
+
+  <line x1="600" y1="120" x2="600" y2="140" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="480" y="140" width="240" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="165" text-anchor="middle" font-size="11" fill="#166534">Costs attributed per agent/task</text>
+
+  <line x1="600" y1="180" x2="600" y2="200" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="480" y="200" width="240" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="225" text-anchor="middle" font-size="11" fill="#166534">Value captured on success (POST_TOOL)</text>
+
+  <line x1="600" y1="240" x2="600" y2="260" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="480" y="260" width="240" height="40" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="600" y="280" text-anchor="middle" font-size="11" fill="#166534">ROI = (Value − Cost) / Cost</text>
+  <text x="600" y="293" text-anchor="middle" font-size="10" fill="#166534" font-style="italic">replayable via ScoringSpec</text>
+
+  <line x1="720" y1="280" x2="740" y2="280" stroke="#16a34a" stroke-width="1.5"/>
+  <line x1="740" y1="280" x2="740" y2="100" stroke="#16a34a" stroke-width="1.5"/>
+  <line x1="740" y1="100" x2="720" y2="100" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="755" y="195" text-anchor="start" font-size="10" fill="#16a34a" transform="rotate(90, 755, 195)">Trust feedback</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#dc2626"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#16a34a"/>
+    </marker>
+  </defs>
+</svg>

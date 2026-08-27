@@ -1,0 +1,3044 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/design/hero-demo-candidates/">
+      
+      
+        <link rel="prev" href="../trust-attestation/">
+      
+      
+        <link rel="next" href="../../research/competitive-landscape/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Hero Demo Candidates - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hero-demo-candidates" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Hero Demo Candidates
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-a-praetor-sre-incident-response-co-pilot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate A: Praetor — SRE Incident Response Co-Pilot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-b-quaestor-vendor-onboarding-spend-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate B: Quaestor — Vendor Onboarding &amp; Spend Control ⭐
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-c-lictor-trade-surveillance-co-pilot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate C: Lictor — Trade Surveillance Co-Pilot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-d-curator-prior-authorization-clinical-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate D: Curator — Prior Authorization &amp; Clinical Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-e-vigil-soc-tier-1-alert-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate E: Vigil — SOC Tier-1 Alert Triage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-f-censor-ma-contract-diligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate F: Censor — M&amp;A Contract Diligence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation-criteria-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Criteria (Enterprise)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ---
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-a-praetor-sre-incident-response-co-pilot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate A: Praetor — SRE Incident Response Co-Pilot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-b-quaestor-vendor-onboarding-spend-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate B: Quaestor — Vendor Onboarding &amp; Spend Control ⭐
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-c-lictor-trade-surveillance-co-pilot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate C: Lictor — Trade Surveillance Co-Pilot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-d-curator-prior-authorization-clinical-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate D: Curator — Prior Authorization &amp; Clinical Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-e-vigil-soc-tier-1-alert-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate E: Vigil — SOC Tier-1 Alert Triage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#candidate-f-censor-ma-contract-diligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Candidate F: Censor — M&amp;A Contract Diligence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Matrix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation-criteria-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Criteria (Enterprise)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ---
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="hero-demo-candidates">Hero Demo Candidates<a class="headerlink" href="#hero-demo-candidates" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Evaluating demo concepts for civitas-io. Targeting OSS developers, platform engineers, enterprise buyers, and AI/ML engineers. Must showcase Civitas runtime + Presidium governance together.</p>
+<p>Status: Ideation phase. No implementation decisions made.
+Last updated: 2026-06-14</p>
+</blockquote>
+<hr />
+<h2 id="candidate-a-praetor-sre-incident-response-co-pilot">Candidate A: Praetor — SRE Incident Response Co-Pilot<a class="headerlink" href="#candidate-a-praetor-sre-incident-response-co-pilot" title="Permanent link">&para;</a></h2>
+<p>Multi-agent triage→diagnose→propose→execute pipeline against synthetic production alerts.</p>
+<p><strong>Topology:</strong> AlertIngestor → DynamicSupervisor spawns IncidentHandler per alert → TriageAgent → parallel DiagnosticSupervisor (logs, metrics, traces) → RemediationProposer → ExecutionAgent (gated). ApprovalRouter, TrustObserver, AuditCollector as permanent agents.</p>
+<p><strong>Wow moment:</strong> Human approval rate drops from 100% to ~12% over compressed 5-minute timeline as agents earn trust on recurring alert patterns. Poisoned alert (<code>DROP TABLE users</code>) blocked by policy engine.</p>
+<p><strong>Strengths:</strong>
+- Universal pain (everyone hates being paged)
+- Governance has existential teeth (data loss vs safety)
+- Trust progression visible in real time
+- Fault tolerance demo (kill agent mid-run → supervisor restarts)
+- Covers all Civitas + Presidium features naturally</p>
+<p><strong>Weaknesses:</strong>
+- Needs quality synthetic alert data to feel real
+- Dashboard is ~30% of effort
+- More SRE/platform-eng than enterprise buyer</p>
+<p><strong>Buyer:</strong> VP Engineering / Director SRE
+<strong>Budget line:</strong> Observability / incident management (PagerDuty, Opsgenie)
+<strong>Audiences:</strong> Strong for OSS devs + platform engineers. Moderate for enterprise.
+<strong>Effort:</strong> ~5-7 days</p>
+<hr />
+<h2 id="candidate-b-quaestor-vendor-onboarding-spend-control">Candidate B: Quaestor — Vendor Onboarding &amp; Spend Control ⭐<a class="headerlink" href="#candidate-b-quaestor-vendor-onboarding-spend-control" title="Permanent link">&para;</a></h2>
+<p>Multi-agent system triages vendor requests, runs security/financial/sanctions diligence, drafts contracts, and routes for approval with risk-tiered autonomy.</p>
+<p><strong>Topology:</strong> IntakeAgent → SecurityReviewAgent → FinancialHealthAgent → SanctionsScreener → ContractAnalyzer → ApprovalRouter. DynamicSupervisor spawns per-vendor review pipeline.</p>
+<p><strong>Wow moment:</strong> Agent auto-approves $3K office supplies vendor in seconds (earned trust on low-risk category). Same agent blocks "AcmeAI" vendor requesting prod data access — policy requires CISO grant regardless of trust. Shadow-AI vendor with full data access auto-approved in OFF mode → breach scenario.</p>
+<p><strong>Strengths:</strong>
+- Universal buyer (every company has procurement, CPO signs the MSA)
+- Shadow-AI panic is the 2026-2027 zeitgeist ("what AI vendors have our data?")
+- Earned autonomy demos beautifully: categories naturally tier (office supplies → SaaS → AI/data tools)
+- Multi-agent is obvious: security, financial, sanctions, contract — clearly different specializations
+- Cheapest to mock: vendor intake form, fake D&amp;B lookup, public OFAC SDN list, mock approval Slack</p>
+<p><strong>Weaknesses:</strong>
+- Less technically exciting for OSS developer audience
+- Procurement workflows vary significantly across companies</p>
+<p><strong>Buyer:</strong> CPO (Chief Procurement Officer), co-signed by CFO + CISO
+<strong>Budget line:</strong> P2P/S2P platform (Coupa, Ariba, Zip) + Third-Party Risk Management (OneTrust, ProcessUnity)
+<strong>Horror story (OFF):</strong> Agent auto-approves shadow AI vendor with prod data access → breach. Or autopays $80K phishing invoice spoofing real supplier (BEC fraud, $2.9B losses 2023 per FBI IC3).
+<strong>Regulations:</strong> SOX 404, OFAC sanctions, GDPR Art. 28 (processor DPAs), DORA Art. 28 (EU financial)
+<strong>vs. Today:</strong> 6-week vendor approval cycle, 8 procurement analysts ($110K each), Coupa + OneTrust + manual email ping-pong
+<strong>Deal size:</strong> Mid-market to Enterprise: $150K-$750K ARR. Broadest TAM of any concept.
+<strong>Effort:</strong> ~5-7 days</p>
+<hr />
+<h2 id="candidate-c-lictor-trade-surveillance-co-pilot">Candidate C: Lictor — Trade Surveillance Co-Pilot<a class="headerlink" href="#candidate-c-lictor-trade-surveillance-co-pilot" title="Permanent link">&para;</a></h2>
+<p>Multi-agent system monitors trader comms + order flow, drafts SAR filings, and auto-closes false-positive alerts after earning trust.</p>
+<p><strong>Topology:</strong> CommsIngestionAgent → PatternDetectionAgent → TriageClassifier → SARDraftAgent → FilingApprovalRouter. TrustObserver tracks per-analyst-type performance.</p>
+<p><strong>Wow moment:</strong> 98%+ of surveillance alerts are false positives today. Agent earns trust to auto-close cafeteria/HR chatter false positives but NEVER auto-files a SAR. Show OFF: spurious SAR filing → FINRA inquiry. Show ON: precision-filtered queue with audit trail.</p>
+<p><strong>Strengths:</strong>
+- Highest deal sizes ($750K-$3M ARR)
+- Most defensible against "ChatGPT can do this" (audit trail IS the product)
+- Strongest regulatory teeth (FINRA fines are existential: JPM $200M spoofing fine)
+- FS buyers respond to peers — one credible demo unlocks the vertical</p>
+<p><strong>Weaknesses:</strong>
+- Narrow audience (financial services only)
+- Niche mocks needed (Bloomberg chat format, OMS trade tape, SAR portal)
+- Compliance domain expertise needed to be credible</p>
+<p><strong>Buyer:</strong> Chief Compliance Officer (CCO) or Head of Surveillance
+<strong>Budget line:</strong> RegTech / Surveillance Technology (NICE Actimize, Nasdaq SMARTS, Behavox replacement)
+<strong>Horror story (OFF):</strong> Auto-files spurious SAR → FINRA inquiry + relationship damage. Or misses front-running pattern → $50M+ fine.
+<strong>Regulations:</strong> FINRA 3110, SEC 17a-4, MAR (EU), MiFID II Art. 16, FINRA Reg Notice 24-09 (AI in compliance)
+<strong>vs. Today:</strong> ~200 surveillance analysts at $150K reviewing alerts where 98%+ are false positives. Bloomberg surveillance ($2K/seat) + Actimize installs $2M+.
+<strong>Deal size:</strong> Enterprise: $750K-$3M ARR
+<strong>Effort:</strong> ~7-10 days (domain complexity)</p>
+<hr />
+<h2 id="candidate-d-curator-prior-authorization-clinical-documentation">Candidate D: Curator — Prior Authorization &amp; Clinical Documentation<a class="headerlink" href="#candidate-d-curator-prior-authorization-clinical-documentation" title="Permanent link">&para;</a></h2>
+<p>Multi-agent system extracts clinical data from charts, matches against payer criteria, drafts PA requests and appeals, with earned autonomy per condition category.</p>
+<p><strong>Topology:</strong> ChartExtractorAgent → CriteriaMatcherAgent → PayerRuleEngine → AppealDrafterAgent → ClinicianReviewRouter.</p>
+<p><strong>Wow moment:</strong> Diabetes med refill auto-approved in seconds (high trust, routine). Oncology case always routes to board-certified physician reviewer regardless of trust score — policy hardcodes it. Show OFF: auto-denies cancer treatment meeting NCCN guidelines → patient harm + regulatory investigation.</p>
+<p><strong>Strengths:</strong>
+- Highest ceiling deal sizes ($1M-$5M ARR)
+- Regulatory forcing function: CMS-0057-F mandates 72hr urgent / 7-day standard from 2026
+- Patient impact stories are visceral
+- Enormous market ($30B+ prior auth / revenue cycle)</p>
+<p><strong>Weaknesses:</strong>
+- Healthcare demos need domain credibility — non-clinician audiences may not feel the pain
+- HIPAA compliance adds real complexity even for demos
+- Mock FHIR endpoints and clinical criteria need domain expertise</p>
+<p><strong>Buyer:</strong> (Payer) CMO + VP Utilization Management. (Provider) VP Revenue Cycle + CFO
+<strong>Budget line:</strong> UM platform / RCM automation (Cohere Health, Olive AI space)
+<strong>Horror story (OFF):</strong> Auto-denies oncology case meeting NCCN guidelines → state insurance commissioner investigation + viral patient story (cf. Cigna PXDX lawsuit, 2023). Or PHI leak across patient records → HIPAA penalty.
+<strong>Regulations:</strong> HIPAA, HITECH, CMS-0057-F (Interoperability &amp; Prior Auth Final Rule, 2026-2027), state PA reform laws
+<strong>vs. Today:</strong> Nurse reviewers ($85K) at $1.50-$3/PA, 5-15 day turnaround
+<strong>Deal size:</strong> Enterprise: $1M-$5M ARR
+<strong>Effort:</strong> ~10+ days (domain-heavy)</p>
+<hr />
+<h2 id="candidate-e-vigil-soc-tier-1-alert-triage">Candidate E: Vigil — SOC Tier-1 Alert Triage<a class="headerlink" href="#candidate-e-vigil-soc-tier-1-alert-triage" title="Permanent link">&para;</a></h2>
+<p>Multi-agent system triages SIEM alerts, performs IOC enrichment, executes containment playbooks, and escalates Tier-2-worthy incidents with privileged-action governance.</p>
+<p><strong>Topology:</strong> AlertIntakeAgent → EnrichmentAgent (threat intel) → ContainmentAgent → CommsAgent → EscalationRouter.</p>
+<p><strong>Wow moment:</strong> Containment agent quarantines compromised dev endpoint autonomously (earned trust). Production/executive endpoints always require HITL. CEL condition: <code>resource.criticality != "executive"</code>. Show OFF: isolates CEO laptop mid-board-meeting. Show ON: asks for approval first.</p>
+<p><strong>Strengths:</strong>
+- Hot market (CISO budgets growing, SOC analyst shortage acute)
+- Clear tiered autonomy: dev VLAN vs production vs executive
+- SEC Cyber Disclosure Rule (4-day 8-K) creates regulatory urgency
+- CISO is a powerful internal buyer</p>
+<p><strong>Weaknesses:</strong>
+- Adjacent to Praetor (SRE) — may feel redundant in same demo deck
+- SIEM mock data needs to look credible (Splunk/Sentinel format)</p>
+<p><strong>Buyer:</strong> CISO + Director of Security Operations
+<strong>Budget line:</strong> MDR/MSSP (Arctic Wolf, Expel, Red Canary) + SOAR (Splunk SOAR, Tines)
+<strong>Horror story (OFF):</strong> Fails to contain ransomware → 4-day SEC reporting clock missed → material disclosure + shareholder lawsuit. Or posts incident details to wrong Slack channel → public disclosure.
+<strong>Regulations:</strong> SEC Cyber Disclosure Rule (4-day 8-K), NIS2 (EU), DORA, NYDFS Part 500
+<strong>vs. Today:</strong> $200K-$500K/yr MDR contracts; in-house SOC analysts at $130K with 80% false-positive fatigue
+<strong>Deal size:</strong> Mid-market to Enterprise: $250K-$1.5M ARR
+<strong>Effort:</strong> ~5-7 days</p>
+<hr />
+<h2 id="candidate-f-censor-ma-contract-diligence">Candidate F: Censor — M&amp;A Contract Diligence<a class="headerlink" href="#candidate-f-censor-ma-contract-diligence" title="Permanent link">&para;</a></h2>
+<p>Multi-agent system reviews target company contracts during due diligence, flags change-of-control / IP / liability risks, generates risk-scored disclosure schedules.</p>
+<p><strong>Topology:</strong> DocumentClassifier → ClauseExtractor → RiskScorer → ComparisonAgent (vs. precedent) → ScheduleDrafter.</p>
+<p><strong>Wow moment:</strong> Boilerplate jurisdiction clauses auto-tagged (earned trust after 1K examples). Change-of-control and IP assignment clauses always require partner sign-off — missing one could cost $XX0M in EV miscalculation.</p>
+<p><strong>Strengths:</strong>
+- Very high per-deal value ($50K-$200K per deal, or $300K-$1.5M ARR)
+- Audit trail = privilege log evidence (governance IS the legal requirement)</p>
+<p><strong>Weaknesses:</strong>
+- Episodic spend (deal-driven, not recurring)
+- Legal industry slow to buy
+- Needs convincing document corpus to demo</p>
+<p><strong>Buyer:</strong> General Counsel + Head of Corporate Development; or PE firm Operating Partner
+<strong>Budget line:</strong> Legal tech (Kira, Luminance, Harvey) + outside counsel substitution
+<strong>vs. Today:</strong> BigLaw at $1,200-$1,800/hr, 12-week diligence, $2M+ per deal
+<strong>Deal size:</strong> $300K-$1.5M ARR or $50K-$200K per deal
+<strong>Effort:</strong> ~7-10 days</p>
+<hr />
+<h2 id="comparison-matrix">Comparison Matrix<a class="headerlink" href="#comparison-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Buyer Reach</th>
+<th>Demo Drama</th>
+<th>Regulatory Teeth</th>
+<th>Deal Size</th>
+<th>1-Week Build</th>
+<th>2027-Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Praetor</strong> (SRE)</td>
+<td>★★★★ engineers</td>
+<td>★★★★ data loss</td>
+<td>★★ weak</td>
+<td>$150-500K</td>
+<td>★★★★★</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td><strong>B. Quaestor</strong> (Procurement) ⭐</td>
+<td>★★★★★ universal</td>
+<td>★★★★ fraud + shadow AI</td>
+<td>★★★ SOX/OFAC</td>
+<td>$150-750K</td>
+<td>★★★★★</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>C. Lictor</strong> (Trade Surv.)</td>
+<td>★★ FS only</td>
+<td>★★★★★ FINRA fines</td>
+<td>★★★★★ FINRA/MAR</td>
+<td>$750K-3M</td>
+<td>★★★ niche</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td><strong>D. Curator</strong> (Prior Auth)</td>
+<td>★★★ healthcare</td>
+<td>★★★★★ patient harm</td>
+<td>★★★★★ CMS-0057-F</td>
+<td>$1-5M</td>
+<td>★★ domain-heavy</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>E. Vigil</strong> (SOC)</td>
+<td>★★★★ CISOs</td>
+<td>★★★★ CEO laptop</td>
+<td>★★★★ SEC 4-day</td>
+<td>$250K-1.5M</td>
+<td>★★★★</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td><strong>F. Censor</strong> (M&amp;A)</td>
+<td>★★ legal/PE</td>
+<td>★★★★ deal-killer</td>
+<td>★★★ UPL rules</td>
+<td>$300K-1.5M</td>
+<td>★★★ corpus</td>
+<td>★★★</td>
+</tr>
+</tbody>
+</table>
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Quaestor (B)</strong> is the strongest hero demo for broad enterprise reach — every company has procurement, shadow-AI is the hot topic, and it's the cheapest to mock.</li>
+<li><strong>Lictor (C)</strong> is the vertical-specific "we're serious about regulated industries" demo — highest deal sizes, strongest regulatory story.</li>
+<li><strong>Praetor (A)</strong> remains the best for OSS developer + platform engineer audiences.</li>
+<li>A two-demo strategy (Quaestor for enterprise sales + Praetor for developer adoption) covers all audiences.</li>
+<li><strong>Curator (D)</strong> has the highest ceiling but needs domain investment to be credible.</li>
+<li><strong>Censor (F)</strong> is lowest priority — episodic spend, slow buyers.</li>
+</ul>
+<h2 id="evaluation-criteria-enterprise">Evaluation Criteria (Enterprise)<a class="headerlink" href="#evaluation-criteria-enterprise" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Does it showcase earned autonomy (HITL → autonomous progression)?</li>
+<li>Does it demonstrate governance ON vs OFF with clear business impact?</li>
+<li>Does it resonate with enterprise buyers who sign contracts?</li>
+<li>Is the use case something companies are actively budgeting for?</li>
+<li>Is it buildable in ~1 week with mock services?</li>
+<li>Will it still be compelling in mid-2027?</li>
+<li>Can it serve as a conference talk / blog post / README hero example?</li>
+</ol>
+<h2 id="-">---<a class="headerlink" href="#-" title="Permanent link">&para;</a></h2>
+<h1 id="oss-community-demos">OSS Community Demos<a class="headerlink" href="#oss-community-demos" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Free, useful tools meant to drive adoption and start conversations on HN, Reddit, Twitter/X.
+Goal: get developers to <code>pip install civitas presidium</code> and actually USE it.
+Key rule: position as standalone tools that <em>happen to</em> run on Civitas/Presidium. Governance should be discovered, not announced.</p>
+</blockquote>
+<hr />
+<h2 id="candidate-g-codeguard-seatbelts-for-ai-coding-agents">Candidate G: CodeGuard — Seatbelts for AI Coding Agents<a class="headerlink" href="#candidate-g-codeguard-seatbelts-for-ai-coding-agents" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"I gave Claude Code root and didn't lose my homedir (open-source guardrails for AI coding agents)"</em></p>
+<p>A sidecar that wraps any coding agent (Cursor, Claude Code, Aider, OpenCode, Codex CLI, Gemini CLI) and intercepts shell exec, filesystem writes, and network calls. CEL policies declare what's allowed: no <code>rm -rf</code> outside <code>/tmp</code>, no <code>curl | bash</code>, no <code>git push --force</code> to main, no writes to <code>~/.ssh</code>. New agents start with trust score 0.2 and earn capabilities through successful operations. HITL prompts for anything risky.</p>
+<p><strong>Why devs use it:</strong> Everyone has the YOLO agent horror story — Cursor that <code>rm -rf</code>'d the wrong directory, Aider that pushed to main, an agent that <code>npm install</code>'d a malicious package. This is the seatbelt people want but nobody built well.</p>
+<p><strong>Governance angle:</strong> Pre-execution policy is the killer feature — agents <em>can't</em> do the dangerous thing even if prompt-injected. Trust scoring means you don't manually approve every <code>ls</code>, just the scary stuff. Audit log = "what did the agent actually do today."</p>
+<p><strong>Show, don't tell:</strong> Side-by-side terminal. Left: unsupervised agent given a prompt-injected README, runs malicious bash. Right: same agent, CodeGuard intercepts with <code>BLOCKED: curl | bash matches policy denylist</code>, trust drops to 0.05, forensic audit entry written.</p>
+<p><strong>Local model:</strong> N/A — works as governance layer for any agent regardless of model. Works with Claude, GPT, AND local Ollama agents.</p>
+<p><strong>Effort:</strong> 1.5-2 weeks (shell interception via PTY wrapping is the hard part)</p>
+<hr />
+<h2 id="candidate-h-agentops-htop-for-ai-agents">Candidate H: AgentOps — htop for AI Agents<a class="headerlink" href="#candidate-h-agentops-htop-for-ai-agents" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"htop, but for AI agents — real-time visibility into autonomous systems"</em></p>
+<p>A Textual TUI that attaches to any Civitas runtime and shows every running agent in real-time: SPIFFE identity, trust score, current tool call, message flow between agents, token spend, time-in-state. Hotkeys: suspend, kill, force HITL on next action, dump decision history. Like Erlang Observer or k9s, but for agents.</p>
+<p><strong>Why devs use it:</strong> Multi-agent systems are currently impossible to debug. People stitch together LangSmith traces and CloudWatch logs. A beautiful, instant, local TUI is what you actually want at 2am when an agent loop is burning $40/hr.</p>
+<p><strong>Governance angle:</strong> Identity is the unlock — every agent has a cryptographic SPIFFE URI, not an opaque uuid. Trust scores visible as live gauges (red = recently policy-denied). Kill switches use Presidium's revocation. The "force HITL" hotkey is governance-as-debugging.</p>
+<p><strong>Show, don't tell:</strong> Screen recording: 12 agents in a supervisor tree (left), live message bus (center), trust-score gauges with one decaying as it fails post-execution checks (right). User presses <code>k</code>, supervisor respawns with reset trust. Cinematic.</p>
+<p><strong>Local model:</strong> 100% runtime-agnostic.</p>
+<p><strong>Effort:</strong> 1-1.5 weeks (Textual makes this fast)</p>
+<hr />
+<h2 id="candidate-i-agenttrap-i-left-an-agent-on-the-internet">Candidate I: AgentTrap — I Left an Agent on the Internet<a class="headerlink" href="#candidate-i-agenttrap-i-left-an-agent-on-the-internet" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"I left a vulnerable AI agent on the public internet for a week. Here's the attempted-hijack log."</em></p>
+<p>A deliberately-exposed agent (web scraper, RSS summarizer — something that consumes adversarial input) deployed publicly with full forensic logging. Then a comparison run with Presidium policies enabled. Output is BOTH a reproducible repo AND a research blog post documenting every real-world prompt injection / tool-call hijack / data exfiltration attempt observed.</p>
+<p><strong>Why devs use it:</strong> The blog post is the lead magnet. The repo gives them a forensics framework to deploy themselves. This becomes the canonical reference for "is prompt injection real?" debates.</p>
+<p><strong>Governance angle:</strong> Trust-score decay is the star — every successful injection attempt drops the source's trust. Agent stops trusting that source's inputs. Audit enrichment means every blocked attack has a full trace: what the attacker tried, what the agent would have done, what policy denied it.</p>
+<p><strong>Show, don't tell:</strong> Chart in the blog: "23 hijack attempts in 7 days. Without Presidium: 19 succeeded. With Presidium: 0 succeeded, 23 logged, average attacker trust score: 0.02."</p>
+<p><strong>Local model:</strong> Yes — run the honeypot on Qwen/Llama 4. MORE compelling that way ("a 7B model didn't get pwned because of governance, not intelligence").</p>
+<p><strong>Effort:</strong> 1 week build + 1 week running for content</p>
+<hr />
+<h2 id="candidate-j-padlock-docker-for-mcp-servers">Candidate J: Padlock — Docker for MCP Servers<a class="headerlink" href="#candidate-j-padlock-docker-for-mcp-servers" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"Docker for MCP servers — safely run that random GitHub MCP without trusting it"</em></p>
+<p>A wrapper that runs any MCP server in a capability-sandboxed environment. Declare what the server SHOULD be able to do (filesystem read on <code>~/projects</code>, network to <code>api.github.com</code>, no shell). Presidium enforces at the boundary. Each MCP server gets its own SPIFFE identity, trust score, and audit log. Drop-in: <code>padlock run npx @some/mcp-server</code> instead of <code>npx @some/mcp-server</code>.</p>
+<p><strong>Why devs use it:</strong> The MCP ecosystem is exploding and nobody is auditing these servers. Installing a random MCP server today is <code>curl | bash</code> energy. This is the safety net for trying new MCPs without paranoia.</p>
+<p><strong>Governance angle:</strong> Capability declaration is the differentiator — most sandboxes are all-or-nothing. Presidium policies let you say "this MCP can read <code>~/Documents</code> but cannot read <code>~/Documents/taxes</code>." Trust scores let dodgy MCPs lose access over time. Audit log = "what did the GitHub MCP actually do this week?"</p>
+<p><strong>Show, don't tell:</strong> Install a deliberately-malicious MCP server. Unsandboxed: reads <code>~/.aws/credentials</code> and exfiltrates. Padlock: policy denies, trust → 0, server quarantined, audit log shows attempted exfiltration with exact payload. Then: "Here's how to write a Padlock policy in 4 lines of CEL."</p>
+<p><strong>Local model:</strong> Runtime-agnostic. Works for any MCP client (Claude Desktop, Cursor, Continue, etc.).</p>
+<p><strong>Effort:</strong> 1.5-2 weeks (process isolation is hard — start with Linux namespaces / macOS sandbox-exec)</p>
+<hr />
+<h2 id="candidate-k-agentwolf-local-llms-play-werewolf">Candidate K: AgentWolf — Local LLMs Play Werewolf<a class="headerlink" href="#candidate-k-agentwolf-local-llms-play-werewolf" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"I made 8 local LLMs play Werewolf and watched them invent deception"</em></p>
+<p>Multi-agent social deduction game. 8 Ollama-powered agents play Werewolf/Mafia. Each agent has a real SPIFFE identity (cheating provably impossible — you can prove who said what). Audit logs reveal post-game "who knew what when." Watch emergent lying, coalition-building, and trust dynamics. Run tournaments between model families.</p>
+<p><strong>Why devs use it:</strong> Pure curiosity + entertainment + benchmark. People will run this just to see if Qwen-72B can out-lie Llama-4. Also a legitimate multi-agent testbed — more interesting than yet another RAG demo. Educators use it to teach multi-agent concepts.</p>
+<p><strong>Governance angle:</strong> Identity becomes a game mechanic. Trust scoring becomes meta (which model is the most "trustworthy" liar?). Audit replay shows Agent #4 tried to send a private message to the wrong channel — supervision tree caught it. Governance features feel natural because the game NEEDS them.</p>
+<p><strong>Show, don't tell:</strong> 90-second video: 8 agent portraits with live chat, voting phase, a werewolf accusing an innocent, the village voting wrong, post-game reveal showing werewolves' private coordination. Tweetable.</p>
+<p><strong>Local model:</strong> PRIMARY use case. Fully Ollama. Mix Qwen, Llama, DeepSeek, Phi in one game.</p>
+<p><strong>Effort:</strong> ~1 week (game logic is straightforward, magic is presentation)</p>
+<hr />
+<h2 id="candidate-l-provenance-cite-or-die-research-agent">Candidate L: Provenance — Cite-or-Die Research Agent<a class="headerlink" href="#candidate-l-provenance-cite-or-die-research-agent" title="Permanent link">&para;</a></h2>
+<p><strong>HN title:</strong> <em>"Local Deep Research that physically can't hallucinate citations"</em></p>
+<p>Multi-agent research pipeline: planner → searchers → synthesizer → critic. Presidium POST_LLM policy: every factual claim MUST link to a source the agent actually fetched, with content hash verified. If the synthesizer outputs an unsourced claim, the policy rejects it and forces a re-write. Audit log is a full provenance graph: claim → quote → URL → fetch timestamp → content hash.</p>
+<p><strong>Why devs use it:</strong> Local alternative to OpenAI Deep Research / Perplexity Pro that solves the actual problem — trustworthy citations. Journalists, researchers, anyone doing due diligence has been burned by hallucinated URLs.</p>
+<p><strong>Governance angle:</strong> Post-execution policy is the differentiator most agent frameworks don't have. Hallucination becomes architecturally impossible, not "hopefully won't happen." Audit enrichment IS the deliverable — user gets the provenance graph as output.</p>
+<p><strong>Show, don't tell:</strong> Research question → final report where every sentence is highlightable, hover shows exact source paragraph + content hash. Then: same question, governance disabled — 3 hallucinated citations marked red after manual verification.</p>
+<p><strong>Local model:</strong> Yes — Qwen for synthesis, smaller models for search/critic. SearXNG for free search.</p>
+<p><strong>Effort:</strong> ~2 weeks (claim→source matching is the substantive engineering)</p>
+<hr />
+<h2 id="oss-comparison-matrix">OSS Comparison Matrix<a class="headerlink" href="#oss-comparison-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Virality</th>
+<th>Utility</th>
+<th>Governance Showcase</th>
+<th>Local Model</th>
+<th>Build Time</th>
+<th>HN Appeal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>G. CodeGuard</strong></td>
+<td>★★★★</td>
+<td>★★★★★ daily use</td>
+<td>★★★★★ pre-exec policy</td>
+<td>★★★★★ any agent</td>
+<td>1.5-2wk</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>H. AgentOps</strong></td>
+<td>★★★★</td>
+<td>★★★★★ debugging</td>
+<td>★★★★ identity + trust</td>
+<td>★★★★★ agnostic</td>
+<td>1-1.5wk</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>I. AgentTrap</strong></td>
+<td>★★★★★ blog post</td>
+<td>★★★ research</td>
+<td>★★★★★ forensics</td>
+<td>★★★★★ 7B model</td>
+<td>1+1wk</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>J. Padlock</strong></td>
+<td>★★★★ MCP wave</td>
+<td>★★★★★ daily use</td>
+<td>★★★★★ capability sandbox</td>
+<td>★★★★★ any client</td>
+<td>1.5-2wk</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td><strong>K. AgentWolf</strong></td>
+<td>★★★★★ viral</td>
+<td>★★★ entertainment</td>
+<td>★★★ identity + audit</td>
+<td>★★★★★ Ollama</td>
+<td>~1wk</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>L. Provenance</strong></td>
+<td>★★★★</td>
+<td>★★★★★ real tool</td>
+<td>★★★★★ post-exec policy</td>
+<td>★★★★ needs capable model</td>
+<td>~2wk</td>
+<td>★★★★</td>
+</tr>
+</tbody>
+</table>
+<h2 id="oss-ship-order-recommended">OSS Ship Order (Recommended)<a class="headerlink" href="#oss-ship-order-recommended" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Order</th>
+<th>Concept</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>#1</strong></td>
+<td><strong>AgentWolf (K)</strong></td>
+<td>Lowest effort, highest virality. Gets people installing for FUN — trojan horse for the stack</td>
+</tr>
+<tr>
+<td><strong>#2</strong></td>
+<td><strong>AgentOps (H)</strong></td>
+<td>Beautiful demos sell themselves. Everyone with agents wants this</td>
+</tr>
+<tr>
+<td><strong>#3</strong></td>
+<td><strong>CodeGuard (G)</strong></td>
+<td>The "seatbelt I needed" moment. Biggest organic growth potential</td>
+</tr>
+<tr>
+<td><strong>#4</strong></td>
+<td><strong>AgentTrap (I)</strong></td>
+<td>Best for starting conversations. Blog post is the asset, repo is the proof</td>
+</tr>
+<tr>
+<td><strong>#5</strong></td>
+<td><strong>Padlock (J)</strong></td>
+<td>Rides the MCP wave. Useful timing as ecosystem matures</td>
+</tr>
+<tr>
+<td><strong>#6</strong></td>
+<td><strong>Provenance (L)</strong></td>
+<td>Highest effort, but quietly the most important. Ships when you can do it right</td>
+</tr>
+</tbody>
+</table>
+<h2 id="key-positioning-rule">Key Positioning Rule<a class="headerlink" href="#key-positioning-rule" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Don't position any of these as "Presidium demos." Position them as standalone tools that <em>happen to</em> run on Civitas/Presidium. The governance angle should be discovered, not announced. README opens with user value, not the framework. HN rejects framework-first projects ruthlessly.</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

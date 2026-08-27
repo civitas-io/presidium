@@ -1,0 +1,3929 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/research/agent-registry-research/">
+      
+      
+        <link rel="prev" href="../fiddler-relationship/">
+      
+      
+        <link rel="next" href="../trust-scoring-research/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Agent Registry Research - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-registry-industry-research" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent Registry Research
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-aws-bedrock-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. AWS Bedrock Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. AWS Bedrock Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versioning-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning &amp; Aliases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-groups-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Groups (Capabilities)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guardrails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam-policy-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Policy Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentcore-policy-cedar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentCore Policy (Cedar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam-roles-anywhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Roles Anywhere
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-google-gemini-enterprise-agent-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Google Gemini Enterprise Agent Platform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Google Gemini Enterprise Agent Platform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-spiffe-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity (SPIFFE-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry-centralized-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry (Centralized Catalog)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auth-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth Manager
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-zanzibar-spicedb-rebac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Zanzibar / SpiceDB (ReBAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-grants-via-zanzibar-tuples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Grants via Zanzibar Tuples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gcp-iam-service-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP IAM &amp; Service Accounts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-microsoft-agt-agent-governance-toolkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Microsoft AGT (Agent Governance Toolkit)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Microsoft AGT (Agent Governance Toolkit)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-did-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity (DID-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-scoring-0-1000-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Scoring (0-1000 Scale)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-decay-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Decay Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#privilege-rings-0-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Privilege Rings (0-3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#policy-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zero-trust-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zero-Trust Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ibm-watsonx-orchestrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. IBM watsonx Orchestrate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. IBM watsonx Orchestrate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuga-compositional-unified-governance-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CUGA (Compositional Unified Governance Architecture)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entra-agent-id-microsoft-ibm-convergence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entra Agent ID (Microsoft + IBM convergence)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-infrastructure-identity-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Infrastructure Identity Systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Infrastructure Identity Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiffespire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPIFFE/SPIRE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-rbac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes RBAC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-20-client-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth 2.0 Client Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workload-identity-k8s-cloud-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload Identity (K8s → Cloud IAM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-academic-research-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Academic Research (2026)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Academic Research (2026)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditable-agents-arxiv260405485" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auditable Agents (arXiv:2604.05485)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overlaying-governance-arxiv260603518" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overlaying Governance (arXiv:2606.03518)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governing-dynamic-capabilities-arxiv260314332" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governing Dynamic Capabilities (arXiv:2603.14332)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentsafe-framework-arxiv251203180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AGENTSAFE Framework (arXiv:2512.03180)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-comparative-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Comparative Analysis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-key-patterns-for-presidium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Key Patterns for Presidium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Key Patterns for Presidium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-separate-identity-from-authorization-universal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Separate Identity from Authorization (Universal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-bindings-link-identity-to-authorization-k8s-zanzibar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Bindings Link Identity to Authorization (K8s, Zanzibar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-trust-scoring-influences-authorization-agt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Trust Scoring Influences Authorization (AGT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-human-sponsor-for-accountability-agt-entra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 4: Human Sponsor for Accountability (AGT, Entra)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-5-ephemeral-credentials-for-ephemeral-agents-spiffe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 5: Ephemeral Credentials for Ephemeral Agents (SPIFFE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-6-delegation-with-attenuation-agt-zanzibar-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 6: Delegation with Attenuation (AGT, Zanzibar, OAuth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-7-fail-closed-policy-evaluation-agt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 7: Fail-Closed Policy Evaluation (AGT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-8-layered-enforcement-aws-ibm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 8: Layered Enforcement (AWS, IBM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-aws-bedrock-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. AWS Bedrock Agents
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. AWS Bedrock Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versioning-aliases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning &amp; Aliases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-groups-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Groups (Capabilities)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guardrails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam-policy-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Policy Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentcore-policy-cedar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AgentCore Policy (Cedar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam-roles-anywhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Roles Anywhere
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-google-gemini-enterprise-agent-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Google Gemini Enterprise Agent Platform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Google Gemini Enterprise Agent Platform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-spiffe-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity (SPIFFE-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry-centralized-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry (Centralized Catalog)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auth-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth Manager
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-zanzibar-spicedb-rebac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Zanzibar / SpiceDB (ReBAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-grants-via-zanzibar-tuples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Grants via Zanzibar Tuples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gcp-iam-service-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP IAM &amp; Service Accounts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-microsoft-agt-agent-governance-toolkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Microsoft AGT (Agent Governance Toolkit)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Microsoft AGT (Agent Governance Toolkit)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-identity-did-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Identity (DID-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-scoring-0-1000-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Scoring (0-1000 Scale)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-decay-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Decay Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#privilege-rings-0-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Privilege Rings (0-3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#policy-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zero-trust-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zero-Trust Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ibm-watsonx-orchestrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. IBM watsonx Orchestrate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. IBM watsonx Orchestrate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cuga-compositional-unified-governance-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CUGA (Compositional Unified Governance Architecture)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entra-agent-id-microsoft-ibm-convergence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entra Agent ID (Microsoft + IBM convergence)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-infrastructure-identity-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Infrastructure Identity Systems
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Infrastructure Identity Systems">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiffespire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPIFFE/SPIRE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-rbac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes RBAC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-20-client-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth 2.0 Client Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workload-identity-k8s-cloud-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload Identity (K8s → Cloud IAM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-academic-research-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Academic Research (2026)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Academic Research (2026)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditable-agents-arxiv260405485" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auditable Agents (arXiv:2604.05485)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overlaying-governance-arxiv260603518" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overlaying Governance (arXiv:2606.03518)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governing-dynamic-capabilities-arxiv260314332" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governing Dynamic Capabilities (arXiv:2603.14332)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agentsafe-framework-arxiv251203180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AGENTSAFE Framework (arXiv:2512.03180)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-comparative-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Comparative Analysis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-key-patterns-for-presidium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Key Patterns for Presidium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Key Patterns for Presidium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-separate-identity-from-authorization-universal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Separate Identity from Authorization (Universal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-bindings-link-identity-to-authorization-k8s-zanzibar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Bindings Link Identity to Authorization (K8s, Zanzibar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-trust-scoring-influences-authorization-agt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Trust Scoring Influences Authorization (AGT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-human-sponsor-for-accountability-agt-entra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 4: Human Sponsor for Accountability (AGT, Entra)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-5-ephemeral-credentials-for-ephemeral-agents-spiffe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 5: Ephemeral Credentials for Ephemeral Agents (SPIFFE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-6-delegation-with-attenuation-agt-zanzibar-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 6: Delegation with Attenuation (AGT, Zanzibar, OAuth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-7-fail-closed-policy-evaluation-agt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 7: Fail-Closed Policy Evaluation (AGT)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-8-layered-enforcement-aws-ibm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 8: Layered Enforcement (AWS, IBM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agent-registry-industry-research">Agent Registry: Industry Research<a class="headerlink" href="#agent-registry-industry-research" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>How cloud providers, infrastructure systems, and governance frameworks model agent identity, registration, authorization, and trust.
+Researched: June 2026</p>
+</blockquote>
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>Every major system that manages agent or workload identity makes the same architectural choice: identity and authorization are separate objects. Who you are is an immutable fact. What you can do is a revocable grant. This separation appears in AWS IAM (agentId vs. agentResourceRoleArn), Kubernetes RBAC (ServiceAccount vs. Role vs. RoleBinding), SPIFFE (SPIFFE ID vs. downstream policy), and Google Zanzibar (principal vs. relationship tuple). No system conflates them.</p>
+<p>Google has the closest prior art to what Presidium needs. The Gemini Enterprise Agent Platform ships a centralized Agent Registry — a unified catalog for agents, MCP servers, tools, and endpoints, with IAM-based access control, audit logging, and dynamic endpoint resolution. Google also adopted SPIFFE as the identity substrate for agents, giving each agent a cryptographically bound, non-impersonable identity that rotates every 24 hours. This is the most complete production implementation of agent identity found in the research.</p>
+<p>Microsoft AGT has the most mature trust scoring model: a 0-1000 scale with 5 tiers, 5 weighted dimensions, temporal decay, and trust contagion across interaction graphs. SPIFFE/SPIRE is the best model for ephemeral workloads — agents that spawn, attest, communicate, and crash, with credentials that expire naturally rather than requiring cleanup. Kubernetes RBAC has the cleanest structural pattern: three separate objects (identity, authorization definition, binding) that can be composed independently. These four systems together cover the design space Presidium needs to navigate.</p>
+<hr />
+<h2 id="1-aws-bedrock-agents">1. AWS Bedrock Agents<a class="headerlink" href="#1-aws-bedrock-agents" title="Permanent link">&para;</a></h2>
+<h3 id="agent-identity-model">Agent Identity Model<a class="headerlink" href="#agent-identity-model" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>agentId</code> (10-char alphanumeric) + ARN for cross-account reference</li>
+<li>Identity separated from authorization via <code>agentResourceRoleArn</code> (IAM Role)</li>
+<li>Agent metadata: <code>name</code>, <code>description</code>, <code>foundationModel</code>, <code>instruction</code> (40-4000 chars), <code>status</code> (CREATING/PREPARED/FAILED/UPDATING/DELETING)</li>
+</ul>
+<h3 id="versioning-aliases">Versioning &amp; Aliases<a class="headerlink" href="#versioning-aliases" title="Permanent link">&para;</a></h3>
+<ul>
+<li>DRAFT (mutable working version) → numbered versions (immutable snapshots via <code>PrepareAgent</code>) → aliases (pointers to versions for deployment)</li>
+<li>Alias routing configuration enables blue-green/canary deployment patterns</li>
+<li>Alias history events provide audit trail of routing changes</li>
+</ul>
+<h3 id="action-groups-capabilities">Action Groups (Capabilities)<a class="headerlink" href="#action-groups-capabilities" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Declare what an agent can do: <code>name</code>, <code>description</code>, <code>state</code> (ENABLED/DISABLED)</li>
+<li>Executor: Lambda ARN or RETURN_CONTROL</li>
+<li>Schema: OpenAPI 3.0 or function definitions</li>
+<li>Built-in signatures: <code>AMAZON.UserInput</code>, <code>AMAZON.CodeInterpreter</code>, <code>ANTHROPIC.Computer</code>, <code>ANTHROPIC.Bash</code>, <code>ANTHROPIC.TextEditor</code></li>
+<li>Key pattern: capability declaration is separate from implementation</li>
+</ul>
+<h3 id="guardrails">Guardrails<a class="headerlink" href="#guardrails" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Content filters (Hate/Insults/Sexual/Violence/Misconduct/Prompt Attack)</li>
+<li>Denied topics, word filters, PII detection/masking, contextual grounding, automated reasoning</li>
+<li>Layered enforcement: org-level → account-level → application-level (most restrictive wins)</li>
+<li>Attached to agents via <code>guardrailConfiguration</code> (identifier + version)</li>
+</ul>
+<h3 id="iam-policy-structure">IAM Policy Structure<a class="headerlink" href="#iam-policy-structure" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Effect/Action/Resource/Condition model</li>
+<li>20+ condition operators (String, Numeric, Date, Bool, IP, ARN, Null, IfExists)</li>
+<li>Trust policies for role assumption (who can assume this role)</li>
+<li>Permission boundaries (maximum permissions ceiling)</li>
+</ul>
+<h3 id="agentcore-policy-cedar">AgentCore Policy (Cedar)<a class="headerlink" href="#agentcore-policy-cedar" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Deterministic, auditable access control for agent-to-tool interactions</li>
+<li>Cedar policy language: <code>permit</code>/<code>forbid</code> with principal, action, resource, conditions</li>
+<li>Natural language policy authoring with automatic Cedar translation + safety validation</li>
+<li>Enforcement at AgentCore Gateway (outside agent code)</li>
+</ul>
+<h3 id="iam-roles-anywhere">IAM Roles Anywhere<a class="headerlink" href="#iam-roles-anywhere" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Certificate-based identity for workloads outside AWS</li>
+<li>Trust anchor → Profile → Role assumption</li>
+<li>X.509 certificate attributes extracted as principal tags for policy evaluation</li>
+<li>Relevant: agents may run anywhere, not just inside a cloud provider</li>
+</ul>
+<hr />
+<h2 id="2-google-gemini-enterprise-agent-platform">2. Google Gemini Enterprise Agent Platform<a class="headerlink" href="#2-google-gemini-enterprise-agent-platform" title="Permanent link">&para;</a></h2>
+<h3 id="agent-identity-spiffe-based">Agent Identity (SPIFFE-based)<a class="headerlink" href="#agent-identity-spiffe-based" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Per-agent SPIFFE identity: <code>spiffe://TRUST_DOMAIN/resources/SERVICE/RESOURCE_PATH</code></li>
+<li>Cryptographically bound X.509 certificates (24-hour rotation)</li>
+<li>Non-impersonable (unlike shared service accounts)</li>
+<li>IAM principal format: <code>principal://agents.global.org-ORGID.system.id.goog/resources/...</code></li>
+</ul>
+<h3 id="agent-registry-centralized-catalog">Agent Registry (Centralized Catalog)<a class="headerlink" href="#agent-registry-centralized-catalog" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Unified catalog for agents, MCP servers, tools, endpoints</li>
+<li>Search by keyword/prefix</li>
+<li>Centralized authentication via auth manager</li>
+<li>Dynamic endpoint resolution</li>
+<li>IAM-based access control + audit logging</li>
+<li>Data model: Agent ID, Display Name, Description, Runtime Type, Deployment Location, Version, MCP Servers, Tools, Auth Bindings, IAM Policy</li>
+</ul>
+<h3 id="auth-manager">Auth Manager<a class="headerlink" href="#auth-manager" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Manages OAuth credentials (2-legged machine-to-machine, 3-legged user delegation)</li>
+<li>API key storage</li>
+<li>End-user credential encryption (decrypted only at Agent Gateway)</li>
+<li>Audit trails</li>
+</ul>
+<h3 id="google-zanzibar-spicedb-rebac">Google Zanzibar / SpiceDB (ReBAC)<a class="headerlink" href="#google-zanzibar-spicedb-rebac" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Relationship tuples: <code>object#relation@user</code> (e.g., <code>document:readme#editor@bob</code>)</li>
+<li>Userset rewrite rules for computed permissions: <code>permission view = owner + editor + viewer + parent-&gt;viewer</code></li>
+<li>Schema definition language for namespace configuration</li>
+<li>Zookies (consistency tokens) prevent the "new enemy problem"</li>
+<li>Scale: 10M+ QPS, 2+ trillion ACLs, &lt;10ms 95<sup>th</sup> percentile</li>
+<li>Open-source implementation: SpiceDB by AuthZed</li>
+</ul>
+<h3 id="agent-grants-via-zanzibar-tuples">Agent Grants via Zanzibar Tuples<a class="headerlink" href="#agent-grants-via-zanzibar-tuples" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Model agent-to-resource permissions: <code>agent:researcher#can_use@tool:web_search</code></li>
+<li>Supports inheritance: <code>team:engineering#member@agent:researcher</code> → team grants flow to agent</li>
+<li>Supports delegation with computed permissions</li>
+<li>Schema example:
+  <code>zed
+  definition agent {
+    relation owner: user
+    relation can_use: tool
+  }
+  definition tool {
+    relation accessible_by: agent
+    permission use = accessible_by
+  }</code></li>
+</ul>
+<h3 id="gcp-iam-service-accounts">GCP IAM &amp; Service Accounts<a class="headerlink" href="#gcp-iam-service-accounts" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Service account identity: <code>SA@PROJECT.iam.gserviceaccount.com</code></li>
+<li>Key difference from Agent Identity: service accounts are shared and impersonable; agent identities are per-agent and non-impersonable</li>
+<li>Workload Identity Federation: external workloads → STS → service account → GCP resources</li>
+</ul>
+<hr />
+<h2 id="3-microsoft-agt-agent-governance-toolkit">3. Microsoft AGT (Agent Governance Toolkit)<a class="headerlink" href="#3-microsoft-agt-agent-governance-toolkit" title="Permanent link">&para;</a></h2>
+<h3 id="agent-identity-did-based">Agent Identity (DID-based)<a class="headerlink" href="#agent-identity-did-based" title="Permanent link">&para;</a></h3>
+<ul>
+<li>DID format: <code>did:mesh:&lt;128-bit-hex&gt;</code> (128 bits = 32 hex chars from <code>secrets.token_hex(16)</code>)</li>
+<li>Ed25519 keypairs for all signatures</li>
+<li><code>AgentIdentity</code> fields: <code>did</code>, <code>name</code>, <code>description</code>, <code>public_key</code>, <code>verification_key_id</code>, <code>sponsor_email</code>, <code>sponsor_verified</code>, <code>organization</code>, <code>organization_id</code>, <code>capabilities</code>, <code>created_at</code>, <code>updated_at</code>, <code>expires_at</code>, <code>status</code> (active/suspended/revoked), <code>revocation_reason</code>, <code>parent_did</code>, <code>delegation_depth</code> (0-5), <code>max_initial_trust_score</code></li>
+<li>Mandatory human sponsor: every agent has a human accountable for it</li>
+<li>Delegation chains with depth limits (max 5) and trust ceiling propagation</li>
+</ul>
+<h3 id="trust-scoring-0-1000-scale">Trust Scoring (0-1000 Scale)<a class="headerlink" href="#trust-scoring-0-1000-scale" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Default: 500 (Standard tier)</li>
+<li>5 tiers:</li>
+<li>900-1000: Verified Partner (full autonomy)</li>
+<li>700-899: Trusted (high autonomy)</li>
+<li>500-699: Standard (normal operations)</li>
+<li>300-499: Probationary (restricted)</li>
+<li>0-299: Untrusted (sandbox only)</li>
+<li>Revocation threshold: 300</li>
+<li>5 weighted dimensions:</li>
+<li>Policy compliance: 25%</li>
+<li>Security posture: 25%</li>
+<li>Output quality: 20%</li>
+<li>Resource efficiency: 15%</li>
+<li>Collaboration health: 15%</li>
+</ul>
+<h3 id="trust-decay-algorithm">Trust Decay Algorithm<a class="headerlink" href="#trust-decay-algorithm" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Temporal decay: 2 points/hour with no positive signals</li>
+<li>Trust contagion: if agent A trusts B and B fails, A's score decays proportionally (30% propagation factor, 2-hop depth)</li>
+<li>Behavioral regime detection: KL divergence between recent (1 hour) and historical (30 days) action distributions triggers alerts at threshold 0.5</li>
+<li>Network-aware: interaction graph tracks <code>(from_did, to_did)</code> edges</li>
+</ul>
+<h3 id="privilege-rings-0-3">Privilege Rings (0-3)<a class="headerlink" href="#privilege-rings-0-3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Ring 0 (Root): Hypervisor config, requires SRE Witness. Full access.</li>
+<li>Ring 1 (Privileged): Non-reversible actions, requires <code>eff_score &gt; 0.95</code> + consensus. Full network/filesystem/subprocess.</li>
+<li>Ring 2 (Standard): Reversible actions, requires <code>eff_score &gt; 0.60</code>. Network allowed, scoped filesystem, 8 concurrent tools max.</li>
+<li>Ring 3 (Sandbox): Read-only, default for unknown agents. No network, no filesystem write, no subprocess, 2 concurrent tools max.</li>
+</ul>
+<h3 id="policy-engine">Policy Engine<a class="headerlink" href="#policy-engine" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>PolicyRule</code> fields: <code>name</code>, <code>description</code>, <code>stage</code> (pre_input/pre_tool/post_tool/pre_output), <code>condition</code> (expression string), <code>action</code> (allow/deny/warn/require_approval/log), <code>limit</code> (rate string), <code>approvers</code>, <code>priority</code>, <code>enabled</code></li>
+<li>Fail-closed semantics: evaluation errors default to MATCH (deny)</li>
+<li>Supports YAML, OPA Rego, Cedar</li>
+<li>Example: <code>condition: "action.type == 'export' and agent.trust_score &lt; 500"</code> → <code>action: deny</code></li>
+</ul>
+<h3 id="zero-trust-workflow">Zero-Trust Workflow<a class="headerlink" href="#zero-trust-workflow" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Agent registered → DID + Ed25519 keypair generated</li>
+<li>Human sponsor verifies</li>
+<li>Initial trust: 500 (Standard), Ring 3 (Sandbox)</li>
+<li>Every action evaluated by policy engine</li>
+<li>Trust score updated based on behavior</li>
+<li>Ring elevation/demotion based on effective score</li>
+</ol>
+<hr />
+<h2 id="4-ibm-watsonx-orchestrate">4. IBM watsonx Orchestrate<a class="headerlink" href="#4-ibm-watsonx-orchestrate" title="Permanent link">&para;</a></h2>
+<h3 id="agent-registry-api">Agent Registry API<a class="headerlink" href="#agent-registry-api" title="Permanent link">&para;</a></h3>
+<ul>
+<li>REST: <code>POST /v1/orchestrate/agents</code> with <code>name</code>, <code>display_name</code>, <code>config</code> (type, model, tools), <code>metadata</code> (publisher, tags, version)</li>
+<li>Listing: <code>GET /v1/orchestrate/agents?query=...&amp;limit=50</code></li>
+<li>Multi-framework: native, LangGraph, A2A</li>
+</ul>
+<h3 id="cuga-compositional-unified-governance-architecture">CUGA (Compositional Unified Governance Architecture)<a class="headerlink" href="#cuga-compositional-unified-governance-architecture" title="Permanent link">&para;</a></h3>
+<ul>
+<li>5 structural checkpoints embedded in the agent pipeline:</li>
+<li>Intent Guard (upstream of planning)</li>
+<li>Playbook (within system prompt)</li>
+<li>Tool Guide (at tool-call boundary)</li>
+<li>Tool Approvals (outside reasoning loop)</li>
+<li>Output Formatter (at output stage)</li>
+<li>Policy-as-code, no model fine-tuning required</li>
+<li>Typed governance primitives per checkpoint</li>
+<li>Explicit conflict handling for overlapping policies</li>
+</ul>
+<h3 id="entra-agent-id-microsoft-ibm-convergence">Entra Agent ID (Microsoft + IBM convergence)<a class="headerlink" href="#entra-agent-id-microsoft-ibm-convergence" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Extends Entra ID to AI agent identities</li>
+<li>Lifecycle: provisioning → approval → activation → rotation → decommission</li>
+<li>Mandatory human sponsor</li>
+<li>Conditional Access policies target agent identities</li>
+<li>Revocation in ≤5 seconds</li>
+</ul>
+<hr />
+<h2 id="5-infrastructure-identity-systems">5. Infrastructure Identity Systems<a class="headerlink" href="#5-infrastructure-identity-systems" title="Permanent link">&para;</a></h2>
+<h3 id="spiffespire">SPIFFE/SPIRE<a class="headerlink" href="#spiffespire" title="Permanent link">&para;</a></h3>
+<ul>
+<li>SPIFFE ID format: <code>spiffe://trust-domain/path</code> (max 2048 bytes)</li>
+<li>SVID: X.509 (SPIFFE ID in SAN extension, short-lived, auto-rotated) or JWT (<code>sub</code> claim = SPIFFE ID, audience required)</li>
+<li>Designed for ephemeral workloads: spawn → attest → issue SVID → communicate → crash → SVID expires naturally</li>
+<li>Two-phase attestation: node (verify host) + workload (verify process via selectors: UID, container ID, K8s namespace/SA)</li>
+<li>Registration entry: Entry ID, SPIFFE ID, Parent ID, Selectors, TTL, Hint, Federated Trust Domains</li>
+<li>Trust domains + federation via SPIFFE bundles (JWK sets)</li>
+</ul>
+<h3 id="kubernetes-rbac">Kubernetes RBAC<a class="headerlink" href="#kubernetes-rbac" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Identity: ServiceAccount (name + namespace, JWT token auto-mounted)</li>
+<li>Authorization: Role/ClusterRole with rules (<code>apiGroups</code>, <code>resources</code>, <code>verbs</code>, <code>resourceNames</code>)</li>
+<li>Binding: RoleBinding/ClusterRoleBinding links identity to authorization</li>
+<li>Namespace scoping for isolation</li>
+<li>Admission webhooks for policy enforcement at API level</li>
+<li>The pattern: 3 separate objects (identity, authorization, binding) — clean separation</li>
+</ul>
+<h3 id="oauth-20-client-credentials">OAuth 2.0 Client Credentials<a class="headerlink" href="#oauth-20-client-credentials" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Client ID as identity, client secret as credential</li>
+<li>Scopes as grants: <code>read:logs write:metrics</code></li>
+<li>Token-based, time-limited</li>
+<li>Resource server validates scope on each request</li>
+</ul>
+<h3 id="workload-identity-k8s-cloud-iam">Workload Identity (K8s → Cloud IAM)<a class="headerlink" href="#workload-identity-k8s-cloud-iam" title="Permanent link">&para;</a></h3>
+<ul>
+<li>GKE: K8s ServiceAccount → GCP IAM Service Account via annotation + workload identity pool</li>
+<li>EKS: K8s ServiceAccount → AWS IAM Role via OIDC provider + trust policy</li>
+<li>Pattern: local identity maps to cloud identity for resource access</li>
+</ul>
+<hr />
+<h2 id="6-academic-research-2026">6. Academic Research (2026)<a class="headerlink" href="#6-academic-research-2026" title="Permanent link">&para;</a></h2>
+<h3 id="auditable-agents-arxiv260405485">Auditable Agents (arXiv:2604.05485)<a class="headerlink" href="#auditable-agents-arxiv260405485" title="Permanent link">&para;</a></h3>
+<ul>
+<li>5 dimensions: action recoverability, lifecycle coverage, policy checkability, responsibility attribution, evidence integrity</li>
+<li>3 mechanism classes: detect (real-time), enforce (preventive), recover (forensic)</li>
+<li>Key finding: no single temporal vantage point supplies all 5 dimensions</li>
+</ul>
+<h3 id="overlaying-governance-arxiv260603518">Overlaying Governance (arXiv:2606.03518)<a class="headerlink" href="#overlaying-governance-arxiv260603518" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Compositional authorization: overlay agentic semantics on existing relational policies</li>
+<li>Recursive delegation with scope attenuation (child gets narrower permissions)</li>
+<li>Dynamic scoping: permissions change based on runtime context</li>
+</ul>
+<h3 id="governing-dynamic-capabilities-arxiv260314332">Governing Dynamic Capabilities (arXiv:2603.14332)<a class="headerlink" href="#governing-dynamic-capabilities-arxiv260314332" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Chain verifiability theorem: one unverifiable agent breaks end-to-end verification</li>
+<li>Bounded divergence: ε ≤ 1 - α^(1/n) for n agents in chain</li>
+<li>Implementations: Ed25519 + SHA-256 (97µs verify) or BBS+ ZK proofs (13.8ms verify)</li>
+</ul>
+<h3 id="agentsafe-framework-arxiv251203180">AGENTSAFE Framework (arXiv:2512.03180)<a class="headerlink" href="#agentsafe-framework-arxiv251203180" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Design controls → runtime controls → audit controls</li>
+<li>Semantic telemetry, dynamic authorization, anomaly detection, interruptibility, cryptographic tracing</li>
+</ul>
+<hr />
+<h2 id="7-comparative-analysis">7. Comparative Analysis<a class="headerlink" href="#7-comparative-analysis" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>AWS Bedrock</th>
+<th>Google Gemini</th>
+<th>Microsoft AGT</th>
+<th>IBM watsonx</th>
+<th>SPIFFE</th>
+<th>K8s RBAC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identity format</td>
+<td>agentId + ARN</td>
+<td>SPIFFE URI</td>
+<td>DID (did:mesh:)</td>
+<td>Service principal</td>
+<td>SPIFFE URI</td>
+<td>ServiceAccount</td>
+</tr>
+<tr>
+<td>Identity binding</td>
+<td>IAM Role (separate)</td>
+<td>IAM + Agent Identity</td>
+<td>Ed25519 keypair</td>
+<td>Entra ID</td>
+<td>X.509 cert / JWT</td>
+<td>JWT token</td>
+</tr>
+<tr>
+<td>Authorization model</td>
+<td>IAM policies + Cedar</td>
+<td>IAM + Zanzibar ReBAC</td>
+<td>YAML/OPA/Cedar policies</td>
+<td>CUGA checkpoints</td>
+<td>None (identity only)</td>
+<td>RBAC rules</td>
+</tr>
+<tr>
+<td>Grant structure</td>
+<td>Effect/Action/Resource/Condition</td>
+<td>Relationship tuples</td>
+<td>Capabilities list + policy rules</td>
+<td>Policy-as-code</td>
+<td>N/A</td>
+<td>apiGroups/resources/verbs</td>
+</tr>
+<tr>
+<td>Trust scoring</td>
+<td>None</td>
+<td>None</td>
+<td>0-1000, 5 tiers, 5 dimensions, decay + contagion</td>
+<td>Implicit</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Human sponsor</td>
+<td>None</td>
+<td>None</td>
+<td>Mandatory</td>
+<td>Publisher (soft)</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Versioning</td>
+<td>DRAFT → numbered → aliases</td>
+<td>Revisions</td>
+<td>expires_at</td>
+<td>Semantic version</td>
+<td>TTL-based</td>
+<td>Immutable objects</td>
+</tr>
+<tr>
+<td>Ephemeral workloads</td>
+<td>Via IAM session credentials</td>
+<td>SPIFFE (auto-rotation)</td>
+<td>expires_at field</td>
+<td>N/A</td>
+<td>Core design</td>
+<td>Via token rotation</td>
+</tr>
+<tr>
+<td>Delegation</td>
+<td>Via IAM role chaining</td>
+<td>Via Zanzibar tuples</td>
+<td>parent_did + depth limit + trust ceiling</td>
+<td>N/A</td>
+<td>Via parent ID</td>
+<td>Via bindings</td>
+</tr>
+<tr>
+<td>Policy enforcement</td>
+<td>IAM + Cedar + Guardrails</td>
+<td>IAM + Zanzibar</td>
+<td>4-stage policy pipeline (fail-closed)</td>
+<td>5-checkpoint pipeline</td>
+<td>N/A</td>
+<td>Admission webhooks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-key-patterns-for-presidium">8. Key Patterns for Presidium<a class="headerlink" href="#8-key-patterns-for-presidium" title="Permanent link">&para;</a></h2>
+<h3 id="pattern-1-separate-identity-from-authorization-universal">Pattern 1: Separate Identity from Authorization (Universal)<a class="headerlink" href="#pattern-1-separate-identity-from-authorization-universal" title="Permanent link">&para;</a></h3>
+<p>Every system separates who you are from what you can do. Identity is an immutable fact. Authorization is a revocable grant.</p>
+<h3 id="pattern-2-bindings-link-identity-to-authorization-k8s-zanzibar">Pattern 2: Bindings Link Identity to Authorization (K8s, Zanzibar)<a class="headerlink" href="#pattern-2-bindings-link-identity-to-authorization-k8s-zanzibar" title="Permanent link">&para;</a></h3>
+<p>The cleanest systems have 3 objects: identity, permission definition, and a binding that links them. This enables: same permissions → multiple agents, multiple permissions → one agent, revoke binding without touching identity or permission definition.</p>
+<h3 id="pattern-3-trust-scoring-influences-authorization-agt">Pattern 3: Trust Scoring Influences Authorization (AGT)<a class="headerlink" href="#pattern-3-trust-scoring-influences-authorization-agt" title="Permanent link">&para;</a></h3>
+<p>Trust score determines what ring/tier an agent operates in. Low trust → sandbox. High trust → full access. Score changes dynamically based on behavior. This is the bridge between static grants and dynamic autonomy.</p>
+<h3 id="pattern-4-human-sponsor-for-accountability-agt-entra">Pattern 4: Human Sponsor for Accountability (AGT, Entra)<a class="headerlink" href="#pattern-4-human-sponsor-for-accountability-agt-entra" title="Permanent link">&para;</a></h3>
+<p>Every agent has a human owner. This enables: responsibility attribution, sponsor-initiated revocation, compliance (someone is accountable). Enterprise adoption likely requires this.</p>
+<h3 id="pattern-5-ephemeral-credentials-for-ephemeral-agents-spiffe">Pattern 5: Ephemeral Credentials for Ephemeral Agents (SPIFFE)<a class="headerlink" href="#pattern-5-ephemeral-credentials-for-ephemeral-agents-spiffe" title="Permanent link">&para;</a></h3>
+<p>Agents spawn and die. Credentials should be short-lived, auto-rotated, and expire naturally on crash. No persistent key storage, no cleanup on failure.</p>
+<h3 id="pattern-6-delegation-with-attenuation-agt-zanzibar-oauth">Pattern 6: Delegation with Attenuation (AGT, Zanzibar, OAuth)<a class="headerlink" href="#pattern-6-delegation-with-attenuation-agt-zanzibar-oauth" title="Permanent link">&para;</a></h3>
+<p>When agent A spawns agent B, B gets narrower permissions than A. Trust ceiling propagation (AGT), scope attenuation (OAuth), computed permissions (Zanzibar) all achieve this differently.</p>
+<h3 id="pattern-7-fail-closed-policy-evaluation-agt">Pattern 7: Fail-Closed Policy Evaluation (AGT)<a class="headerlink" href="#pattern-7-fail-closed-policy-evaluation-agt" title="Permanent link">&para;</a></h3>
+<p>If the policy engine errors during evaluation, the result is DENY, not ALLOW. This prevents attackers from crafting inputs that trigger exceptions to bypass policy.</p>
+<h3 id="pattern-8-layered-enforcement-aws-ibm">Pattern 8: Layered Enforcement (AWS, IBM)<a class="headerlink" href="#pattern-8-layered-enforcement-aws-ibm" title="Permanent link">&para;</a></h3>
+<p>Multiple enforcement points: org-level → agent-level → action-level. Most restrictive wins. AWS does this with guardrail layering. IBM does it with 5 structural checkpoints.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

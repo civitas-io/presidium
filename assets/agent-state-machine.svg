@@ -1,0 +1,81 @@
+<svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#9CA3AF"/>
+    </marker>
+    <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#B45309"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#2D6A4F"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="200" fill="#111827" rx="8"/>
+
+  <!-- Start circle -->
+  <circle cx="30" cy="100" r="10" fill="#E5E7EB"/>
+  <circle cx="30" cy="100" r="6" fill="#111827"/>
+
+  <!-- Arrow: start -> REGISTERED -->
+  <line x1="40" y1="100" x2="68" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- REGISTERED box -->
+  <rect x="70" y="82" width="100" height="36" rx="6" fill="#1E3A5F"/>
+  <text x="120" y="104" text-anchor="middle" fill="#E5E7EB" font-size="11" font-weight="600">REGISTERED</text>
+
+  <!-- Arrow: REGISTERED -> STARTING -->
+  <line x1="170" y1="100" x2="198" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STARTING box -->
+  <rect x="200" y="82" width="90" height="36" rx="6" fill="#1E3A5F"/>
+  <text x="245" y="104" text-anchor="middle" fill="#E5E7EB" font-size="11" font-weight="600">STARTING</text>
+
+  <!-- Arrow: STARTING -> RUNNING -->
+  <line x1="290" y1="100" x2="318" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- RUNNING box -->
+  <rect x="320" y="82" width="90" height="36" rx="6" fill="#2D6A4F"/>
+  <text x="365" y="104" text-anchor="middle" fill="#E5E7EB" font-size="11" font-weight="600">RUNNING</text>
+
+  <!-- Arrow: RUNNING -> STOPPING -->
+  <line x1="410" y1="100" x2="438" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STOPPING box -->
+  <rect x="440" y="82" width="90" height="36" rx="6" fill="#374151"/>
+  <text x="485" y="104" text-anchor="middle" fill="#E5E7EB" font-size="11" font-weight="600">STOPPING</text>
+
+  <!-- Arrow: STOPPING -> STOPPED -->
+  <line x1="530" y1="100" x2="558" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STOPPED box -->
+  <rect x="560" y="82" width="90" height="36" rx="6" fill="#374151"/>
+  <text x="605" y="104" text-anchor="middle" fill="#9CA3AF" font-size="11" font-weight="600">STOPPED</text>
+
+  <!-- Arrow: STOPPED -> end -->
+  <line x1="650" y1="100" x2="668" y2="100" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- End circle (double ring) -->
+  <circle cx="678" cy="100" r="10" fill="none" stroke="#E5E7EB" stroke-width="2"/>
+  <circle cx="678" cy="100" r="6" fill="#E5E7EB"/>
+
+  <!-- SUSPENDED box (below center) -->
+  <rect x="270" y="148" width="100" height="36" rx="6" fill="#B45309"/>
+  <text x="320" y="170" text-anchor="middle" fill="#E5E7EB" font-size="11" font-weight="600">SUSPENDED</text>
+
+  <!-- Arrow: STARTING -> SUSPENDED (down-left diagonal) -->
+  <path d="M245,118 L245,135 L270,148" fill="none" stroke="#B45309" stroke-width="1.5" marker-end="url(#arr-amber)"/>
+  <text x="218" y="138" text-anchor="middle" fill="#B45309" font-size="9">policy</text>
+  <text x="218" y="149" text-anchor="middle" fill="#B45309" font-size="9">violation</text>
+
+  <!-- Arrow: RUNNING -> SUSPENDED (down) -->
+  <path d="M365,118 L365,135 L370,148" fill="none" stroke="#B45309" stroke-width="1.5" marker-end="url(#arr-amber)"/>
+  <text x="410" y="138" text-anchor="start" fill="#B45309" font-size="9">trust below</text>
+  <text x="410" y="149" text-anchor="start" fill="#B45309" font-size="9">threshold</text>
+
+  <!-- Arrow: SUSPENDED -> STARTING (curved back up) -->
+  <path d="M270,155 L245,155 L245,118" fill="none" stroke="#2D6A4F" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="195" y="162" text-anchor="middle" fill="#2D6A4F" font-size="9">human review</text>
+  <text x="195" y="173" text-anchor="middle" fill="#2D6A4F" font-size="9">approved</text>
+</svg>

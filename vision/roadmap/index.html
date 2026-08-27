@@ -1,0 +1,3605 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/vision/roadmap/">
+      
+      
+        <link rel="prev" href="../prd/">
+      
+      
+        <link rel="next" href="../../architecture/overview/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Roadmap - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#roadmap" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roadmap
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-priority-p0-p1-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Priority (P0 / P1 / P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Priority (P0 / P1 / P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p0-blocks-calling-presidium-complete-fix-before-anything-else" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P0 — blocks calling Presidium "complete." Fix before anything else.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p1-real-designed-necessary-for-genuine-production-readiness-not-immediately-blocking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 — real, designed, necessary for genuine production-readiness, not immediately blocking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2-deferred-by-design-commercial-or-dependent-on-things-outside-our-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2 — deferred by design, commercial, or dependent on things outside our control
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m1-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M1: Foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m2-core-interfaces-cel-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M2: Core Interfaces + CEL Policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m3-contrib-adapters-trust-scoring-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M3: Contrib Adapters + Trust Scoring Foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m4-autonomy-progression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M4: Autonomy Progression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m5-sdk-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M5: SDK + CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m6-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M6: Cloud
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m7-presidium-server-self-hostable-network-governance-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M7: Presidium Server — self-hostable network governance service
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m8-performance-research-rust-vs-python-at-the-governance-hot-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M8: Performance Research — Rust vs. Python at the governance hot path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-investigation-multi-dimensional-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Investigation: Multi-Dimensional Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-priority-p0-p1-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Priority (P0 / P1 / P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Priority (P0 / P1 / P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p0-blocks-calling-presidium-complete-fix-before-anything-else" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P0 — blocks calling Presidium "complete." Fix before anything else.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p1-real-designed-necessary-for-genuine-production-readiness-not-immediately-blocking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 — real, designed, necessary for genuine production-readiness, not immediately blocking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2-deferred-by-design-commercial-or-dependent-on-things-outside-our-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2 — deferred by design, commercial, or dependent on things outside our control
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m1-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M1: Foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m2-core-interfaces-cel-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M2: Core Interfaces + CEL Policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m3-contrib-adapters-trust-scoring-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M3: Contrib Adapters + Trust Scoring Foundation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m4-autonomy-progression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M4: Autonomy Progression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m5-sdk-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M5: SDK + CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m6-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M6: Cloud
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m7-presidium-server-self-hostable-network-governance-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M7: Presidium Server — self-hostable network governance service
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m8-performance-research-rust-vs-python-at-the-governance-hot-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M8: Performance Research — Rust vs. Python at the governance hot path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-investigation-multi-dimensional-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Investigation: Multi-Dimensional Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Phase-based development plan for Presidium.</p>
+</blockquote>
+<h2 id="philosophy">Philosophy<a class="headerlink" href="#philosophy" title="Permanent link">&para;</a></h2>
+<p>Documentation-driven development. Design docs and RFCs are written and reviewed before implementation begins. Each milestone (M) represents a coherent, shippable increment.</p>
+<hr />
+<h2 id="implementation-priority-p0-p1-p2">Implementation Priority (P0 / P1 / P2)<a class="headerlink" href="#implementation-priority-p0-p1-p2" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Added 2026-08-22, after a full cross-project completion review (part of a wider effort covering
+<code>python-civitas</code>, <code>presidium</code>, and <code>fabrica</code> together — see <code>civitas-io/context</code>). This section
+is orthogonal to the M-numbered milestones below: it says <strong>what order to actually do things in</strong>
+to reach a genuinely complete, trustworthy Presidium, which cuts across several milestones at
+once. The M-sections remain the source of truth for scope; this section is the source of truth
+for sequencing and urgency.</p>
+</blockquote>
+<h3 id="p0-blocks-calling-presidium-complete-fix-before-anything-else">P0 — blocks calling Presidium "complete." Fix before anything else.<a class="headerlink" href="#p0-blocks-calling-presidium-complete-fix-before-anything-else" title="Permanent link">&para;</a></h3>
+<p>These are either <strong>correctness/trust gaps hiding behind claims of completeness</strong>, or the single
+structural blocker to the three-pillar platform (Civitas + Presidium + Fabrica) working end to end.</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Fix the Ed25519 identity binding.</strong> ~~<code>GovernedRuntime.start()</code> hardcodes
+  <code>AgentRecord(public_key="", ...)</code>~~ <strong>Done 2026-08-22.</strong> <code>GovernedRuntime</code> now generates/loads a
+  real, persistent <code>civitas.security.identity.AgentIdentity</code> per agent (<code>AgentIdentity.
+  load_or_generate(name, key_dir)</code>, default <code>key_dir=.presidium/keys</code>, overridable via
+  <code>presidium.registry.key_dir</code> in topology YAML or the constructor directly) and binds its real
+  <code>public_key_b64()</code> into <code>AgentRecord.public_key</code>. <code>AgentRegistry</code> gained a real
+  <code>verify_signature(name, data, signature) -&gt; bool</code> method (shared implementation in the new
+  <code>presidium.identity</code> module, fail-closed-as-a-plain-return-value like <code>has_grant()</code> — never
+  raises), implemented in <code>InMemoryRegistry</code>, <code>SqliteRegistry</code>, and
+  <code>presidium-contrib</code>'s <code>PostgresAgentRegistry</code>. 18 new real tests (real Ed25519 keypairs, real
+  sign/verify round trips, persistence-across-restarts, tampered-data/wrong-key/malformed-key/
+  missing-pynacl failure paths). <strong>Found and fixed a real, separate, pre-existing bug while doing
+  this work</strong>: <code>presidium_contrib.service.registry.RegistryServer</code> named its own governance
+  registry attribute <code>self._registry</code>, colliding with <code>civitas.process.AgentProcess</code>'s own
+  reserved <code>_registry</code> attribute (Civitas's internal name-routing registry) — a real Supervisor
+  wiring a <code>RegistryServer</code> into a live tree would silently clobber one with the other. Renamed to
+  <code>self._agent_registry</code>; caught by mypy only after the <code>civitas</code> PyPI-pin fix below made
+  <code>civitas</code>'s real <code>py.typed</code> marker visible for the first time. <code>.gitignore</code> gained <code>.presidium/</code>
+  (real private key material must never be committable, even by accident). Coverage: presidium
+  core 90.97% → <strong>95.24%</strong>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Pin <code>civitas</code> to a real PyPI release, not <code>git</code>/<code>branch = "main"</code>.</strong> <strong>Done 2026-08-22.</strong>
+  Removed the <code>[tool.uv.sources]</code> git override from the workspace root; bumped
+  <code>presidium</code>'s own dependency from <code>civitas&gt;=0.3</code> to <code>civitas&gt;=0.11.0</code> (the real, current,
+  tested-against version — matches <code>civitas-io/fabrica</code>'s own precedent). Also added
+  <code>pynacl&gt;=1.5</code> as a real, direct (not optional) dependency, since identity binding is now a core,
+  always-on capability, not an opt-in extra. <strong>Real, unexpected side effect worth knowing</strong>:
+  <code>civitas</code> only gained its own <code>py.typed</code> marker in a real, recent release — three
+  <code># type: ignore[misc]  # civitas lacks py.typed</code> comments (on <code>GovernedMessageBus</code>,
+  <code>PolicyEvaluatorServer</code>, <code>RegistryServer</code>) were now genuinely unused and removed, which is what
+  surfaced the <code>RegistryServer</code> bug above (a broad class-level ignore had been silently
+  suppressing real attribute-type errors in the class body, not just the class definition line).
+  Also added missing <code>mypy</code> override entries for <code>hvac</code>/<code>asyncpg</code> (no published stubs), found
+  adjacent to this work. All 442+ tests (354 core + 108 contrib) pass, 3x stable, mypy and ruff
+  clean on both packages.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Close the <code>presidium_contrib.service.policy</code>/<code>.registry</code> 0%-coverage gap.</strong> <strong>Done
+  2026-08-22.</strong> Both files now at <strong>100% coverage</strong> (up from 0%) — 14 new tests: unit tests calling
+  <code>handle_call()</code> directly (<code>test_service_policy.py</code>, <code>test_service_registry.py</code>) plus a real
+  end-to-end integration suite through an actual <code>civitas.Runtime</code>/<code>Supervisor</code>
+  (<code>tests/integration/test_service_mode_real_runtime.py</code>), including a dedicated regression test
+  proving the <code>self._registry</code>/<code>AgentProcess._registry</code> collision fix (above) survives real
+  Supervisor wiring, not just a static rename. <strong>Found and fixed a second real, previously-hidden
+  bug this same pass</strong>: <code>PolicyEvaluatorServer._handle_load()</code> stored a raw string in
+  <code>PolicyRule.decision</code> instead of converting it to the <code>PolicyDecision</code> enum —
+  <code>CelPolicyEngine.evaluate()</code> accepted it silently, but <code>_handle_evaluate()</code>'s own
+  <code>result.decision.value</code> then crashed with a real <code>AttributeError</code> on every non-default-ALLOW
+  decision. 0% coverage had masked this entirely; caught immediately by the first real test that
+  exercised a non-trivial policy outcome. <code>presidium-contrib</code> coverage: 71% → <strong>82%</strong>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Build M7 (Presidium Server) itself.</strong> <strong>Done 2026-08-22/23.</strong> <code>check_grant()</code> over real
+  REST+mTLS is shipped and now genuinely proven end to end (real handshake test, real published
+  <code>civitas&gt;=0.11.3</code> dependency, no workaround) -- the structural gap between "three separate
+  pillars" and "one integrated platform" is closed for the <code>check_grant</code> path. Registry CRUD/
+  approval/credential endpoints remain deferred (see M7 section below) -- not part of this item's
+  own scope.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Wire <code>GovernedModelProvider</code>/<code>GovernedToolProvider</code> to actually call a backend, not just
+  check permission.</strong> <strong>Done 2026-08-22.</strong> New <code>presidium.providers.civitas_adapters</code> module:
+  <code>GovernedModelProviderAdapter</code>/<code>GovernedToolAdapter</code>, real structural implementations of
+  <code>civitas.plugins.model.ModelProvider</code>/<code>civitas.plugins.tools.ToolProvider</code>, each constructed
+  per-agent (<code>agent_name</code> bound at construction — the same, already-established pattern
+  <code>civitas.process.AgentProcess.connect_mcp()</code> uses for <code>civitas-io/fabrica</code>'s own <code>MCPTool</code>, not
+  a new one invented here). <code>GovernedRuntime</code> gained <code>model_for(agent_name, backend)</code>/
+  <code>tool_for(agent_name, backend)</code> factory methods, mirroring Civitas's own <code>model_for()</code> naming.
+  DENY still <strong>raises</strong> <code>PolicyDeniedError</code> (reusing <code>check()</code>'s existing behavior exactly) — a
+  real, deliberate difference from <code>check_grant()</code>'s non-raising HTTP-boundary design, correct
+  here because an in-process Python exception through the calling agent's own error boundary is
+  the idiomatic Civitas convention, not a limitation to work around. 13 new tests, both new/
+  touched modules at 100%/83% coverage (<code>runtime.py</code>'s remaining gap is pre-existing, unrelated).
+  <strong>Scope note, precise not overclaimed</strong>: this solves "can <code>GovernedModelProvider</code>/
+  <code>GovernedToolProvider</code> be a drop-in Civitas <code>ModelProvider</code>/<code>ToolProvider</code>" — it does <strong>not</strong>
+  build the separate, larger <code>LLMGatewayBackend</code>/<code>ToolsGatewayBackend</code> <em>pluggable-vendor</em>
+  abstraction from <code>docs/design/llm-gateway.md</code>/<code>mcp-gateway.md</code> (AgentGateway/LiteLLM/etc. as
+  swappable backends) — that remains real, designed, not built (P1 above). <code>backend:
+  ModelProvider</code>/<code>backend: ToolProvider</code> here can already be <em>any</em> object satisfying those real
+  Civitas Protocols, including a future pluggable-vendor adapter, without further changes to
+  these two new classes.</li>
+</ul>
+<p><strong>Recommended sequence</strong> (cheapest/most urgent first, not milestone order): ~~Ed25519 binding fix~~
+→ ~~<code>civitas</code> PyPI pin~~ → ~~<code>service/*</code> test coverage~~ → ~~M7 network layer~~ →
+~~<code>GovernedModelProvider</code>/<code>GovernedToolProvider</code> backend wiring~~. <strong>All five done as of
+2026-08-22.</strong> Shipping a first real <code>presidium</code>/<code>presidium-contrib</code> PyPI release (see M5/P1 below)
+can now genuinely be considered — the fictional-cryptographic-identity-claim blocker that made
+releasing premature before is resolved. M5 itself (CLI, docs site, example applications) is still
+real, separate work, not automatically unblocked by this alone.</p>
+<h3 id="p1-real-designed-necessary-for-genuine-production-readiness-not-immediately-blocking">P1 — real, designed, necessary for genuine production-readiness, not immediately blocking<a class="headerlink" href="#p1-real-designed-necessary-for-genuine-production-readiness-not-immediately-blocking" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong><code>AgentGatewayClient</code>'s MCP tool-side gap — DONE, 2026-08-24.</strong> Real vendor research
+  (<a href="../../design/agentgateway-vendor-research-2026-08/"><code>docs/design/agentgateway-vendor-research-2026-08.md</code></a>)
+  against AgentGateway <code>v1.4.1</code>, a real design pass (<code>docs/design/mcp-gateway.md</code>'s "Design
+  decisions, 2026-08-24"), and real implementation, all same session. New
+  <code>presidium/providers/gateway.py</code> (<code>LLMGatewayBackend</code>/<code>ToolsGatewayBackend</code> Protocols,
+  <code>GatewayModelProvider</code>/<code>GatewayToolProvider</code>); <code>GovernedToolProvider</code> gained
+  <code>check_resource()</code>/<code>post_check_resource()</code> for the new <code>agent:&lt;name&gt;</code> grant namespace (a real
+  double-prefix bug caught and fixed during implementation, before it shipped);
+  <code>AgentGatewayClient.list_tools()</code>/<code>call_tool()</code> are real MCP <code>tools/list</code>/<code>tools/call</code> over
+  Streamable HTTP (the exact transport GH #26 shipped), verified end to end against a real
+  running MCP server, not mocked. 167 <code>presidium-contrib</code> tests pass (+5), 452 <code>presidium</code> tests
+  pass (+13), <code>ruff</code>/<code>mypy --strict</code> clean. Any AgentGateway pin must be <code>&gt;=1.4.0</code>
+  (GHSA-mvgg-jvj2-4frq, a real HIGH-severity security advisory, is fixed exactly there).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong><code>AgentGatewayClient.delegate_to_agent()</code> real implementation (A2A half) — DONE,
+  2026-08-24, same day as the MCP-tool half above.</strong> Real vendor research first
+  (<a href="../../design/a2a-delegation-vendor-research-2026-08/"><code>docs/design/a2a-delegation-vendor-research-2026-08.md</code></a>):
+  confirmed the real <code>a2a-sdk</code> (<code>1.1.2</code>, <code>a2aproject/a2a-python</code>) client API
+  (<code>create_client()</code>/<code>send_message()</code>/<code>get_stream_response_text()</code>) and the real, new,
+  load-bearing finding that AgentGateway's A2A proxy is per-upstream-agent (one route per agent
+  server, agent-card URL rewriting), not federated behind one shared endpoint the way MCP tools
+  are. <code>AgentGatewayClient</code> gained <code>a2a_routes: dict[str, str] | None</code> (an explicit target-name
+  -&gt; gateway-route-URL map) and a real <code>delegate_to_agent()</code> mapping <code>arguments["text"]</code> onto a
+  real A2A text message (or the whole dict onto a structured data message otherwise), extracting
+  the result via <code>get_stream_response_text()</code> and raising a new <code>AgentGatewayDelegationError</code> on
+  an unconfigured target or a terminal FAILED/REJECTED/CANCELED <code>TaskState</code>. Verified end to end
+  against a real running A2A server (<code>tests/integration/fixtures/hello_a2a_server.py</code>, a faithful
+  port of the real, official a2a-samples Hello World reference agent's exact <code>Task</code> lifecycle,
+  not simplified) — 6 new tests, not mocked, all passing on the first real run. 469 <code>presidium</code>
+  tests pass, 183 <code>presidium-contrib</code> tests pass (+6), 96% coverage on the changed client file,
+  <code>ruff</code>/<code>ruff format --check</code>/<code>mypy --strict</code> clean.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Build <code>presidium-contrib[spiffe]</code> (real SPIRE SVIDs) — DONE, 2026-08-24.</strong> Real vendor
+  research (<code>docs/design/spiffe-vendor-research-2026-08.md</code>), a real design pass
+  (<code>docs/design/agent-registry.md</code>'s updated "M3+ upgrade path" section), and real implementation,
+  verified end to end against an actual running SPIRE v1.15.3 server + agent on the homelab (not
+  mocked). <code>AgentRecord</code> gained <code>public_key_algorithm</code> (additive, Ed25519 stays default);
+  <code>presidium.identity.verify_agent_signature()</code> is now algorithm-aware (<code>cryptography</code> added as a
+  real, hard core dependency, matching <code>pynacl</code>'s own precedent); <code>AgentRegistry.update_identity()</code>
+  added across all three backends for real SVID rotation (two real double-<code>_save()</code>-omission bugs
+  found and fixed during implementation, before they shipped); new
+  <code>presidium_contrib.spiffe.SpiffeIdentitySource</code>/<code>bind_identity_to_registry()</code>, a real async
+  bridge over the official <code>spiffe</code> SDK's own blocking, thread-based Workload API client. 462
+  <code>presidium</code> tests pass (+10), 174 <code>presidium-contrib</code> tests pass (+5, all passing for real on
+  the homelab, 4 correctly hardware-gated-skipped elsewhere), <code>ruff</code>/<code>mypy --strict</code> clean.
+  Certificate-based mTLS between agents and cross-deployment federation remain real, separate,
+  not-yet-built future directions (see <code>agent-registry.md</code>'s updated section).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> LiteLLM adapter + stub adapters (Kong/Portkey/Cloudflare AI Gateway/Helicone/TrueFoundry) —
+  real market flexibility; AgentGateway already covers the reference path so this isn't urgent.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Default-deny for <code>CelPolicyEngine</code>'s no-rule-matched case — DONE, 2026-08-24.</strong> Was:
+  direction decided (default DENY over default ALLOW, reduces blast radius), a real
+  implementation attempt reverted the same earlier session after breaking 24 tests, needing its
+  own dedicated design pass before trying again. That design pass happened, with the user,
+  directly engaging the real question "is default-deny good practice, and should it be
+  configurable" -- resolved as: yes, hard default-deny, with two real, explicit, loud opt-in
+  knobs (<code>allow_unmatched_requests: bool = False</code>, <code>unmatched_enforcement: EnforcementMode =
+  HARD</code>), matching this codebase's own <code>allow_ungoverned</code>/<code>allow_unsandboxed</code> naming precedent
+  rather than a neutral, equally-weighted <code>default_decision</code> enum -- because an unopinionated
+  toggle would be picked by exactly the deployments (fast evaluation, no dedicated security
+  review) that most need the safe default, undermining the entire point.
+  <strong>All four of the originally-scoped follow-up items done, not shortcut</strong>: (1) hard,
+  unconditional default-deny chosen, PLUS the <code>unmatched_enforcement=ADVISORY</code> migration path as
+  a genuinely separate, real capability (not conflated with the security-relevant
+  <code>allow_unmatched_requests</code> toggle); (2) every existing example/test policy set given an
+  explicit terminal ALLOW rule across 10 test files (<code>test_cel.py</code>, <code>test_governed_tool.py</code>,
+  <code>test_governed_model.py</code>, <code>test_civitas_adapters.py</code>, <code>test_gateway_provider.py</code>,
+  <code>test_governed_runtime.py</code>, <code>test_service_policy.py</code>, <code>test_gateway_agent.py</code>,
+  <code>test_presidium_server_real_gateway.py</code>, <code>test_service_mode_real_runtime.py</code>) -- a new,
+  per-package <code>ALLOW_ALL</code> fixture in each <code>tests/policy_fixtures.py</code>, not a shortcut via
+  <code>allow_unmatched_requests=True</code> except where a test is genuinely orthogonal to policy content
+  (GenServer coexistence); (3) <code>docs/design/policy-engine.md</code>'s own P5 decision corrected in
+  place (struck through, not deleted, with the real empirical reasoning that overturned it) and
+  <code>docs/guides/getting-started.md</code>'s tutorial updated with a real, working explicit-ALLOW rule
+  plus a new "Default-deny" callout section; (4) the drafted reason string
+  (<code>"No policy rule matched this request (fail-closed default -- no implicit allow)"</code>) shipped
+  exactly as drafted. <code>presidium_contrib.service.policy.PolicyEvaluatorServer</code> also gained the
+  same two forwarded constructor knobs. 466 <code>presidium</code> tests pass (+8 net, several
+  renamed/split to genuinely test the new behavior, not just patched), 175 <code>presidium-contrib</code>
+  tests pass (+2), 100% coverage on both changed engine files, <code>ruff</code>/<code>mypy --strict</code> clean.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Trust ceiling propagation — DONE, real, shipped (2026-08-22).</strong> Was: a real,
+  currently-exploitable "trust washing" gap surfaced by a direct comparison against Microsoft's
+  Agent Governance Toolkit (<code>microsoft/agent-governance-toolkit</code>)'s <code>AGENTMESH-IDENTITY-TRUST-1.0</code>
+  spec. <code>AgentRecord.trust_ceiling: float | None</code> + <code>LinearTrustScore(ceiling=...)</code> (clamps
+  <code>.value</code>'s getter, <code>HUMAN_OVERRIDE</code>/<code>set_value()</code> deliberately still respects it — a hard
+  boundary, not a bypass; an admin who wants to grant more must explicitly raise
+  <code>trust_ceiling</code> itself). New <code>presidium.lineage.compute_child_ceiling()</code>
+  (<code>min(requested or 1.0, parent.trust_ceiling or 1.0, parent.trust_value)</code>, naturally transitive
+  across a multi-hop chain, a one-time snapshot at registration — not continuously re-derived).
+  Enforced inside <code>register()</code>/<code>add_grant()</code> on <strong>all three registry backends</strong>
+  (<code>InMemoryRegistry</code>, <code>SqliteRegistry</code>, <code>PostgresAgentRegistry</code>) — defense in depth, not an
+  opt-in helper a caller could skip. A dangling <code>parent_agent_id</code> now fails closed
+  (<code>UnresolvableParentError</code>) rather than being silently ignored, since silently ignoring it would
+  reopen the exact bypass this closes.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Monotonic capability narrowing on delegation/spawn — DONE, real, shipped (2026-08-22).</strong>
+  Same source comparison. AGT requires every delegated/spawned agent's granted capabilities to be
+  a strict subset of its delegator's own, plus a hard delegation-depth limit (AGT's default: 10,
+  reused as-is). New <code>presidium.lineage.validate_grant_narrowing()</code> — checks the union of
+  (resource, action) pairs is a subset of the parent's (Presidium's grant model has no wildcard
+  concept, so AGT's "reject wildcard delegation" rule is moot here; deliberately does NOT compare
+  <code>scope</code>/<code>condition</code>/<code>expires_at</code> narrowing — proving a CEL condition string is "narrower" is
+  undecidable in general, a documented non-goal). Raises <code>GrantEscalationError</code> rather than
+  silently narrowing, since unlike trust, a grant is binary and can't be safely auto-clamped.
+  New <code>presidium.lineage.compute_child_depth()</code> + <code>AgentRecord.depth</code>, stored/inherited at
+  registration (not chain-walked), <code>max_delegation_depth</code> configurable per registry instance.
+  Enforced in <code>register()</code> <strong>and</strong> <code>add_grant()</code> (an escalation attempt can't just be deferred to
+  a later <code>add_grant()</code> call), across all three registry backends. 60+ new tests (pure-function
+  unit tests in <code>test_lineage.py</code>, registry-level integration tests parametrized over
+  <code>InMemoryRegistry</code>/<code>SqliteRegistry</code>, mock-based <code>PostgresAgentRegistry</code> tests proving the exact
+  same shared <code>presidium.lineage</code> functions are used, not a divergent reimplementation).
+  All 439 <code>presidium</code> + 158 <code>presidium-contrib</code> tests pass, 3x stable, <code>ruff</code>/<code>mypy --strict</code>
+  clean. <strong>Real, deliberate scope note</strong>: there is still no real "spawn" composition anywhere in
+  the whole system (Civitas's <code>Runtime.spawn()</code> doesn't call Presidium; Fabrica's
+  <code>CivitasBridge.request_supervision()</code> is a pass-through, not called by Fabrica's own managers in
+  v1) — this closes the registry-level hole so that whichever real orchestrator eventually gets
+  built inherits safety by default, not a live exploit against a running feature.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Compose the three MCP governance primitives into one real pipeline — DONE, 2026-08-24.</strong>
+  New <code>presidium_contrib.mcp_gateway.pipeline.GovernedMcpToolPipeline</code>: poisoning check (fail-
+  closed by default, <code>allow_unapproved_tools</code> opt-out) -&gt; redact arguments into
+  <code>ActionRequest.parameters</code> for policy/audit visibility -&gt; real <code>GovernedToolProvider.check()</code>
+  PRE_TOOL authorization -&gt; the real, unredacted backend call -&gt; optional <code>PIIDetector.scan_dict()</code>
+  enrichment of the result with <code>contains_pii</code>/<code>pii_pattern_names</code> (opt-in by <code>pii_detector</code>
+  presence) -&gt; <code>post_check()</code> POST_TOOL authorization (a CEL policy can now genuinely reference
+  <code>result.contains_pii</code>, closing this doc's own "Should POST_TOOL be able to modify results"
+  open question with a separate, explicit <code>mask_pii_in_results</code> toggle rather than a new CEL
+  decision type). 15 new tests, 100% coverage on the new file, <code>ruff</code>/<code>ruff format --check</code>/
+  <code>mypy --strict</code> clean. <strong>Real release gap found and named, not silently ignored</strong>: verifying
+  this via a real fresh-venv install required building <code>presidium</code> from local source (not
+  pip-installing the real published PyPI version) — <code>presidium.providers.gateway</code> (this
+  session's own earlier AgentGatewayClient work) isn't in any released <code>presidium</code> version yet.
+  Both <code>presidium</code> (last real release v0.2.1) and <code>presidium-contrib</code> (v0.2.0) have accumulated
+  substantial real, unreleased functionality since — a real, standing item, not urgent but
+  worth doing soon (see "What's next" in HANDOFF.md).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Real, richer candidates found in the same AGT comparison</strong>, worth evaluating: message
+  signing with replay protection, session tokens with TTL, sliding-window rate limiting (already
+  flagged above under M7), and CVE-feed integration (OSV API) against MCP servers in active use — AGT's
+  <code>MCP-SECURITY-GATEWAY-1.0</code> spec covers all of these; none are committed here yet, listed as
+  real candidates to evaluate, not a plan to copy wholesale.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>DONE, 2026-08-24.</strong> Fixed <code>AGENTS.md</code> — not by building the <code>litellm</code>/<code>kong</code>/<code>portkey</code>/
+  <code>cloudflare_ai_gateway</code>/<code>helicone</code>/<code>truefoundry</code> adapters (still not built, still the LiteLLM
+  item above), but by correcting the doc to state that plainly: it previously described them as
+  installable extras/stub modules, when none of that code or those <code>pyproject.toml</code> extras exist
+  at all. Also fixed: stale <code>presidium.protocols</code>/<code>presidium.models</code> module names (real names are
+  distributed Protocols + singular <code>presidium.model</code>), a stale "Pre-alpha (documentation-first
+  phase)" status line, a stale <code>Dependency Rules</code> claim (<code>presidium</code> depends on more than just
+  <code>civitas</code>/<code>cel-python</code> now — <code>pynacl</code>/<code>cryptography</code> too), and the monorepo tree missing
+  <code>presidium.identity</code>/<code>presidium.lineage</code>/<code>presidium_contrib.spiffe</code>/<code>presidium_contrib.server</code>
+  entirely (all real, shipped modules from this session, never added to this file).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>New real release of <code>presidium</code>/<code>presidium-contrib</code> — DONE, 2026-08-24.</strong>
+  <a href="https://github.com/civitas-io/presidium/releases/tag/v0.3.0"><code>presidium</code> v0.3.0</a> and
+  <a href="https://github.com/civitas-io/presidium/releases/tag/contrib-v0.3.0"><code>presidium-contrib</code> v0.3.0</a>,
+  both confirmed live on the real PyPI index (<code>pip install presidium presidium-contrib</code> and
+  <code>pip install "presidium-contrib[agentgateway,spiffe]"</code>, verified via a real fresh-venv install
+  against the actual published packages, not local source). CHANGELOG.md's <code>[0.3.0]</code> entry
+  covers everything: <code>providers/gateway.py</code>, <code>identity.py</code>/<code>lineage.py</code>,
+  <code>presidium_contrib.spiffe</code>, A2A delegation, <code>GovernedMcpToolPipeline</code>, CEL default-deny (a
+  real, documented breaking behavioral change), <code>scope</code> threading. <strong>Real, load-bearing fix
+  caught before release</strong>: <code>presidium-contrib</code>'s own dependency floor was still
+  <code>presidium&gt;=0.1</code> despite needing <code>presidium.providers.gateway</code> (only real as of this same
+  0.3.0) — bumped to <code>presidium&gt;=0.3.0</code>, closing the exact class of bug that would have made a
+  fresh <code>pip install presidium-contrib</code> silently resolve an incompatible <code>presidium</code>. <code>presidium</code>
+  tagged/published first, confirmed live via PyPI's JSON API, before tagging <code>presidium-contrib</code>
+  — order matters given the new floor.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Documentation reliability follow-ups</strong> — opened 2026-08-27, same council-reviewed
+  exercise already run on <code>python-civitas</code> (see that repo's <code>docs/milestones.md</code>), scoped down
+  here because the council found Presidium's doc risk shape is different: ~10,000 lines of
+  <code>docs/design/</code>, <code>docs/research/</code>, <code>docs/vision/</code>, <code>docs/rfcs/</code> content is Draft/speculative by
+  design, not stale reference material, so most of the python-civitas playbook doesn't transfer
+  as-is. <strong>Done, 2026-08-27</strong> (see <code>docs/log.md</code> for full detail) — the wrong <code>civitas-forge</code>
+  upstream repo name in 5 files, the stale <code>docs/index.md</code> status header contradicting its own
+  linked roadmap, plus three real inaccuracies found reading the current-reference tier end to
+  end: a phantom <code>presidium-audit</code> package described as real in <code>docs/architecture/overview.md</code>,
+  a fabricated <code>ModelProvider.chat()</code> signature in the same file's Integration Points table, a
+  <code>README.md</code> claim that directly contradicted <code>AGENTS.md</code> about whether <code>GovernedModelProvider</code>/
+  <code>GovernedToolProvider</code> are drop-in Civitas protocol implementations (they're not — the real
+  Adapter classes are), fabricated Protocol method names for those same two classes in
+  <code>docs/architecture/packages.md</code>, and a fully aspirational, never-implemented YAML config schema
+  across <code>docs/architecture/stack.md</code>'s three deployment scenarios. Still open, in the council's
+  own priority order:</li>
+<li>A minimal required frontmatter status field (Draft/Proposed/Shipped/Superseded) on every doc
+    under <code>docs/design/</code>, <code>docs/research/</code>, <code>docs/vision/</code>, <code>docs/rfcs/</code>, lint-checked in CI —
+    the council's core finding was that the real gap here is a reader (human or agent) having no
+    way to tell "how it works" from "what we're thinking about" without opening every file.</li>
+<li>A mechanical currency check (not hand-maintained prose) comparing <code>docs/index.md</code>'s milestone
+    claims against <code>docs/vision/roadmap.md</code>'s actual state, so this exact bug class can't recur.</li>
+<li>A code-fence import checker (mirroring <code>python-civitas</code>'s
+    <code>tests/integration/test_docs_codeblocks.py</code>) scoped ONLY to <code>docs/index.md</code>,
+    <code>docs/architecture/*</code>, <code>docs/guides/getting-started.md</code>, and <code>README.md</code> — explicitly
+    excluding <code>docs/design/research/vision/rfcs</code>, where forcing Draft code sketches to import-check
+    against current source would produce false positives and train people to ignore the check.</li>
+<li><code>mkdocs build --strict</code> in the docs deploy workflow, after fixing whatever real broken
+    links/anchors it finds first.</li>
+<li>An explicit archive/delete-vs-label decision for any design docs clearly superseded by a
+    shipped milestone, rather than defaulting to "label everything in place" forever.</li>
+<li>AGENTS.md needs no thin-router rework — it's already 389 lines with its own documented
+    self-correction history (2026-08-24). Deliberately not manufacturing work there.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
+  usable without it (trust tiers work fine statically in the meantime).</li>
+<li>[~] M5: SDK + CLI, docs site, example applications. <strong>The "real first PyPI release + git
+  tag" half is DONE</strong> (<code>presidium</code> v0.4.0, <code>presidium-contrib</code> v0.7.0, both live on PyPI, real
+  git tags/GitHub Releases). <strong>The CLI half started, 2026-08-24</strong> -- see the full M5 section
+  below for real detail (<code>presidium version</code>/<code>registry list</code>/<code>policy validate</code>/<code>trust replay</code>
+  shipped; docs site/examples/v1.0.0/<code>presidium run</code>/live-server CLI mode remain).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> M8: Performance Research — <strong>Complete, 2026-08-25.</strong> Real benchmarks, real comparison,
+  real recommendation (see M8 below and <code>docs/design/performance-research.md</code>).</li>
+</ul>
+<h3 id="p2-deferred-by-design-commercial-or-dependent-on-things-outside-our-control">P2 — deferred by design, commercial, or dependent on things outside our control<a class="headerlink" href="#p2-deferred-by-design-commercial-or-dependent-on-things-outside-our-control" title="Permanent link">&para;</a></h3>
+<ul>
+<li>M6: Cloud — explicitly commercial, multi-tenant SaaS; not core-completeness.</li>
+<li>Inbound A2A exposure — needs Civitas to gain an A2A <em>server</em> role first; a Civitas-side feature,
+  not Presidium's to unblock alone.</li>
+<li>RFC-002 (multi-dimensional evaluation) — already labeled "Future Investigation," research-first,
+  no concrete plan yet.</li>
+<li>Deferred adapters (<code>CedarPolicyEngine</code>, <code>TemporalApprovalService</code>) — no unique capability gap;
+  CEL+OPA and Slack/Webhook already cover the space.</li>
+</ul>
+<hr />
+<h2 id="m1-foundation">M1: Foundation<a class="headerlink" href="#m1-foundation" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> Establish project identity, architecture, and documentation.</p>
+<p><strong>Status:</strong> Complete</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Repository setup (monorepo, uv workspace, CI/CD)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> AGENTS.md</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Vision documents (manifesto, positioning, roadmap)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Architecture overview and package map</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Interface-first architecture decisions (2-package structure, CEL default, library-first)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Competitive research archive</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> CNCF standards alignment principle (SPIFFE, OTEL, CEL)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> RFC-001: Presidium scope and boundaries (draft exists, needs finalization)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Agent Registry (requirements + design + research, reviewed)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Policy Engine (requirements + design, reviewed)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Credential Provider (requirements + design)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Approval Service (requirements + design)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Audit Enricher (requirements + design)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Design doc: Topology Integration (requirements + design)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Agent registry industry research (AWS, Google, Microsoft, IBM, SPIFFE, K8s RBAC)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Full M2 design review (Oracle + consistency check, 12/12 issues resolved)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> RFC-002: Multi-dimensional evaluation (seed for post-M4 investigation)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Community feedback on architecture</li>
+</ul>
+<p><strong>Deliverable:</strong> Complete documentation. No code.</p>
+<hr />
+<h2 id="m2-core-interfaces-cel-policy">M2: Core Interfaces + CEL Policy<a class="headerlink" href="#m2-core-interfaces-cel-policy" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> All Protocol definitions in <code>presidium</code> core, plus working library-mode defaults. A developer can <code>pip install presidium</code> and have complete in-process governance.</p>
+<p><strong>Status:</strong> Complete. 245 tests, 95% coverage, mypy strict, ruff clean. Integration tests passing.</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Requirements and design for all 9 components (35 design decisions, 12 review issues resolved)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>presidium</code> package — Protocol definitions + default implementations:</li>
+<li><code>AgentRegistry</code> + <code>InMemoryRegistry</code> / <code>SqliteRegistry</code> — SPIFFE-compatible <code>presidium://</code> identity, Ed25519 binding, K8s-style grants with CEL conditions, <code>trust_events</code> history table</li>
+<li><code>PolicyEngine</code> + <code>CelPolicyEngine</code> — 3 evaluation stages (pre_tool, pre_llm, registration), fail-closed, advisory/soft/hard enforcement modes, multi-stage rules</li>
+<li><code>CredentialProvider</code> + <code>EnvCredentialProvider</code> / <code>FileCredentialProvider</code> — grant-based credential access (<code>credential:{name}</code>), structured logging</li>
+<li><code>TrustScorer</code> + <code>LinearTrustScore</code> — 0.0-1.0, 3 tiers, lazy-on-read decay, materialize-on-write</li>
+<li><code>ApprovalService</code> + <code>CallbackApprovalProvider</code> — async HITL with 5-min default timeout, fail-closed</li>
+<li><code>AuditEnricher</code> + <code>InProcessAuditEnricher</code> — middleware sink, re-enrichment guard, fail-open enrichment</li>
+<li><code>GovernedModelProvider</code> — wraps ModelProvider, evaluates pre_llm policies</li>
+<li><code>GovernedToolProvider</code> — wraps ToolProvider, evaluates pre_tool policies</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>GovernedRuntime</code> — programmatic constructor + <code>from_config()</code> YAML-based construction</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 2 Civitas changes: add <code>"presidium"</code> to known keys + add <code>from_config_dict()</code> classmethod</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Integration tests (compliant agent, denied agent, approval-gated, from_config YAML loading)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Getting started guide</li>
+</ul>
+<p><strong>Deliverable:</strong> <code>pip install presidium</code> — complete library-mode governance. No sidecars, no infrastructure, no Rego.</p>
+<hr />
+<h2 id="m3-contrib-adapters-trust-scoring-foundation">M3: Contrib Adapters + Trust Scoring Foundation<a class="headerlink" href="#m3-contrib-adapters-trust-scoring-foundation" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> <code>presidium-contrib</code> with adapters for existing products and reference implementations. Trust scoring enhancements for enterprise adoption: windowed aggregation, controllability, cold-start, spec introspection, bounded learning. Post-execution evaluation stages.</p>
+<p><strong>Requirements:</strong> <a href="../../design/trust-scoring-requirements/">trust-scoring-requirements.md</a> (FR-3.1–3.8, FR-E.1–E.6)</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>presidium-contrib</code> package (second workspace member)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Post-execution evaluation stages: <code>POST_TOOL</code>, <code>POST_LLM</code></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Adapters: <code>OPAPolicyEngine</code>, <code>OpenBaoCredentialProvider</code>, <code>AgentGatewayClient</code>, <code>SlackApprovalService</code>, <code>WebhookApprovalProvider</code></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Reference impls: <code>PostgresAgentRegistry</code>, <code>LearningTrustScorer</code> (refactored to use <code>presidium.scoring</code> library)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Trust scoring enhancements (presidium core):</li>
+<li>Windowed aggregation — last N events or last T hours (FR-3.1)</li>
+<li>Exponential decay opt-in with configurable half-life (FR-3.2)</li>
+<li>Controllability filter — <code>controllable: bool</code> on events (FR-3.3)</li>
+<li>Cold-start strategies — optimistic, neutral, pessimistic (FR-3.4)</li>
+<li>Spec introspection — <code>IntrospectableScorer</code> Protocol with <code>ScoringSpec</code> + <code>spec_hash</code> (FR-3.5)</li>
+<li>Bounded learning with max weight delta and rate limiting (FR-3.7)</li>
+<li>Reason surfacing — <code>QueryableScorer</code> Protocol (FR-3.8)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Enterprise requirements:</li>
+<li>Spec pinning for compliance periods (FR-E.1)</li>
+<li>Override attribution — <code>actor_id</code> required on HUMAN_OVERRIDE (FR-E.2)</li>
+<li>Performance budget — &lt;1ms p99 reads (FR-E.3)</li>
+<li>Zero-downtime M2→M3 migration (FR-E.4)</li>
+<li>Determinism contract on scorers (FR-E.5)</li>
+<li>OpenTelemetry spans for trust operations (FR-E.6)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deferred adapters: <code>CedarPolicyEngine</code>, <code>TemporalApprovalService</code></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>pre_message</code> evaluation stage (Civitas MessageBus hook via <code>GovernedMessageBus</code>)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> MCP governance reference impl (tool poisoning, credential redaction, PII masking)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Service mode GenServer wrappers (<code>PolicyEvaluatorServer</code>, <code>RegistryServer</code>)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Policy hot-reload without restart (<code>GovernedRuntime.reload_policies()</code>)</li>
+</ul>
+<p><strong>Deliverable:</strong> <code>pip install presidium-contrib[opa,openbao,slack,agentgateway]</code> + enterprise-ready trust scoring</p>
+<hr />
+<h2 id="m4-autonomy-progression">M4: Autonomy Progression<a class="headerlink" href="#m4-autonomy-progression" title="Permanent link">&para;</a></h2>
+<p><strong>Priority: P1</strong> — real and well-specified, but Presidium is genuinely usable without it (trust
+tiers work fine statically in the meantime). See "Implementation Priority" above.</p>
+<p><img alt="Autonomy Progression" src="../../assets/autonomy-progression.svg" /></p>
+<p><strong>Goal:</strong> Close the feedback loop. Agents earn autonomy through demonstrated reliability. Multi-dimensional trust scoring. Capability gating by tier. Decision journal for full auditability.</p>
+<p><strong>Requirements:</strong> <a href="../../design/trust-scoring-requirements/">trust-scoring-requirements.md</a> (FR-4.1–4.6)</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Multi-dimensional trust scoring — <code>MultiDimensionalTrustScorer</code> Protocol with per-dimension scores and configurable aggregation (FR-4.1)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Capability gating — tier-to-capability mapping via <code>CapabilityGate</code>, CEL references <code>agent.trust.capabilities</code> (FR-4.2)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Graduated deactivation — <code>TierUpgraded</code>/<code>TierDegraded</code> events, subscriber pattern, no binary kill switch (FR-4.3)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Confidence-gated routing — <code>ConfidenceRouter</code> selects agents or escalates to human (FR-4.4)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Decision journal — all routing decisions and tier transitions recorded with trust snapshots (FR-4.5)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Trust spec export — JSON, Markdown, detached JWS for tamper-evidence (FR-4.6)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Heuristic-to-learned progression — <code>LearningTrustScorer</code> activates after data threshold</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Autonomy level API — agents query current level and promotion criteria</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Design doc: Autonomy Progression</li>
+</ul>
+<p><strong>Deliverable:</strong> Agents that start constrained and earn autonomy through behavior. Full decision audit trail.</p>
+<hr />
+<h2 id="m5-sdk-cli">M5: SDK + CLI<a class="headerlink" href="#m5-sdk-cli" title="Permanent link">&para;</a></h2>
+<p><strong>Priority: P1.</strong> The gating condition (every P0 item true, no fictional cryptographic-identity
+claim) is now genuinely met -- <code>presidium</code> v0.4.0/<code>presidium-contrib</code> v0.7.0 are real, live PyPI
+releases with a real Ed25519 identity binding and a real, proven mTLS handshake behind them. The
+first real CLI shipped 2026-08-24 (see below); what remains here is docs-site/examples/<code>presidium
+run</code>/the live-server registry-CRUD CLI mode, not the release itself.</p>
+<p><strong>Goal:</strong> One package, one install, complete experience. Trust CLI for operators.</p>
+<p><strong>Requirements:</strong> <a href="../../design/trust-scoring-requirements/">trust-scoring-requirements.md</a> (FR-5.1–5.3)</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>The first real <code>presidium</code> CLI -- DONE, 2026-08-24</strong> (<code>presidium_contrib.cli</code>,
+  <code>presidium</code> v0.4.0 / <code>presidium-contrib</code> v0.7.0). Mirrors <code>civitas-io/python-civitas</code>'s own
+  <code>civitas.cli</code> package structure exactly (Typer + Rich, one module per command group,
+  always-core not extra-gated dependency). Real, honest scope confirmed by reading the
+  registry/scoring source first, not assumed:</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>presidium version</code>, <code>presidium registry list --db &lt;path&gt;</code> (local <code>SqliteRegistry</code>
+    file, new <code>presidium-contrib[sqlite]</code> extra), <code>presidium policy validate &lt;file&gt;</code> (reuses
+    <code>presidium.runtime.parse_policy_rules()</code>, promoted from private to public for this).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <code>presidium trust replay --events &lt;file&gt; --spec &lt;file&gt;</code> (FR-5.3) -- wraps the real,
+    pure, already-100%-tested <code>presidium.scoring.functions.replay()</code> directly.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Real, honest re-scoping, not silently dropped</strong>: <code>presidium trust show</code>/<code>trust events</code>
+    (FR-5.1's two commands that query a LIVE agent's history) and <code>presidium run</code> remain
+    unbuilt. Confirmed directly: no registry backend today persists a durable, queryable
+    trust-event history (<code>LinearTrustScore</code>, the scorer every backend actually uses, keeps no
+    event log; <code>WindowedTrustScorer</code>, which does use the real event-based scoring model, is
+    pure in-memory and unused as any default) -- building those two commands for real needs a
+    durable event store first, arguably M4's own job (FR-4.5, decision journal), not a CLI gap.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Event export (FR-5.2) -- <code>ScoringSpec.spec_hash</code> already existed, real and tested,
+    before this work started; <code>trust replay</code> surfaces it directly. A dedicated
+    <code>export_events()</code> JSON Lines/CSV command remains a real, separate, smaller follow-up.</li>
+<li>Two real bugs caught and fixed before shipping: <code>SqliteRegistry</code>'s connection was never
+    closed after <code>registry list</code> (a real, ugly aiosqlite traceback after otherwise-correct
+    output); <code>trust replay</code>'s <code>--as-of</code> parsing sat outside the command's own error handling,
+    so an invalid value raised an unhandled exception instead of a clean error.</li>
+<li>18 new tests, 86-100% coverage per file, <code>ruff</code>/<code>ruff format --check</code>/<code>mypy --strict</code> clean.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>presidium run</code> (bootstrap a <code>GovernedRuntime</code> from a topology YAML, mirroring
+  <code>civitas run</code>) -- not built yet, real follow-up.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>presidium registry list</code>/<code>policy validate</code> against a LIVE <code>presidium-server</code>'s HTTP
+  endpoints (<code>--server-url</code> mode) -- the local-SQLite-file mode shipped first; this is a real,
+  separate, named follow-up, not silently promised.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Comprehensive documentation site (MkDocs) -- <code>mkdocs.yml</code>'s own nav structure already
+  exists; no GitHub Pages deployment or <code>Deploy Docs</code> workflow yet (confirmed: <code>civitas-io/
+  python-civitas</code> has a real, working one to copy directly).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Example applications (3-5 real-world scenarios)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> v1.0.0 release</li>
+</ul>
+<p><strong>Deliverable:</strong> <code>pip install presidium</code> — the full experience, documented and released.</p>
+<hr />
+<h2 id="m6-cloud">M6: Cloud<a class="headerlink" href="#m6-cloud" title="Permanent link">&para;</a></h2>
+<p><strong>Priority: P2</strong> — explicitly commercial, multi-tenant SaaS; not core-completeness.</p>
+<p><strong>Goal:</strong> Managed service and enterprise features. Trust feedback loop measurement. Compliance reporting.</p>
+<p><strong>Requirements:</strong> <a href="../../design/trust-scoring-requirements/">trust-scoring-requirements.md</a> (FR-6.1–6.4)</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Multi-tenant trust isolation — events, specs, audits partitioned by tenant (FR-6.1)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Centralized event store — REST + gRPC, idempotent submissions (FR-6.2)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Feedback loop metric — % of agents recovering from RESTRICTED to STANDARD+ (FR-6.3)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Compliance reports — NIST AI RMF, ISO/IEC 42001 mappings (FR-6.4)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Presidium Cloud (managed runtime + governance)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Enterprise features (SSO, RBAC, SOC 2 compliance)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Multi-region deployment</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SLA guarantees</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pricing tiers (Free → Starter → Pro → Enterprise)</li>
+</ul>
+<p><strong>Deliverable:</strong> Commercial offering with trust analytics and compliance automation.</p>
+<hr />
+<h2 id="m7-presidium-server-self-hostable-network-governance-service">M7: Presidium Server — self-hostable network governance service<a class="headerlink" href="#m7-presidium-server-self-hostable-network-governance-service" title="Permanent link">&para;</a></h2>
+<p><strong>Priority: P0</strong> — the single structural blocker to the three-pillar platform working end to end.
+See "Implementation Priority" above for the full P0/P1 breakdown of this milestone's own items.</p>
+<p><strong>Goal:</strong> Make Presidium's governance surface (policy evaluation, registry, approval,
+credentials, trust) callable over a real network boundary by any properly authenticated
+client — not just other Civitas agents in the same runtime. Today, <code>presidium</code>'s governance
+components are only reachable in-process (as a library) or via Civitas's own actor-model
+transport (Service Mode's <code>PolicyEvaluatorServer</code>/<code>RegistryServer</code> GenServers, reachable only
+by other Civitas agents). <strong>Neither of those is reachable by an external, non-Civitas system</strong>,
+which is a real, concrete blocker: <code>civitas-io/fabrica</code>'s <code>PresidiumClient</code> Protocol
+(<code>check_grant()</code>) is fully specified and implementation-ready, but has nothing real to talk to.</p>
+<p><strong>Not the same thing as M6.</strong> M6 ("Cloud") is the commercial, multi-tenant SaaS offering —
+Presidium Cloud, SSO, pricing tiers, SLAs. M7 is the underlying OSS building block: can
+Presidium run as its own addressable, self-hosted, single-tenant process at all, reachable by
+any authenticated caller. M6 would eventually run as a managed, multi-tenant deployment of
+what M7 builds — not the reverse. Sequenced after M6 in this document because it was scoped
+later, not because it is architecturally dependent on M6.</p>
+<p><strong>Full design finalized 2026-08-22</strong> — <a href="../../design/presidium-server-requirements/">presidium-server-requirements.md</a>
+and <a href="../../design/presidium-server/">presidium-server.md</a>. The summary below is kept for history;
+the two design docs are now the authoritative source for exactly what gets built.</p>
+<p><strong>Builds on real, existing work — this is a transport skin, not a rewrite:</strong></p>
+<ul>
+<li>Reuses <code>GovernedRuntime</code>'s existing composition (policy engine, registry, approval,
+  credentials, trust) as the implementation behind the one real endpoint — no new governance
+  logic.</li>
+<li><strong>Finalized design decision, superseding this bullet's original framing</strong>: does <strong>not</strong> recompose
+  <code>PolicyEvaluatorServer</code>/<code>RegistryServer</code>'s separate GenServer call protocols for <code>check_grant</code> —
+  that would mean re-deriving orchestration (lookup → evaluate → approval) that already exists,
+  correctly, as <code>GovernedRuntime</code>'s own object graph. Instead, a new, thin <code>PresidiumGatewayAgent</code>
+  wraps a <code>GovernedRuntime</code> directly. Those two GenServers remain valid for a later, genuinely
+  distributed deployment topology — not this one. See <code>presidium-server.md</code>'s own "Architecture"
+  section for the full reasoning.</li>
+<li>Implements the AAA architecture already designed in
+  <a href="../../rfcs/001-presidium-scope/#aaa-architecture-holistic-view">RFC-001</a> and
+  <a href="../../research/aaa-patterns/"><code>docs/research/aaa-patterns.md</code></a> — this milestone is "build the
+  server RFC-001 already describes," not a new architecture decision.</li>
+</ul>
+<p><strong>Major real finding, 2026-08-22 — reuse <code>civitas.gateway.HTTPGateway</code> directly, don't build a new
+server framework.</strong> A direct read of <code>python-civitas</code>'s own source (not assumed) found it already
+ships a mature, well-tested (91-100% coverage across its submodules), production-grade HTTP/gRPC/
+HTTP3 gateway with real mTLS (<code>GatewayConfig.tls_cert</code>/<code>tls_key</code>/<code>tls_ca_cert</code>/<code>client_cert_mode</code>,
+<code>civitas/gateway/mtls.py</code>, 98% covered) and real JWT bearer auth (<code>civitas/gateway/jwt_auth.py</code>,
+100% covered) already built in. Critically, <code>HTTPGateway</code> is <strong>transport-agnostic and
+declarative</strong>: a route is just <code>{"method": "POST", "path": "/v1/...", "agent": "&lt;name&gt;", "mode":
+"call"}</code>, dispatched onto the Civitas bus via <code>GatewayDispatcher</code> to <em>any</em> named agent — not
+limited to a fixed set of built-in routes. Since <code>PolicyEvaluatorServer</code>/<code>RegistryServer</code> are
+<strong>already real <code>AgentProcess</code>/<code>GenServer</code> subclasses</strong> (M3, shipped), most of M7's own "REST
+endpoints" and "mTLS" requirements below could be satisfied by <strong>registering these agents behind
+an <code>HTTPGateway</code> with a routes/<code>GatewayConfig</code> manifest</strong>, not by building a new REST+mTLS server
+from scratch. This substantially de-risks and likely de-scopes M7 — see <code>examples/http_gateway.py</code>
+and <code>examples/gateway_auth.py</code> in <code>python-civitas</code> for the exact reusable pattern. Re-verify this
+assumption early in implementation (confirm <code>HTTPGateway</code>'s auth middleware composes cleanly with
+Presidium's own grant/policy checks, not just transport-level authentication) before committing
+to it fully, but treat "build a new server" as the fallback, not the default.</p>
+<p><strong>Requirements:</strong></p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Close the existing test-coverage gap: <code>presidium_contrib.service.policy</code>/<code>.registry</code> (the
+  GenServers this milestone wraps). <strong>Done 2026-08-22</strong> — see "Implementation Priority" → P0
+  above for the full write-up (both files now 100%, a real second bug found and fixed in the
+  process).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Wire up the Ed25519 identity binding that M2 already documents as done but never actually
+  implemented.</strong> <strong>Done 2026-08-22</strong> — see the full write-up under "Implementation Priority" → P0
+  above. <code>GovernedRuntime.start()</code> now binds a real, persistent <code>AgentIdentity</code> per agent;
+  <code>AgentRegistry</code> gained a real <code>verify_signature()</code>. <strong>Still open, not done by this fix</strong>: the
+  actual mTLS wiring below (this item only unblocks it by making the underlying key real).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> Design docs: <code>docs/design/presidium-server-requirements.md</code> + <code>presidium-server.md</code>.
+  <strong>Done 2026-08-22</strong> — full design walkthrough, real decisions recorded (Option A architecture
+  reusing <code>civitas.gateway.HTTPGateway</code>, the <code>check_grant()</code> action-mapping algorithm, the new
+  non-blocking <code>GovernedToolProvider.check_grant()</code> method, mTLS via a real private CA rather than
+  waiting on SPIRE, a minimal explicit <code>/health</code> route). Ready for implementation review.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> Package shape decided: <strong><code>presidium_contrib.server</code></strong>, a new module in
+  <code>presidium-contrib</code> (extra: <code>presidium-contrib[server]</code>, needs <code>civitas[http]</code>) — settles the
+  three-option decision below in favor of the <code>civitas-gateway</code>-reuse approach, formalized as a
+  real module rather than a separate standalone package.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> Implement <code>PresidiumGatewayAgent</code> and <code>GovernedToolProvider.check_grant()</code>.
+  <strong>Done 2026-08-22.</strong> <code>POST /v1/check_grant</code> + <code>GET /health</code> only in this first cut — registry
+  CRUD, approval request/list/decide, and credential resolution remained designed (see
+  <code>presidium-server.md</code>'s own "Deferred" section) but explicitly out of scope for that first cut.
+  <strong>Update, 2026-08-24: registry CRUD and approval list/decide are both now DONE too</strong> — see the
+  two dedicated bullets below; only credential resolution remains undone. <strong>A real,
+  second implementation-time correction found and fixed</strong>: the design's original
+  <code>payload_extra</code>-based single-agent dispatch doesn't work —
+  <code>civitas.gateway.router.RouteTable.from_config()</code> never populates <code>payload_extra</code> for ordinary,
+  user-declared routes (confirmed live: a real <code>GET /health</code> returned <code>400 {"error": "Unknown
+  operation: None"}</code>). Fixed with one real agent per route (<code>PresidiumGatewayAgent</code> for
+  <code>check_grant</code>, a new <code>HealthCheckAgent</code> for <code>/health</code>) instead — simpler, and correctly matches
+  the real API. 39 new tests (unit + a real end-to-end suite through an actual <code>HTTPGateway</code> and
+  real <code>httpx</code> requests over real HTTP), both new modules at 100% coverage.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Registry CRUD over the network -- DONE, 2026-08-24.</strong>
+  <code>presidium_contrib.server.registry_agent</code>: <code>RegisterAgentGatewayAgent</code> (<code>POST /v1/agents</code>),
+  <code>ListAgentsGatewayAgent</code> (<code>GET /v1/agents</code>), <code>GetAgentGatewayAgent</code> (<code>GET /v1/agents/{name}</code>),
+  <code>DeregisterAgentGatewayAgent</code> (<code>DELETE /v1/agents/{name}</code>), <code>build_registry_gateway_config()</code>.
+  <strong>Real, corrected design, not the original sketch</strong>: one real GenServer per HTTP route, NOT the
+  <code>payload["__op__"]</code> multi-op pattern <code>presidium-server.md</code>'s own "Deferred" section originally
+  proposed -- that exact pattern was already tried and rejected for check_grant/health earlier
+  (payload_extra is never populated for ordinary, user-declared routes). New
+  <code>presidium_contrib/server/serialization.py</code> -- real AgentRecord/Grant JSON (de)serialization,
+  built from scratch (no such helper existed on either dataclass before). <strong>Real, previously-
+  unknown framework constraint found while implementing</strong>: <code>civitas.gateway.dispatch.py</code>
+  classifies ANY reply payload containing a top-level <code>"error"</code> key as <code>DispatchStatus.
+  AGENT_ERROR</code> -&gt; HTTP 400, regardless of whether anything raised -- every reply uses <code>"reason"</code>
+  instead, matching <code>PresidiumGatewayAgent</code>'s own pre-existing convention (confirmed it already
+  avoided this pitfall; caught this the hard way via a real end-to-end test, not by reading the
+  framework source first). <strong>Real, honest scope notes, not silently glossed over</strong>: <code>GET
+  /v1/agents</code> doesn't support <code>list_agents()</code>'s own status/trust_tier/owner filters (civitas's
+  dispatch never forwards query strings into a <code>mode: "call"</code> route's payload); grants are
+  deliberately not settable via the register endpoint (a real, separate, not-yet-built
+  grant-management endpoint); register is upsert, matching <code>AgentRegistry.register()</code>'s own real
+  behavior, not inventing new duplicate-detection. 15 new tests (unit + real end-to-end HTTP),
+  100% coverage on all three new/changed files, <code>ruff</code>/<code>ruff format --check</code>/<code>mypy --strict</code>
+  clean.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>Approval list/decide over the network -- DONE, 2026-08-24, real, shipped, with an
+  explicit scope boundary.</strong> <code>presidium_contrib.server.approval_agent</code>:
+  <code>ListApprovalsGatewayAgent</code> (<code>GET /v1/approvals</code>), <code>ApproveGatewayAgent</code>
+  (<code>POST /v1/approvals/{id}/approve</code>), <code>DenyGatewayAgent</code> (<code>POST /v1/approvals/{id}/deny</code>) --
+  exposing <code>ApprovalService.list_pending()</code>/<code>decide()</code>. Deliberately no <code>POST /v1/approvals</code> --
+  approval requests are created in-process by <code>check()</code>, never by an external caller. <strong>Real,
+  honest scope boundary, confirmed by reading the source, not assumed</strong>: <code>check_grant()</code> does
+  NOT call <code>ApprovalService.request_approval()</code> at all (by design, per FR-1.5) -- only approvals
+  from the blocking <code>check()</code> path are tracked and resolvable here; wiring <code>check_grant()</code>'s own
+  <code>REQUIRE_APPROVAL</code> path into this is a real, separate, bigger integration needing the calling
+  side's own durable suspension mechanism (e.g. Fabrica), explicitly out of scope for this pass.
+  Also honest about <code>ApprovalService.decide()</code>'s own real contract (no "not found" signal --
+  confirmed against <code>CallbackApprovalProvider</code>'s own silent-no-op implementation) -- these
+  endpoints reply honestly, not inventing a false-confidence 404. 13 new tests (unit + real
+  end-to-end HTTP), 100% coverage on the new file, <code>ruff</code>/<code>ruff format --check</code>/<code>mypy --strict</code>
+  clean. Credential resolution remains a real, designed intent, not built until something
+  concretely needs it.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>DONE, 2026-08-24.</strong> <code>scope</code> (FR-1.4) is now threaded through to <code>ActionRequest.parameters</code>
+  — <code>GovernedToolProvider.check_grant()</code>/<code>check()</code>/<code>check_resource()</code> gained an additive,
+  optional <code>parameters: dict[str, Any] | None = None</code>, and <code>PresidiumGatewayAgent.handle_call()</code>
+  (which previously read <code>agent_id</code>/<code>action</code> from the request body but silently discarded
+  <code>scope</code> entirely, despite FR-1.1's own documented request shape always including it) now reads
+  it, validates it's a dict (fail-closed DENY otherwise, not a 5xx), and passes it through. CEL
+  policies can now genuinely reference <code>request.parameters.&lt;key&gt;</code> from a <code>check_grant</code> call —
+  verified end to end with real tests proving a policy actually sees a value that arrived via the
+  HTTP request body's <code>scope</code> field, not just that the parameter is accepted. 469 <code>presidium</code>
+  tests pass (+3), 178 <code>presidium-contrib</code> tests pass (+3), <code>ruff</code>/<code>ruff format --check</code>/
+  <code>mypy --strict</code> clean on both packages.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> <strong>Must satisfy <code>civitas-io/fabrica</code>'s <code>PresidiumClient.check_grant()</code> contract
+  exactly</strong>: synchronous REST, <code>agent_id</code> + <code>action</code> + <code>scope</code> in,
+  <code>GrantResult(decision, reason, approval_context)</code> out (confirmed directly against
+  <code>civitas-io/fabrica/docs/contracts/managers.md</code>) — shipped, minus the <code>scope</code> gap noted directly
+  above.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> Preserve fail-closed semantics across the network boundary: an unreachable or
+  erroring server must be something the <em>client</em> can safely treat as <code>deny</code> without the server
+  needing to do anything special — confirmed shipped: <code>PresidiumGatewayAgent</code> never raises for a
+  missing field, an unresolvable agent, or any policy decision; a real end-to-end test proves a
+  <code>200</code> (never a <code>5xx</code>) for every one of these cases over real HTTP.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P0)</strong> mTLS at the transport boundary, not bearer tokens/API keys as the primary
+  mechanism. <strong>Config-level wiring done earlier (<code>require_mtls=True</code> default,
+  <code>civitas.gateway.mtls.require_client_cert</code>); a real handshake test done 2026-08-23 found this
+  went further than "untested" — the currently-published <code>civitas</code> (&gt;=0.11.0) never actually
+  delivered a real client certificate to the ASGI app at all, so every request, valid or not, got
+  <code>401</code>.</strong> Root cause: a known, tracked, upstream gap (uvicorn never populates the ASGI TLS
+  extension) — <code>civitas-io/python-civitas#25</code>'s <code>direct</code>-mode half, explicitly left broken by that
+  repo's own earlier <code>proxy_header</code> fix. Reported, designed, and fixed upstream the same day
+  (<code>civitas-io/python-civitas</code> commit <code>8d72084</code>, <code>docs/design/gateway-http-mtls-direct.md</code>) — a
+  new <code>TlsAwareHttpToolsProtocol</code> reads the real peer certificate straight off the TLS transport.
+  Verified end to end against Presidium's own real mTLS test suite via a local, uncommitted
+  editable install of the fixed <code>python-civitas</code> (all 4 handshake scenarios passed) — then
+  reverted to the published dependency, since the fix isn't in a tagged <code>civitas</code> release yet.
+  <strong>Presidium's own test
+  (<code>packages/presidium-contrib/tests/integration/test_presidium_server_mtls.py</code>) marked the two
+  scenarios that needed the fix <code>xfail(strict=True)</code></strong> until a real release existed. <strong>Done for
+  real, 2026-08-23</strong>: the fix shipped as <code>civitas</code> v0.11.2 (immediately followed by v0.11.3, a
+  same-day patch after v0.11.2's own release verification caught a real, live packaging bug —
+  <code>import civitas</code> failed entirely; see that repo's own CHANGELOG). Bumped this package's pin to
+  <code>civitas&gt;=0.11.3</code>, removed both <code>xfail</code> markers — all 4 handshake scenarios now pass for real
+  against the real, published dependency, no local override, no workaround. 439 <code>presidium</code> + 162
+  <code>presidium-contrib</code> tests pass, 3x stable, <code>ruff</code>/<code>mypy --strict</code> clean.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P1)</strong> Build <code>presidium-contrib[spiffe]</code> — <strong>DONE, 2026-08-24</strong>, real SPIRE-issued
+  X.509-SVIDs, real auto-rotation via a real Workload API subscription. See the "real vendor
+  research done" entry above (Implementation Priority §P1) for full detail. Cross-deployment
+  federation via trust domain bundles remains a real, separate, not-yet-built future direction,
+  not silently dropped.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> <strong>(P1)</strong> Rate limiting / backpressure at the network boundary — <strong>DONE, 2026-08-24.</strong>
+  Reuses Civitas's own first-party G4 rate limiter (<code>civitas.gateway.ratelimit.RateLimiter</code>/
+  <code>rate_limit</code> middleware, sliding-window, per-client-IP) rather than building a second
+  mechanism. <code>build_check_grant_gateway_config()</code> gained <code>rate_limit: bool = False</code> (opt-in, not
+  opt-out -- an availability/tuning control, not a fail-closed security boundary like mTLS). New
+  <code>build_rate_limiter()</code> convenience constructor, exposing <code>RATE_LIMITER_AGENT_NAME</code> so a caller
+  doesn't need to discover the middleware's own hardcoded <code>"rate_limiter"</code> lookup name by reading
+  Civitas's source. <strong>Real, load-bearing finding caught while implementing</strong>: global and
+  per-route middleware are concatenated per request, not deduplicated (confirmed against
+  <code>civitas.gateway.asgi.py</code>'s own dispatch chain) -- so rate limiting is wired onto
+  <code>/v1/check_grant</code>'s own per-route middleware specifically, never <code>/health</code> or the global list
+  (a liveness probe must never be rejected because real traffic used up the budget; putting mTLS
+  in both the global and per-route list would have silently run it twice). Verified end to end:
+  a real running gateway with a small, real budget genuinely returns <code>429</code>/<code>Retry-After</code> once
+  exhausted, while <code>/health</code> keeps returning <code>200</code> throughout. 4 new tests, 100% coverage on the
+  changed file, <code>ruff</code>/<code>ruff format --check</code>/<code>mypy --strict</code> clean.</li>
+</ul>
+<p><strong>Deliverable:</strong> A real, self-hostable Presidium server process, reachable over REST+mTLS by
+any authenticated external client (Civitas-based or not) — the concrete prerequisite that
+unblocks Fabrica's <code>PresidiumClient</code> real implementation, and the technical foundation M6's
+"Presidium Cloud" would eventually run as a managed, multi-tenant version of.</p>
+<hr />
+<h2 id="m8-performance-research-rust-vs-python-at-the-governance-hot-path">M8: Performance Research — Rust vs. Python at the governance hot path<a class="headerlink" href="#m8-performance-research-rust-vs-python-at-the-governance-hot-path" title="Permanent link">&para;</a></h2>
+<p><strong>Status: Complete, 2026-08-25.</strong> Real benchmarks against a real M7 server, on real, separate,
+network-connected hardware (a MacBook + a remote Linux host over a direct Tailscale connection),
+plus a real, same-hardware comparison against OPA. Full results, methodology, and a market-
+comparison analysis: <a href="../../design/performance-research/"><code>docs/design/performance-research.md</code></a>.
+<strong>Headline findings</strong>: the original "~88µs/eval" baseline below undercounted the real,
+worst-case cost -- a new, reproducible microbenchmark measured ~1,314µs at 20 rules (linear,
+~67µs/rule). Real HTTP-endpoint throughput is flat regardless of concurrency (confirming the GIL
+hypothesis directly, not just by inference). <strong>Option A (horizontal scaling) confirmed working,
+close to linearly, zero code changes -- recommended as the real default scaling story for M7
+deployments now.</strong> <strong>Option B (free-threaded CPython) does NOT help today</strong>, for two independent
+reasons: <code>cel-python</code>'s <code>google-re2</code> dependency isn't free-threading-safe (CPython auto-
+re-enables the GIL on import) and, even forced off, <code>civitas.gateway.HTTPGateway</code>'s
+single-asyncio-thread architecture has no multi-thread GIL contention to relieve in the first
+place. <strong>Option C (a Rust-backed CEL evaluator) is the real next lever</strong> if Option A proves
+insufficient -- not prototyped this pass, but grounded in a real, maintained Rust CEL crate and a
+real 15-140x directional comparison against OPA on identical, same-hardware workloads. Option D
+remains correctly out of scope, per this section's own original sequencing.</p>
+<p><strong>Priority: P1, and only after M7 ships</strong> — this only becomes load-bearing once Presidium is a
+real multi-tenant network service. See "Implementation Priority" above.</p>
+<p><strong>Goal:</strong> A research milestone, not a rewrite commitment. Answer, with real measured evidence,
+whether any part of Presidium's request-path hot loop needs to move off pure Python — and if so,
+which part, and how — before it becomes a real production bottleneck rather than after.</p>
+<p><strong>Trigger:</strong> A direct, evidence-based comparison already exists one layer down: AgentGateway
+(Rust) vs. LiteLLM Proxy (pure Python) is cited in <code>docs/design/llm-gateway.md</code>'s own adapter
+table as a real, named trade-off (LiteLLM needs Postgres+Redis to scale where AgentGateway is a
+single binary) — and LiteLLM itself is reportedly moving toward a Rust rewrite for exactly this
+reason. Presidium's own policy-evaluation hot path has the same structural shape as LiteLLM's:
+pure Python, in the synchronous critical path of every governed action, GIL-bound within a
+process. Worth checking with real numbers before assuming either "it's fine" or "it needs Rust."</p>
+<p><strong>Real, measured baseline established while scoping this (not a guess):</strong></p>
+<ul>
+<li><code>CelPolicyEngine.evaluate()</code> (<code>cel-python</code>/<code>celpy</code>, confirmed pure Python — a <code>lark</code>-based
+  tree-walking interpreter, no Rust/C core): <strong>~88µs per evaluation, ~11,400 evaluations/sec on
+  one core</strong>, with 20 loaded rules, first-match-wins. This is the dominant cost in a <code>check()</code>
+  call — registry lookups are ~10x cheaper (see below) — and scales with rule count, since
+  first-match-wins means a request that matches no rule (the common ALLOW case) evaluates every
+  loaded rule for that stage.</li>
+<li><code>InMemoryRegistry.lookup()</code> (deep-copy snapshot semantics): <strong>~9µs, ~112,000 lookups/sec on one
+  core.</strong> Not the bottleneck; CEL evaluation is.</li>
+<li><strong>The real constraint is the GIL, not raw per-call cost.</strong> ~88µs in isolation is not
+  catastrophic — the problem is that Python's GIL means this ceiling does not rise with more CPU
+  cores <em>within a single process</em>; scaling past it today means horizontal replicas, not vertical
+  throughput. This is exactly the shape of AgentGateway's structural advantage over LiteLLM.</li>
+</ul>
+<p><strong>Why this isn't urgent yet, and why it will become real precisely at M7:</strong> In today's
+library-mode usage, this cost is paid once per tool/LLM call inside an agent's own async loop —
+negligible next to LLM call latencies (milliseconds vs. seconds), and concurrency is naturally
+bounded by how many agents one Civitas runtime hosts. <strong>It becomes a real, load-bearing question
+specifically once M7 exists</strong> — a shared, multi-tenant, externally-callable service is the first
+place Presidium has the same concurrent-request profile AgentGateway/LiteLLM actually have.
+Sequenced after M7 for this reason, not because it's unimportant.</p>
+<p><strong>Research questions -- answered, 2026-08-25, see <code>docs/design/performance-research.md</code> for the
+full real results:</strong></p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Benchmark realistic Presidium call paths (not isolated micro-benchmarks) under real
+  concurrent load against an actual M7 server, once it exists — rule-set sizes and concurrency
+  levels drawn from a real or realistic deployment, not synthetic worst cases. <strong>Done</strong>: real
+  standalone M7 server, real <code>ab</code> load, real network hop to a separate host, 5/20/50/100 rule
+  sizes, concurrency 1-100.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Option A — horizontal scaling only. <strong>Confirmed working, close to linearly, zero code
+  changes</strong> — two independent processes sustained ~650 combined req/sec vs. ~355 for one.
+  Recommended as the real default scaling story for M7 deployments now.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Option B — free-threaded CPython. <strong>Does NOT help today</strong>, for two independent real
+  reasons: <code>cel-python</code>'s <code>google-re2</code> dependency isn't free-threading-safe (the GIL is
+  auto-re-enabled on import, confirmed directly); even forced off, <code>civitas.gateway.HTTPGateway</code>'s
+  single-asyncio-thread architecture has no multi-thread GIL contention to relieve in the first
+  place (confirmed: forced-off-GIL throughput was statistically indistinguishable from normal).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Option C — a Rust-backed CEL evaluator. <strong>Not prototyped</strong> (per this milestone's own
+  scope), but grounded in a real, maintained Rust CEL crate (<code>cel-interpreter</code>, crates.io) and a
+  real 15-140x directional comparison against OPA on identical, same-hardware workloads.
+  Recommended as the next real lever if Option A proves insufficient.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Option D — correctly not evaluated, per this item's own original sequencing ("only worth
+  it if A-C don't clear the bar" -- A already does, for today's known load).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> MCP governance's regex-based scanning (<code>PIIDetector</code>, <code>PoisoningDetector</code>, redaction) —
+  <strong>Done, 2026-08-25</strong> (a real, separate follow-up pass -- see <code>docs/design/
+  performance-research.md</code> §8). <code>PIIDetector.scan_dict()</code>/<code>mask_dict()</code>/<code>redact_dict()</code> scale
+  linearly with tool-OUTPUT size, not rule count -- a 1MB result costs ~60-115ms of real,
+  GIL-bound regex processing, a genuinely larger cost than CEL evaluation at any realistic rule
+  count. <code>PoisoningDetector.check()</code> confirmed cheap and output-size-independent (~3.4µs). A
+  real, honest ReDoS smoke test on the <code>credit_card</code> pattern's bounded-repetition shape found no
+  catastrophic backtracking (with a real theoretical explanation, not just a lucky result), but
+  is explicitly not claimed as an exhaustive proof.</li>
+</ul>
+<p><strong>Deliberately not decided here, per this project's own "ship the default, revisit only with
+evidence" discipline</strong> (the same discipline that shipped <code>fabrica</code>'s retriever as pure Python v1
+rather than pre-optimizing in Rust): no component was rewritten in Rust as part of this
+milestone. The deliverable was a design doc with real numbers and a recommendation, not code --
+delivered.</p>
+<p><strong>Deliverable, shipped:</strong> <a href="../../design/performance-research/"><code>docs/design/performance-research.md</code></a>
+— real benchmark results against an actual M7 deployment (two real environments: local loopback
+and a real cross-host network hop), a real, same-hardware comparison against OPA, a
+competitive-landscape/benchmark-methodology analysis, and a clear recommendation (ship Option A
+now; don't pursue B; C is the next real lever if needed; D stays out of scope).</p>
+<hr />
+<h2 id="future-investigation-multi-dimensional-evaluation">Future Investigation: Multi-Dimensional Evaluation<a class="headerlink" href="#future-investigation-multi-dimensional-evaluation" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>See <a href="../../rfcs/002-multi-dimensional-evaluation/">RFC-002</a></p>
+</blockquote>
+<p>Current LLM evaluation collapses high-dimensional, non-deterministic outputs to scalar scores. This is a category error — the evaluation output should be distributional and multi-dimensional (per-dimension means with confidence intervals, context, and caveats), not a single number.</p>
+<p>The M2 <code>TrustScorer</code> ships as a simple 0.0-1.0 scalar. Post-M4, investigate replacing scalar trust with distributional trust profiles: per-dimension scores with uncertainty bounds, context-dependent trust, and explicit caveats. This is a research-first effort — the questions in RFC-002 need answers before any design work.</p>
+<hr />
+<h2 id="timeline">Timeline<a class="headerlink" href="#timeline" title="Permanent link">&para;</a></h2>
+<p>These are aspirational, not commitments. Adjusted based on community feedback and contributor availability.</p>
+<p><strong>Status column last verified against real, current source 2026-08-24</strong> -- this table went
+stale before (it showed M7 as "Planning" for two days after M7's own P0 scope shipped, and for
+zero days after its rate-limiting/registry-CRUD/approval extensions shipped); check the
+M-section itself, not just this table, if in doubt.</p>
+<table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Target</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1: Foundation</td>
+<td>Q2 2026</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>M2: Core Interfaces + CEL Policy</td>
+<td>Q3 2026</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>M3: Contrib Adapters + Reference Impls</td>
+<td>Q3-Q4 2026</td>
+<td>Complete</td>
+</tr>
+<tr>
+<td>M4: Autonomy Progression</td>
+<td>Q4 2026</td>
+<td>Planning -- not started</td>
+</tr>
+<tr>
+<td>M5: SDK + CLI</td>
+<td>Q1 2027</td>
+<td><strong>Started 2026-08-24</strong> -- the first real <code>presidium</code> CLI shipped (version/registry list/policy validate/trust replay); docs site, examples, v1.0.0 remain</td>
+</tr>
+<tr>
+<td>M6: Cloud</td>
+<td>2027+</td>
+<td>Future -- not started, explicitly commercial</td>
+</tr>
+<tr>
+<td>M7: Presidium Server</td>
+<td>TBD</td>
+<td><strong>Complete for its P0 scope + 3 of 4 "Deferred" extensions</strong> (check_grant, registry CRUD, rate limiting, approval list/decide -- real, shipped, released as of 2026-08-24). Only credential resolution remains, deliberately unsketched</td>
+</tr>
+<tr>
+<td>M8: Performance Research (Rust vs. Python)</td>
+<td>After M7</td>
+<td><strong>Complete, 2026-08-25</strong> -- real benchmarks against a real M7 server + a real OPA comparison; Option A (horizontal scaling) recommended now, Option B ruled out, Option C is the next real lever if needed</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

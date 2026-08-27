@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6B7280"/>
+    </marker>
+    <marker id="a-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3B82F6"/>
+    </marker>
+    <marker id="a-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#10B981"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="600" fill="#F9FAFB" rx="8"/>
+
+  <!-- Title -->
+  <text x="460" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">Test Harness Architecture</text>
+
+  <!-- ═══ DATASET SOURCES ═══ -->
+  <rect x="16" y="50" width="888" height="100" rx="8" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="32" y="72" font-size="12" font-weight="600" fill="#6B7280" letter-spacing="1">DATASET SOURCES</text>
+
+  <rect x="40" y="84" width="200" height="50" rx="6" fill="#374151"/>
+  <text x="140" y="106" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Curated Goldens</text>
+  <text x="140" y="122" text-anchor="middle" font-size="9" fill="#D1D5DB">manually written test cases</text>
+
+  <rect x="260" y="84" width="200" height="50" rx="6" fill="#374151"/>
+  <text x="360" y="106" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Recorded Traces</text>
+  <text x="360" y="122" text-anchor="middle" font-size="9" fill="#D1D5DB">captured via flight recorder</text>
+
+  <rect x="480" y="84" width="200" height="50" rx="6" fill="#374151"/>
+  <text x="580" y="106" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Adversarial Suite</text>
+  <text x="580" y="122" text-anchor="middle" font-size="9" fill="#D1D5DB">designed to trigger failures</text>
+
+  <!-- Dataset format box -->
+  <rect x="710" y="84" width="180" height="50" rx="6" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+  <text x="800" y="103" text-anchor="middle" font-size="10" font-weight="600" fill="#374151">Format: EvalDataset</text>
+  <text x="800" y="118" text-anchor="middle" font-size="9" fill="#6B7280">JSON / JSONL</text>
+  <text x="800" y="130" text-anchor="middle" font-size="9" fill="#6B7280">civitas core schema</text>
+
+  <!-- Arrows down from sources -->
+  <line x1="140" y1="134" x2="140" y2="170" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="360" y1="134" x2="360" y2="170" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="580" y1="134" x2="580" y2="170" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- ═══ EVAL TEST RUNNER ═══ -->
+  <rect x="50" y="174" width="630" height="140" rx="8" fill="#1D4ED8" opacity="0.08" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="365" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#1D4ED8">EvalTestRunner</text>
+  <text x="365" y="214" text-anchor="middle" font-size="10" fill="#3B82F6">civitas core — civitas[test] extra</text>
+
+  <!-- Pipeline inside runner -->
+  <rect x="72" y="230" width="140" height="40" rx="6" fill="#3B82F6"/>
+  <text x="142" y="254" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">Load dataset</text>
+
+  <line x1="212" y1="250" x2="240" y2="250" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#a-blue)"/>
+
+  <rect x="244" y="230" width="180" height="40" rx="6" fill="#3B82F6"/>
+  <text x="334" y="248" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">Replay through</text>
+  <text x="334" y="262" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">agent pipeline</text>
+
+  <line x1="424" y1="250" x2="452" y2="250" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#a-blue)"/>
+
+  <rect x="456" y="230" width="140" height="40" rx="6" fill="#3B82F6"/>
+  <text x="526" y="254" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">Collect outputs</text>
+
+  <!-- Metric Registry -->
+  <rect x="72" y="282" width="226" height="22" rx="4" fill="#2563EB"/>
+  <text x="185" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#FFFFFF">Metric Registry — metrics + thresholds per agent type</text>
+
+  <!-- Arrow from runner to DeepEval -->
+  <line x1="596" y1="250" x2="700" y2="250" stroke="#6B7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="648" y="240" text-anchor="middle" font-size="9" fill="#6B7280" font-style="italic">evaluate</text>
+
+  <!-- ═══ DEEPEVAL METRICS ═══ -->
+  <rect x="704" y="174" width="196" height="140" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+  <text x="802" y="198" text-anchor="middle" font-size="12" font-weight="700" fill="#065F46">DeepEval Metrics</text>
+
+  <text x="720" y="220" font-size="10" font-weight="600" fill="#065F46">Built-in:</text>
+  <text x="720" y="236" font-size="10" fill="#374151">TaskCompletionMetric</text>
+  <text x="720" y="252" font-size="10" fill="#374151">ToolCorrectnessMetric</text>
+  <text x="720" y="268" font-size="10" fill="#374151">FaithfulnessMetric</text>
+
+  <text x="720" y="290" font-size="10" font-weight="600" fill="#065F46">Custom:</text>
+  <text x="720" y="306" font-size="10" fill="#374151">GovernanceCompliance</text>
+
+  <!-- Arrow down from metrics -->
+  <line x1="802" y1="314" x2="802" y2="350" stroke="#10B981" stroke-width="1.5" marker-end="url(#a-green)"/>
+
+  <!-- Arrow down from runner -->
+  <line x1="365" y1="314" x2="365" y2="350" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#a-blue)"/>
+
+  <!-- ═══ RESULTS ═══ -->
+  <rect x="16" y="354" width="888" height="110" rx="8" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="32" y="376" font-size="12" font-weight="600" fill="#6B7280" letter-spacing="1">RESULTS</text>
+
+  <rect x="40" y="390" width="240" height="56" rx="6" fill="#374151"/>
+  <text x="160" y="414" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">pytest report</text>
+  <text x="160" y="434" text-anchor="middle" font-size="9" fill="#D1D5DB">pass/fail per test case + metric scores</text>
+
+  <rect x="300" y="390" width="240" height="56" rx="6" fill="#374151"/>
+  <text x="420" y="414" text-anchor="middle" font-size="11" font-weight="600" fill="#F9FAFB">Score trends</text>
+  <text x="420" y="434" text-anchor="middle" font-size="9" fill="#D1D5DB">regression tracking across dataset versions</text>
+
+  <rect x="560" y="390" width="240" height="56" rx="6" fill="#DC2626"/>
+  <text x="680" y="414" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">CI gate</text>
+  <text x="680" y="434" text-anchor="middle" font-size="9" fill="#FEE2E2">blocks PR if below threshold</text>
+
+  <!-- ═══ ANNOTATION ═══ -->
+  <rect x="24" y="484" width="876" height="46" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="460" y="504" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">Same metrics run in-flight (EvalAgent) and offline (test harness) — single source of truth.</text>
+  <text x="460" y="520" text-anchor="middle" font-size="10" fill="#92400E">Threshold drift between environments is impossible. Metric Registry is the canonical definition.</text>
+
+  <!-- ═══ LEGEND ═══ -->
+  <rect x="24" y="544" width="876" height="44" rx="6" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="40" y="558" width="12" height="12" rx="2" fill="#3B82F6"/>
+  <text x="58" y="569" font-size="10" fill="#374151"><tspan font-weight="600">civitas core</tspan> — EvalTestRunner, Metric Registry, EvalDataset schema</text>
+  <rect x="380" y="558" width="12" height="12" rx="2" fill="#10B981"/>
+  <text x="398" y="569" font-size="10" fill="#374151"><tspan font-weight="600">deepeval</tspan> — metric execution engine</text>
+  <rect x="600" y="558" width="12" height="12" rx="2" fill="#374151"/>
+  <text x="618" y="569" font-size="10" fill="#374151"><tspan font-weight="600">application</tspan> — datasets, CI pipeline</text>
+</svg>

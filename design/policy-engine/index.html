@@ -1,0 +1,3469 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/design/policy-engine/">
+      
+      
+        <link rel="prev" href="../agent-registry-requirements/">
+      
+      
+        <link rel="next" href="../policy-engine-requirements/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Policy Engine - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#design-policy-engine" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Policy Engine
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-goals-m2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Goals (M2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-pdp-pep-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture: PDP / PEP / PIP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#policyrule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolicyRule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#policyengine-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolicyEngine Protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#celpolicyengine-default-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CelPolicyEngine (Default Implementation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Stages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#policy-yaml-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy YAML Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforcement-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforcement Modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fail-closed-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fail-Closed Semantics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grant-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grant Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforcement-point-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforcement Point Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Enforcement Point Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#governedmodelprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GovernedModelProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governedtoolprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GovernedToolProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#civitas-integration-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Civitas Integration Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions (Deferred)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-goals-m2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Goals (M2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-pdp-pep-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture: PDP / PEP / PIP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#policyrule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolicyRule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationContext
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#policyengine-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PolicyEngine Protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#celpolicyengine-default-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CelPolicyEngine (Default Implementation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Stages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#policy-yaml-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy YAML Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforcement-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforcement Modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fail-closed-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fail-Closed Semantics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grant-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grant Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforcement-point-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforcement Point Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Enforcement Point Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#governedmodelprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GovernedModelProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governedtoolprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GovernedToolProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#civitas-integration-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Civitas Integration Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions (Deferred)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="design-policy-engine">Design: Policy Engine<a class="headerlink" href="#design-policy-engine" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Deterministic policy evaluation for agent governance.</p>
+</blockquote>
+<p><strong>Status:</strong> Draft (revised June 2026)
+<strong>Package:</strong> <code>presidium</code> (protocol + CelPolicyEngine) / <code>presidium-contrib</code> (OPA, Cedar adapters)
+<strong>Milestone:</strong> M2
+<strong>Requirements:</strong> <a href="../policy-engine-requirements/">policy-engine-requirements.md</a>
+<strong>Research:</strong> <a href="../../research/agent-registry-research/">agent-registry-research.md</a>, an internal policy-engine-landscape research pass (not published; local research notes only)</p>
+<h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
+<p>Agent systems lack deterministic policy enforcement. Agents can call any tool, access any data, invoke any LLM — with no constraints beyond what the framework allows. Guardrails (Fiddler, NeMo) address content safety but not structural governance: "Is this agent authorized to perform this action?"</p>
+<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Deterministic, sub-5ms policy evaluation using CEL (Common Expression Language)</li>
+<li>Three decision types: ALLOW, DENY, REQUIRE_APPROVAL</li>
+<li>Policies evaluate against the AgentRecord (grants, trust, status, owner)</li>
+<li>Fail-closed on evaluation errors (security invariant)</li>
+<li>Gradual rollout via enforcement modes (advisory → soft → hard)</li>
+<li>The PolicyEngine is a Protocol — CEL default, OPA/Cedar via contrib adapters</li>
+</ol>
+<h2 id="non-goals-m2">Non-Goals (M2)<a class="headerlink" href="#non-goals-m2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Content safety / hallucination detection (that's Fiddler/guardrails)</li>
+<li>LLM output filtering (content layer, not policy layer)</li>
+<li>Rate limiting (needs stateful counters — M3)</li>
+<li>Policy hot-reload without restart (M3)</li>
+<li>Formal verification (Cedar-specific — M3+)</li>
+</ul>
+<hr />
+<h2 id="architecture-pdp-pep-pip">Architecture: PDP / PEP / PIP<a class="headerlink" href="#architecture-pdp-pep-pip" title="Permanent link">&para;</a></h2>
+<p>The policy engine follows the standard authorization architecture:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Role</th>
+<th>Presidium Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PDP</strong> (Policy Decision Point)</td>
+<td>Evaluates expressions, returns decisions</td>
+<td><code>PolicyEngine</code> / <code>CelPolicyEngine</code></td>
+</tr>
+<tr>
+<td><strong>PEP</strong> (Policy Enforcement Point)</td>
+<td>Intercepts actions, calls PDP, enforces</td>
+<td><code>GovernedModelProvider</code>, <code>GovernedToolProvider</code></td>
+</tr>
+<tr>
+<td><strong>PIP</strong> (Policy Information Point)</td>
+<td>Provides agent context for evaluation</td>
+<td><code>AgentRegistry</code> (grants, trust, identity)</td>
+</tr>
+</tbody>
+</table>
+<pre><code>Agent calls tool
+    ↓
+GovernedToolProvider (PEP)
+    ↓ builds EvaluationContext
+    ↓ calls PolicyEngine.evaluate()
+PolicyEngine (PDP)
+    ↓ loads agent data from AgentRegistry (PIP)
+    ↓ evaluates CEL expressions against context
+    ↓ returns PolicyResult
+GovernedToolProvider
+    ↓ ALLOW → delegate to underlying ToolProvider
+    ↓ DENY → raise PolicyDeniedError
+    ↓ REQUIRE_APPROVAL → route to ApprovalService
+</code></pre>
+<hr />
+<h2 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h2>
+<h3 id="policyrule">PolicyRule<a class="headerlink" href="#policyrule" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">from __future__ import annotations
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
+
+class PolicyDecision(Enum):
+    ALLOW = &quot;allow&quot;
+    DENY = &quot;deny&quot;
+    REQUIRE_APPROVAL = &quot;require_approval&quot;
+
+class EvaluationStage(Enum):
+    PRE_TOOL = &quot;pre_tool&quot;
+    PRE_LLM = &quot;pre_llm&quot;
+    REGISTRATION = &quot;registration&quot;
+    POST_TOOL = &quot;post_tool&quot;      # M3 — validate tool outputs
+    POST_LLM = &quot;post_llm&quot;        # M3 — validate LLM responses
+    # PRE_MESSAGE = &quot;pre_message&quot;  — deferred to M3 (requires Civitas MessageBus hook)
+</code></pre>
+<p><strong>Multi-stage rules</strong>: a PolicyRule can apply to multiple stages by specifying a list: <code>stage: [pre_tool, pre_llm]</code>. The rule is evaluated at each listed stage. In YAML, this looks like:</p>
+<pre><code class="language-yaml">- name: enforce-grants
+  stage: [pre_tool, pre_llm]    # same rule applies to both stages
+  expression: &quot;...&quot;
+  decision: deny
+</code></pre>
+<p>This avoids copy-pasting the same rule for each stage.</p>
+<pre><code class="language-python">class EnforcementMode(Enum):
+    ADVISORY = &quot;advisory&quot;     # log only, never block
+    SOFT = &quot;soft&quot;             # log + warn, don't block
+    HARD = &quot;hard&quot;             # enforce — block on DENY
+
+@dataclass(frozen=True)
+class PolicyRule:
+    &quot;&quot;&quot;A single policy rule with a CEL expression.&quot;&quot;&quot;
+    name: str
+    stage: EvaluationStage | list[EvaluationStage]  # single stage or list of stages
+    expression: str                           # CEL expression
+    decision: PolicyDecision                  # what to return if expression is true
+    reason: str | None = None                 # human-readable explanation
+    description: str | None = None
+    priority: int = 0                         # higher = evaluated first
+    enforcement: EnforcementMode = EnforcementMode.HARD
+    approvers: list[str] = field(default_factory=list)  # for REQUIRE_APPROVAL
+    enabled: bool = True
+
+@dataclass
+class PolicyResult:
+    &quot;&quot;&quot;Result of a policy evaluation.&quot;&quot;&quot;
+    decision: PolicyDecision
+    policy_name: str | None = None    # None when no rule matched (all passed)
+    reason: str | None = None
+    approvers: list[str] | None = None
+    enforcement: EnforcementMode = EnforcementMode.HARD
+</code></pre>
+<h3 id="evaluationcontext">EvaluationContext<a class="headerlink" href="#evaluationcontext" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">@dataclass
+class ActionRequest:
+    &quot;&quot;&quot;What the agent is attempting to do.&quot;&quot;&quot;
+    resource: str                # &quot;tool:database&quot;, &quot;llm:claude-sonnet&quot;, &quot;agent:writer&quot;
+    action: str                  # &quot;read&quot;, &quot;write&quot;, &quot;invoke&quot;, &quot;send&quot;
+    parameters: dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class EvaluationContext:
+    &quot;&quot;&quot;Full context passed to the policy engine for evaluation.&quot;&quot;&quot;
+    agent: AgentRecord           # identity, grants, trust, status, owner
+    request: ActionRequest       # what is being attempted
+    time: datetime               # current time (for time-based policies)
+</code></pre>
+<p>The CEL environment exposes:
+- <code>agent.name</code>, <code>agent.agent_id</code>, <code>agent.owner</code>, <code>agent.status</code>
+- <code>agent.trust.value</code> (float), <code>agent.trust.tier</code> (string)
+- <code>agent.grants</code> (list of Grant objects with <code>.resources</code>, <code>.actions</code>, <code>.scope</code>, <code>.condition</code>)
+- <code>request.resource</code>, <code>request.action</code>, <code>request.parameters</code>
+- <code>time</code> (timestamp)</p>
+<hr />
+<h2 id="policyengine-protocol">PolicyEngine Protocol<a class="headerlink" href="#policyengine-protocol" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">class PolicyEngine(Protocol):
+    &quot;&quot;&quot;Protocol for policy evaluation.&quot;&quot;&quot;
+
+    def load_policies(self, rules: list[PolicyRule]) -&gt; None:
+        &quot;&quot;&quot;Load and compile policy rules. Raises on invalid CEL expressions.&quot;&quot;&quot;
+        ...
+
+    async def evaluate(
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -&gt; PolicyResult:
+        &quot;&quot;&quot;Evaluate all matching policies for the given stage and context.&quot;&quot;&quot;
+        ...
+</code></pre>
+<hr />
+<h2 id="celpolicyengine-default-implementation">CelPolicyEngine (Default Implementation)<a class="headerlink" href="#celpolicyengine-default-implementation" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">class CelPolicyEngine:
+    &quot;&quot;&quot;Default PolicyEngine using cel-python for in-process evaluation.
+
+    Compile-once, evaluate-many: CEL expressions are compiled at load time.
+    Evaluation is 1-3ms per expression in cel-python.
+
+    Fail-closed: if a CEL expression errors during evaluation, the result
+    is DENY. This is a non-configurable security invariant.
+    &quot;&quot;&quot;
+
+    def load_policies(self, rules: list[PolicyRule]) -&gt; None:
+        # 1. Filter to enabled rules
+        # 2. Group by stage
+        # 3. Sort by priority (descending) within each stage
+        # 4. Compile each CEL expression — fail immediately on compilation error
+        # 5. Store compiled programs for fast evaluation
+        ...
+
+    async def evaluate(
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -&gt; PolicyResult:
+        # 1. Get compiled rules for this stage
+        # 2. Build CEL activation from context (agent, request, time)
+        # 3. Filter expired grants from agent.grants
+        # 4. Evaluate grant conditions (grants with false conditions excluded)
+        # 5. Evaluate each rule's expression in priority order
+        # 6. First matching expression → return its PolicyResult
+        # 7. If CEL evaluation errors -&gt; DENY (fail-closed), log error
+        # 8. If no expression matches -&gt; DENY, real hard default (2026-08-24; was
+        #    ALLOW -- see &quot;Design Decisions&quot; P5 below for the real reasoning behind
+        #    the flip). allow_unmatched_requests=True restores the old behavior;
+        #    unmatched_enforcement lets a migrating deployment run this in ADVISORY
+        #    mode first (logged, not blocking) before committing to HARD.
+        ...
+</code></pre>
+<hr />
+<h2 id="evaluation-stages">Evaluation Stages<a class="headerlink" href="#evaluation-stages" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>When</th>
+<th>PEP</th>
+<th>Typical Policies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pre_tool</code></td>
+<td>Before tool call</td>
+<td><code>GovernedToolProvider</code></td>
+<td>Grant checks, trust gates, tool ACLs</td>
+</tr>
+<tr>
+<td><code>pre_llm</code></td>
+<td>Before LLM call</td>
+<td><code>GovernedModelProvider</code></td>
+<td>Model allowlists, cost limits, grant checks</td>
+</tr>
+<tr>
+<td><code>pre_message</code></td>
+<td>Before agent-to-agent message</td>
+<td>M3 (requires Civitas MessageBus hook)</td>
+<td>Deferred — inter-agent communication governance</td>
+</tr>
+<tr>
+<td><code>registration</code></td>
+<td>When agent registers</td>
+<td><code>AgentRegistry</code></td>
+<td>Owner requirement, naming conventions</td>
+</tr>
+<tr>
+<td><code>post_tool</code></td>
+<td>After tool execution (M3)</td>
+<td><code>GovernedToolProvider</code></td>
+<td>Output PII detection, result size limits, sensitive data masking</td>
+</tr>
+<tr>
+<td><code>post_llm</code></td>
+<td>After LLM response (M3)</td>
+<td><code>GovernedModelProvider</code></td>
+<td>Schema compliance, content policy, response validation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="policy-yaml-format">Policy YAML Format<a class="headerlink" href="#policy-yaml-format" title="Permanent link">&para;</a></h2>
+<pre><code class="language-yaml">presidium:
+  policies:
+    # Grant enforcement — the &quot;default deny&quot; for actions
+    - name: enforce-grants
+      stage: [pre_tool, pre_llm]
+      expression: &gt;
+        !agent.grants.exists(g,
+          request.resource in g.resources &amp;&amp;
+          request.action in g.actions
+        )
+      decision: deny
+      reason: &quot;Agent does not hold a grant for this resource/action&quot;
+      priority: 100
+
+    # Trust-gated write access
+    - name: trust-gate-writes
+      stage: pre_tool
+      expression: &gt;
+        request.action == &quot;write&quot; &amp;&amp; agent.trust.value &lt; 0.7
+      decision: require_approval
+      reason: &quot;Write actions require approval when trust is below 0.7&quot;
+      approvers: [&quot;security-team@acme.com&quot;]
+      priority: 90
+
+    # Model allowlist for production
+    - name: production-model-allowlist
+      stage: pre_llm
+      expression: &gt;
+        !request.resource in [&quot;llm:claude-sonnet&quot;, &quot;llm:gpt-4o&quot;, &quot;llm:gemini-pro&quot;]
+      decision: deny
+      reason: &quot;Model not in production allowlist&quot;
+      priority: 80
+
+    # Owner required in service mode
+    - name: require-owner
+      stage: registration
+      expression: &quot;agent.owner == null || agent.owner == ''&quot;
+      decision: deny
+      reason: &quot;All agents must have an owner&quot;
+      priority: 100
+      enforcement: soft  # warn but don't block during migration
+
+    # New policy being tested (advisory mode)
+    - name: restrict-expensive-models
+      stage: pre_llm
+      expression: &gt;
+        request.resource == &quot;llm:claude-opus&quot; &amp;&amp; agent.trust.tier != &quot;trusted&quot;
+      decision: deny
+      reason: &quot;Only trusted agents can use expensive models&quot;
+      priority: 70
+      enforcement: advisory  # log only for 48 hours, then switch to hard
+</code></pre>
+<hr />
+<h2 id="enforcement-modes">Enforcement Modes<a class="headerlink" href="#enforcement-modes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>advisory</code></td>
+<td>Evaluate and log, never block</td>
+<td>Testing new policies in production</td>
+</tr>
+<tr>
+<td><code>soft</code></td>
+<td>Evaluate, log, and warn (response includes warning)</td>
+<td>Gradual rollout, migration period</td>
+</tr>
+<tr>
+<td><code>hard</code></td>
+<td>Evaluate and enforce — block on DENY</td>
+<td>Production enforcement</td>
+</tr>
+</tbody>
+</table>
+<p>The recommended deployment pattern (from policy lifecycle research):
+1. Deploy in <code>advisory</code> mode for 24-48 hours
+2. Review logs for false positives
+3. Switch to <code>soft</code> for 24-48 hours
+4. Switch to <code>hard</code> when confident</p>
+<p><strong>Enforcement mode and first-match-wins</strong>: evaluation proceeds through rules in priority order. The first rule whose CEL expression evaluates to TRUE determines the result — both the decision AND the enforcement mode come from that rule. Rules whose expressions evaluate to FALSE are skipped (no match, continue to next).</p>
+<p>Important: a rule with <code>enforcement: advisory</code> and <code>decision: deny</code> will MATCH and STOP evaluation (first-match-wins), but the denial is only logged, not enforced. Lower-priority rules are NOT reached. This means advisory rules can shadow hard rules if placed at higher priority.</p>
+<p><strong>Recommended priority ordering:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Rule</th>
+<th>Enforcement</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>enforce-grants</td>
+<td>hard</td>
+<td>Deny if no grant. Always first.</td>
+</tr>
+<tr>
+<td>90</td>
+<td>trust-gate-writes</td>
+<td>hard</td>
+<td>Require approval for low-trust writes.</td>
+</tr>
+<tr>
+<td>70</td>
+<td>new-cost-limit (testing)</td>
+<td>advisory</td>
+<td>Log but don't block expensive models.</td>
+</tr>
+</tbody>
+</table>
+<p>The grant enforcement rule at priority 100 ensures the security invariant is always checked first. Advisory rules for testing should have LOWER priority than critical enforcement rules.</p>
+<hr />
+<h2 id="fail-closed-semantics">Fail-Closed Semantics<a class="headerlink" href="#fail-closed-semantics" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">async def evaluate(self, stage, context):
+    for rule in self._rules_by_stage[stage]:
+        try:
+            result = rule.compiled_program.evaluate(activation)
+            if result is True:
+                return PolicyResult(
+                    decision=rule.decision,
+                    policy_name=rule.name,
+                    reason=rule.reason,
+                    approvers=rule.approvers,
+                    enforcement=rule.enforcement,
+                )
+        except Exception as exc:
+            # FAIL-CLOSED: evaluation error = DENY
+            # This is non-configurable. If the policy can't evaluate,
+            # the safe answer is DENY.
+            logger.warning(
+                &quot;Policy '%s' evaluation error — fail-closed DENY: %s&quot;,
+                rule.name, exc,
+            )
+            return PolicyResult(
+                decision=PolicyDecision.DENY,
+                policy_name=rule.name,
+                reason=f&quot;Policy evaluation error (fail-closed): {exc}&quot;,
+                enforcement=EnforcementMode.HARD,  # errors always hard-enforce
+            )
+
+    # No rule matched → all policies passed → ALLOW
+    return PolicyResult(
+        decision=PolicyDecision.ALLOW,
+        policy_name=None,
+        reason=&quot;All policies passed&quot;,
+    )
+</code></pre>
+<hr />
+<h2 id="grant-integration">Grant Integration<a class="headerlink" href="#grant-integration" title="Permanent link">&para;</a></h2>
+<p>Grants and policies are separate concerns:
+- <strong>Grants</strong> are data the agent holds (on <code>AgentRecord.grants</code>)
+- <strong>Policies</strong> are rules that evaluate grants</p>
+<p>The standard <code>enforce-grants</code> policy at priority 100 checks whether the agent holds a matching grant. This is a POLICY, not engine logic — users who want custom grant evaluation can replace it.</p>
+<p>Grant conditions are evaluated during context preparation:</p>
+<pre><code class="language-python"># Before policy evaluation, filter grants:
+# 1. Remove expired grants (expires_at &lt; now)
+# 2. Evaluate condition field on each remaining grant
+#    - condition is a CEL expression evaluated against the context
+#    - grant with false condition is excluded from agent.grants
+# 3. The filtered grants list is what policies see
+</code></pre>
+<p>Example: grant <code>{resources: ["tool:database"], actions: ["write"], condition: "agent.trust.value &gt;= 0.7"}</code> — when trust is 0.5, this grant is filtered out before policy evaluation. The <code>enforce-grants</code> policy sees no matching grant and returns DENY.</p>
+<hr />
+<h2 id="enforcement-point-integration">Enforcement Point Integration<a class="headerlink" href="#enforcement-point-integration" title="Permanent link">&para;</a></h2>
+<h3 id="governedmodelprovider">GovernedModelProvider<a class="headerlink" href="#governedmodelprovider" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class GovernedModelProvider:
+    &quot;&quot;&quot;Wraps a Civitas ModelProvider with policy enforcement.&quot;&quot;&quot;
+
+    def __init__(self, provider: ModelProvider, engine: PolicyEngine, registry: AgentRegistry):
+        self._provider = provider
+        self._engine = engine
+        self._registry = registry
+
+    async def chat(self, model: str, messages: list, agent_name: str, **kwargs):
+        record = await self._registry.lookup(agent_name)
+        context = EvaluationContext(
+            agent=record,
+            request=ActionRequest(resource=f&quot;llm:{model}&quot;, action=&quot;invoke&quot;),
+            time=datetime.now(UTC),
+        )
+        result = await self._engine.evaluate(EvaluationStage.PRE_LLM, context)
+
+        if result.enforcement == EnforcementMode.ADVISORY:
+            # Log but proceed
+            await self._audit(result, context)
+            return await self._provider.chat(model, messages, **kwargs)
+
+        if result.decision == PolicyDecision.DENY:
+            await self._audit(result, context)
+            raise PolicyDeniedError(result.reason, result.policy_name)
+
+        if result.decision == PolicyDecision.REQUIRE_APPROVAL:
+            await self._audit(result, context)
+            # Route to ApprovalService, await decision
+            ...
+
+        # ALLOW
+        await self._audit(result, context)
+        return await self._provider.chat(model, messages, **kwargs)
+</code></pre>
+<h3 id="governedtoolprovider">GovernedToolProvider<a class="headerlink" href="#governedtoolprovider" title="Permanent link">&para;</a></h3>
+<p>Same pattern as GovernedModelProvider but evaluates <code>PRE_TOOL</code> stage and wraps <code>ToolProvider</code>.</p>
+<hr />
+<h2 id="civitas-integration-points">Civitas Integration Points<a class="headerlink" href="#civitas-integration-points" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Civitas Hook</th>
+<th>Presidium Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModelProvider</code> protocol</td>
+<td><code>GovernedModelProvider</code> wraps it, evaluates <code>pre_llm</code> policies</td>
+</tr>
+<tr>
+<td><code>ToolProvider</code> protocol</td>
+<td><code>GovernedToolProvider</code> wraps it, evaluates <code>pre_tool</code> policies</td>
+</tr>
+<tr>
+<td><code>AuditSink.emit()</code></td>
+<td>Every policy evaluation emits an audit event</td>
+</tr>
+<tr>
+<td><code>DynamicSupervisor.on_spawn_requested</code></td>
+<td>Evaluates <code>registration</code> stage policies</td>
+</tr>
+<tr>
+<td>Topology YAML <code>presidium.policies</code></td>
+<td>Loaded and compiled at Runtime.start()</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>Choice</th>
+<th>Alternatives Considered</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Policy language</td>
+<td>CEL (cel-python, 1-3ms)</td>
+<td>OPA Rego (3-10ms, requires sidecar), Cedar (no Python SDK), YAML glob matching (not expressive enough)</td>
+<td>CEL: embeddable, non-Turing-complete, CNCF-aligned, type-safe at compile time. OPA/Cedar as contrib adapters for teams with existing policies.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Evaluation model</td>
+<td>First-match-wins by priority, per-stage</td>
+<td>All-rules evaluation, deny-overrides</td>
+<td>Simple, deterministic, predictable. Operators control order via priority numbers.</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Fail-closed</td>
+<td>CEL errors → DENY (non-configurable)</td>
+<td>Configurable fail-open, skip-on-error</td>
+<td>Security invariant. Prevents exception-based policy bypass. From AGT research.</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Enforcement modes</td>
+<td>advisory/soft/hard per-policy</td>
+<td>Global-only mode, no advisory</td>
+<td>Per-policy modes enable gradual rollout. Advisory mode is essential for testing in production. From policy lifecycle pipeline pattern.</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>Default behavior</td>
+<td>~~No match → ALLOW~~ <strong>Resolved, 2026-08-24: No match → DENY, hard, real default.</strong></td>
+<td>No match → DENY</td>
+<td>~~The engine is generic. Grant enforcement is a policy at priority 100, not engine logic. This lets users customize the "default deny" behavior without modifying the engine.~~ <strong>Real, empirical finding that overturned this</strong>: this rationale assumed real policy authors would add their own catch-all default-deny rule if they wanted one. In practice, EVERY existing example/test policy set instead relied on the engine's own implicit ALLOW fallback as the structural "cleared <code>enforce-grants</code>, no more objections -&gt; allow" step -- nobody ever wrote an explicit terminal ALLOW rule, because the engine already did that job silently. That's the exact default-allow anti-pattern this design was trying to avoid, just one level removed. See <code>docs/vision/roadmap.md</code>'s own dated entry for the full reasoning and the real migration this forced (every existing policy set given an explicit terminal ALLOW rule; new <code>allow_unmatched_requests</code>/<code>unmatched_enforcement</code> constructor params on <code>CelPolicyEngine</code> for deployments that need the old behavior or a gradual, audited migration).</td>
+</tr>
+<tr>
+<td>P6</td>
+<td>Grant integration</td>
+<td>Grants are data, policies are logic</td>
+<td>Grants as executable rules, grants as policies</td>
+<td>Clean separation enables independent evolution. CEL reads grants as structured data. Don't conflate data with logic.</td>
+</tr>
+<tr>
+<td>P7</td>
+<td>Evaluation stages</td>
+<td>3 stages for M2 (pre_tool, pre_llm, registration). post_tool, post_llm, and pre_message added in M3.</td>
+<td>Single stage, 8 stages (AGT-style)</td>
+<td>M2: 3 stages cover enforcement points. M3 adds post-execution validation (post_tool for output PII/filtering, post_llm for response compliance) and pre_message (requires Civitas MessageBus hook). Post-execution uses the same CEL engine — governance checks, not content validation (NeMo/Guardrails AI are separate concerns).</td>
+</tr>
+<tr>
+<td>P8</td>
+<td>Grant.condition enforcement</td>
+<td><strong>Real gap closed, 2026-08-25</strong>: this design doc's own "Grant Integration" section above always specified real per-grant condition evaluation -- but <code>CelPolicyEngine</code>'s implementation never actually compiled/evaluated <code>condition</code>, only serialized it into the activation as an inert string. Found and reported externally (a downstream consumer's own audit of this codebase), not caught internally first. Fixed to match the design exactly: <code>_build_activation()</code> now compiles (cached by expression text) and evaluates each grant's <code>condition</code> against a minimal <code>agent</code>/<code>request</code>/<code>time</code> activation, excluding the grant from <code>active_grants</code> on a falsy result, a compile error, or a raise -- fail-closed, matching P3's existing invariant, not a new one.</td>
+<td>Update the docstring to say it's unenforced (option (b) from the external report)</td>
+<td>The field's own documented purpose (per-grant fine-grained authorization) is only real if it's real -- (b) would have papered over a genuine security gap rather than closing it, and the design was already correct; only the implementation was missing.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="open-questions-deferred">Open Questions (Deferred)<a class="headerlink" href="#open-questions-deferred" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Policy composition from agent groups</strong>: should agents inherit policies from their team/group? (M3)</li>
+<li><strong>Policy violations → trust score</strong>: should policy violations automatically trigger trust decay? (M2 — lean yes, via TrustEvent.POLICY_VIOLATION)</li>
+<li><strong>Post-execution evaluation</strong>: M3 adds <code>post_tool</code> and <code>post_llm</code> stages for CEL-based output validation (PII detection, result filtering, schema compliance). Content validation (hallucination, toxicity) is a separate concern handled by NeMo Guardrails or Guardrails AI adapters in contrib.</li>
+<li><strong>Custom CEL functions</strong>: should we support custom function registration for domain-specific checks? (M2 — lean yes for extensibility)</li>
+<li><strong>Policy versioning</strong>: should policy rules have version numbers for audit trail? (M3)</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

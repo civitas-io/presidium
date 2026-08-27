@@ -1,0 +1,3350 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/rfcs/001-presidium-scope/">
+      
+      
+        <link rel="prev" href="../../research/aaa-patterns/">
+      
+      
+        <link rel="next" href="../002-multi-dimensional-evaluation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>RFC-001: Presidium Scope and Boundaries - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#rfc-001-presidium-scope-and-boundaries" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              RFC-001: Presidium Scope and Boundaries
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-one-line-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The One-Line Separation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scope-what-presidium-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope: What Presidium IS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scope: What Presidium IS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-scope-what-presidium-is-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Scope: What Presidium is NOT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundary-civitas-vs-presidium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundary: Civitas vs. Presidium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Boundary: Civitas vs. Presidium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-civitas-provides-the-runtime-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Civitas Provides (the runtime layer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-presidium-provides-the-governance-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Presidium Provides (the governance layer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capability-tags-vs-grants-a-critical-distinction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capability Tags vs. Grants: A Critical Distinction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aaa-architecture-holistic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AAA Architecture: Holistic View
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AAA Architecture: Holistic View">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access Control
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credential-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitl-authorization-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HITL Authorization Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-eight-integration-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Eight Integration Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-platform-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Platform Boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-one-line-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The One-Line Separation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scope-what-presidium-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope: What Presidium IS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scope: What Presidium IS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-scope-what-presidium-is-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Scope: What Presidium is NOT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundary-civitas-vs-presidium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundary: Civitas vs. Presidium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Boundary: Civitas vs. Presidium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-civitas-provides-the-runtime-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Civitas Provides (the runtime layer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-presidium-provides-the-governance-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Presidium Provides (the governance layer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capability-tags-vs-grants-a-critical-distinction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capability Tags vs. Grants: A Critical Distinction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aaa-architecture-holistic-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AAA Architecture: Holistic View
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AAA Architecture: Holistic View">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#access-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access Control
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credential-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitl-authorization-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HITL Authorization Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-eight-integration-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Eight Integration Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-platform-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Platform Boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="rfc-001-presidium-scope-and-boundaries">RFC-001: Presidium Scope and Boundaries<a class="headerlink" href="#rfc-001-presidium-scope-and-boundaries" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Draft (revised 2026-07-07)
+<strong>Author:</strong> Jeryn Mathew
+<strong>Created:</strong> 2026-04-30
+<strong>Revised:</strong> 2026-05-05 — Added AAA architecture, clarified capability/grant distinction, renamed <code>presidium-eval</code> → <code>presidium-audit</code>, formalized integration points.
+<strong>Revised:</strong> 2026-07-07 — Corrected stale "Cedar primary" policy-engine claim: <strong>CEL is primary</strong> (an
+embedded library, zero-ops, in-process — matches the "library mode" default established across
+Presidium and already shipped as the M2/M3 default in <code>presidium/policy/cel.py</code>). Cedar was the
+original RFC-001 proposal but was superseded by the CEL decision before M2 shipped; this document
+was never updated to match. OPA remains supported today via the <code>presidium-contrib[opa]</code> adapter;
+Cedar is deferred to a later roadmap milestone (<code>docs/vision/roadmap.md</code> already correctly lists
+<code>CedarPolicyEngine</code> under "Deferred adapters") for teams that need Cedar's formal-verification
+tooling or ecosystem. This revision brings RFC-001 in line with the roadmap and shipped code — no
+new decision is being made here, only a doc-drift fix.
+<strong>Revised:</strong> 2026-08-22 — Corrected two more stale package names from the original six-package
+era: <code>presidium-audit</code> (line ~112) and <code>presidium-sdk</code> (Open Questions) are not real, separate
+packages in the shipped structure — the real, current shape is two packages,
+<code>presidium</code>/<code>presidium-contrib</code> (see <code>docs/log.md</code>'s M3-completion entry). Audit/compliance is a
+module within these, not its own package. Doc-drift fix only, no new decision.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>This RFC defines what Presidium is, what it isn't, and the exact boundaries between Presidium, Civitas, and external platforms — including a holistic view of Authentication, Authorization, and Access Control (AAA) across both layers.</p>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>Presidium could become many things: a framework, a platform, an observability tool, a compliance engine. Without explicit scope boundaries, features end up in the wrong layer, names conflict, and customers face contradictions. This RFC is the governing document. All package proposals must align with it.</p>
+<hr />
+<h2 id="the-one-line-separation">The One-Line Separation<a class="headerlink" href="#the-one-line-separation" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Civitas</strong>: Run agents reliably.
+<strong>Presidium</strong>: Run agents accountably.</p>
+</blockquote>
+<p>These are additive. A customer never has to choose between a Civitas feature and a Presidium feature for the same job. Civitas is complete and useful without Presidium. Presidium is meaningless without Civitas.</p>
+<hr />
+<h2 id="scope-what-presidium-is">Scope: What Presidium IS<a class="headerlink" href="#scope-what-presidium-is" title="Permanent link">&para;</a></h2>
+<p>Presidium is a <strong>governance layer for AI agent systems</strong>, built on Civitas. It provides five capabilities:</p>
+<ol>
+<li><strong>Agent Registry</strong> — persistent agent identity (name, version, owner, lifecycle state, trust score) integrated with enterprise IdPs</li>
+<li><strong>Policy Engine</strong> — declarative policies enforced at runtime (ALLOW, DENY, REQUIRE_APPROVAL); <strong>CEL primary</strong> (embedded library, zero-ops, in-process — the only implementation in <code>presidium</code> core per its interface-library rule), <strong>OPA supported</strong> via <code>presidium-contrib[opa]</code> adapter, <strong>Cedar deferred</strong> to a later milestone</li>
+<li><strong>Identity &amp; Credentials</strong> — agent identity grants (authorization), credential vault (OAuth tokens, API keys scoped per agent + user), token exchange for user-delegated access</li>
+<li><strong>Gateways</strong> — governed LLM access (<code>GovernedModelProvider</code>) and governed tool access (<code>GovernedToolProvider</code>); wrap Civitas plugins, enforce grants and policy</li>
+<li><strong>Audit &amp; Compliance</strong> — governance metrics, policy compliance reporting, trust score tracking, external platform export (Fiddler, Arize, Langfuse)</li>
+</ol>
+<h3 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Governance is architectural (supervisor constraints, not sidecars)</li>
+<li>Python-first (no multi-language until Python is excellent)</li>
+<li>Developer-centric (simple things simple, complex things possible)</li>
+<li>Vendor-neutral (no cloud lock-in, OTEL for telemetry)</li>
+<li>CNCF-aligned (prefer CNCF standards where applicable — SPIFFE for identity, OTEL for observability, CEL for policy — to enable enterprise adoption and interoperability with existing infrastructure)</li>
+<li>Open source (Apache 2.0, free forever for core)</li>
+</ul>
+<h2 id="out-of-scope-what-presidium-is-not">Out of Scope: What Presidium is NOT<a class="headerlink" href="#out-of-scope-what-presidium-is-not" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>NOT This</th>
+<th>That's This</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent framework</td>
+<td>LangGraph, CrewAI, OpenAI Agents SDK</td>
+<td>Presidium governs agents; doesn't define how they reason</td>
+</tr>
+<tr>
+<td>Agent runtime</td>
+<td>Civitas</td>
+<td>Presidium depends on Civitas; doesn't replace it</td>
+</tr>
+<tr>
+<td>Identity Provider (IdP)</td>
+<td>Entra, Okta, Auth0, Keycloak, Google IAM, AWS IAM</td>
+<td>Presidium integrates with IdPs; does not issue identity tokens</td>
+</tr>
+<tr>
+<td>Observability platform</td>
+<td>Fiddler, Arize, Langfuse</td>
+<td>Presidium generates governance telemetry; they dashboard it</td>
+</tr>
+<tr>
+<td>Content safety / guardrails</td>
+<td>Fiddler Guardrails, NeMo Guardrails</td>
+<td>Presidium governs structural access; not content quality</td>
+</tr>
+<tr>
+<td>LLM provider</td>
+<td>Anthropic, OpenAI, Google</td>
+<td>Presidium routes to providers; does not serve models</td>
+</tr>
+<tr>
+<td>Web dashboard</td>
+<td>Future project (cloud tier)</td>
+<td>Presidium is a library/runtime; not a UI</td>
+</tr>
+<tr>
+<td>Model routing / fallback</td>
+<td>Civitas <code>CompositeModelProvider</code> (thin utility)</td>
+<td>Model routing without governance is infrastructure, not governance</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="boundary-civitas-vs-presidium">Boundary: Civitas vs. Presidium<a class="headerlink" href="#boundary-civitas-vs-presidium" title="Permanent link">&para;</a></h2>
+<h3 id="what-civitas-provides-the-runtime-layer">What Civitas Provides (the runtime layer)<a class="headerlink" href="#what-civitas-provides-the-runtime-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Supervision trees, restart strategies, fault tolerance, escalation</li>
+<li>Message passing, mailboxes, backpressure, bus routing</li>
+<li>Transport abstraction (InProcess, ZMQ, NATS) with mTLS</li>
+<li><strong>Operational routing registry</strong> — where agents are, what capability tags they advertise (routing, not authorization)</li>
+<li><strong>Capability routing tags</strong> — operational tags on <code>AgentProcess</code> that drive <code>send_capable()</code> routing; these are about what an agent <em>can handle technically</em>, not what it is <em>authorized to do</em></li>
+<li>State persistence (InMemory, SQLite, Postgres)</li>
+<li>OTEL tracing, audit event emission pipeline (<code>AuditSink</code>)</li>
+<li>Plugin interfaces: <code>ModelProvider</code>, <code>ToolProvider</code>, <code>StateStore</code>, <code>ExportBackend</code></li>
+<li>Concrete plugins: Anthropic, OpenAI, Gemini, Mistral, NATS, ZMQ, Postgres</li>
+<li>MCP client integration (connectivity mechanics)</li>
+<li>HTTP Gateway (infrastructure edge)</li>
+<li>EvalLoop (agent self-correction signals — separate from governance audit)</li>
+<li>GenServer (OTP-style stateful service process)</li>
+<li>Fabrica (tool namespace, agent-as-tool) — planned v0.5</li>
+<li>Skills Gateway (named composable workflows) — planned v0.5</li>
+<li>Prompt Library (PromptStore GenServer) — planned v0.5</li>
+<li><strong>Extension hooks</strong> for Presidium: <code>RegistryListener</code>, plugin protocols, <code>AuditSink</code></li>
+</ul>
+<p>Civitas does <strong>not</strong> provide:
+- Persistent agent identity (no owner, no version, no trust score)
+- Authorization policy enforcement
+- Per-agent resource governance (rate limits, budgets)
+- Credential vault or token exchange
+- HITL approval routing or approver authentication
+- Compliance reporting</p>
+<h3 id="what-presidium-provides-the-governance-layer">What Presidium Provides (the governance layer)<a class="headerlink" href="#what-presidium-provides-the-governance-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Agent identity</strong> — persistent: name, version, owner, registered_at, lifecycle state. Survives restarts. Linked to IdP service principals.</li>
+<li><strong>Agent grants</strong> — authorization entitlements: what an agent is <em>permitted to access</em> (tool namespaces, LLM tiers, data scopes). Distinct from Civitas capability routing tags.</li>
+<li><strong>Trust scores</strong> — numeric, decays over time, updated by policy compliance signals</li>
+<li><strong>Policy engine</strong> — CEL (primary, embedded in <code>presidium</code> core) and OPA (adapter, <code>presidium-contrib[opa]</code>): evaluates <code>(agent, action, resource, context)</code> → ALLOW / DENY / REQUIRE_APPROVAL. Cedar deferred (see roadmap)</li>
+<li><strong>Identity &amp; credentials</strong> — credential vault scoped per <code>(agent_id, user_id)</code> tuple; token exchange (OBO, XAA/ID-JAG, client credentials); enterprise IdP integrations (Entra, Okta, Google, AWS IAM)</li>
+<li><strong>LLM Gateway</strong> (<code>GovernedModelProvider</code>) — wraps any Civitas <code>ModelProvider</code>; enforces per-agent rate limits, cost tracking, budget enforcement, grant-based provider routing</li>
+<li><strong>MCP Gateway</strong> (<code>GovernedToolProvider</code>) — wraps Civitas MCP client; enforces tool ACLs per agent grants, tool poisoning detection (snapshot hashes), credential redaction, audit logging</li>
+<li><strong>HITL approval</strong> — durable approval requests, signed payloads (LITL protection), approver authentication via org IdP</li>
+<li><strong>Audit &amp; compliance</strong> (module within <code>presidium</code>/<code>presidium-contrib</code>, not a separate package — see the 2026-08-22 revision note below) — governance metrics (policy compliance rate, denial counts, trust drift, budget utilization), external platform export, compliance report generation</li>
+</ul>
+<p>Presidium does <strong>not</strong> provide:
+- The runtime itself (depends on Civitas)
+- Basic model calling (wraps Civitas ModelProvider)
+- Basic tool calling (wraps Civitas MCP)
+- Dashboards (generates telemetry; external platforms render it)
+- Content quality scoring (guardrails, not governance)</p>
+<hr />
+<h2 id="capability-tags-vs-grants-a-critical-distinction">Capability Tags vs. Grants: A Critical Distinction<a class="headerlink" href="#capability-tags-vs-grants-a-critical-distinction" title="Permanent link">&para;</a></h2>
+<p><strong>These are different concepts. Do not conflate them.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Layer</th>
+<th>Meaning</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Capability tag</strong></td>
+<td>Civitas</td>
+<td>What an agent <em>can handle technically</em></td>
+<td>Routing: <code>send_capable("text.summarize")</code> dispatches to any capable agent</td>
+</tr>
+<tr>
+<td><strong>Grant</strong></td>
+<td>Presidium</td>
+<td>What an agent is <em>authorized to access</em></td>
+<td>Authorization: <code>tool:database:read</code> determines if the agent can call the DB tool</td>
+</tr>
+</tbody>
+</table>
+<p>A capability tag is operational and routing-scoped. An agent may declare <code>capabilities = ["text.summarize"]</code> and never be authorized (granted) to use any tools. A grant is a governance entitlement — it is checked by the policy engine and the gateways before any resource access occurs.</p>
+<p>In code: Civitas uses <code>AgentProcess.capabilities</code> (list of routing strings). Presidium uses <code>AgentRecord.grants</code> (list of authorization entitlements, e.g. <code>"tool:database:read"</code>, <code>"llm:claude-sonnet"</code>, <code>"data:customer_pii:read"</code>).</p>
+<hr />
+<h2 id="aaa-architecture-holistic-view">AAA Architecture: Holistic View<a class="headerlink" href="#aaa-architecture-holistic-view" title="Permanent link">&para;</a></h2>
+<p>Authentication, Authorization, and Access Control span both layers. Neither layer owns all of AAA. The boundary is clean:</p>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
+<p><strong>Who authenticates what:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Subject</th>
+<th>Mechanism</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent process → authorization server</td>
+<td>OAuth 2.1 client credentials (client ID + secret or certificate)</td>
+<td>Presidium credential vault issues the client credentials</td>
+</tr>
+<tr>
+<td>Agent → MCP server</td>
+<td>OAuth 2.1 Bearer token (JWT) with PKCE + Resource Indicators</td>
+<td>Presidium MCP Gateway handles token acquisition</td>
+</tr>
+<tr>
+<td>User → agent-facing application</td>
+<td>OIDC/OAuth 2.0 via org IdP (Entra, Okta, Google)</td>
+<td>Platform or application layer — Presidium integrates, does not implement</td>
+</tr>
+<tr>
+<td>Agent acting on behalf of user</td>
+<td>OBO / XAA / ID-JAG token exchange</td>
+<td>Presidium credential vault + token exchange service</td>
+</tr>
+<tr>
+<td>Agent → agent (A2A)</td>
+<td>JWT Bearer token (A2A protocol / OIDC-A)</td>
+<td>Presidium issues agent-to-agent tokens; Civitas transports them</td>
+</tr>
+<tr>
+<td>Human approver (HITL)</td>
+<td>OIDC via org IdP</td>
+<td>Presidium approval service authenticates approver before recording decision</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Civitas's role in authentication</strong>: Transport-level (mTLS between nodes, already implemented in M4.2b). Civitas does not validate application-level tokens — that is Presidium's job.</p>
+<h3 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h3>
+<p><strong>Who makes authorization decisions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Who Makes It</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Can agent A call tool T?</td>
+<td>Presidium policy engine</td>
+<td>CEL policy: agent grants ∩ tool ACL</td>
+</tr>
+<tr>
+<td>Can agent A call LLM with model M?</td>
+<td>Presidium policy engine</td>
+<td>Agent grants include <code>llm:&lt;model&gt;</code></td>
+</tr>
+<tr>
+<td>Can agent A spend more budget today?</td>
+<td>Presidium budget tracker</td>
+<td>Per-agent cost tracking against configured limits</td>
+</tr>
+<tr>
+<td>Can agent A send a message to agent B?</td>
+<td>Civitas routing registry</td>
+<td>B is registered and reachable (operational, not governance)</td>
+</tr>
+<tr>
+<td>Can user U approve action X?</td>
+<td>Presidium HITL service</td>
+<td>Approver's IdP role + Conditional Access policy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="access-control">Access Control<a class="headerlink" href="#access-control" title="Permanent link">&para;</a></h3>
+<p><strong>The MCP access control stack (bottom to top):</strong></p>
+<pre><code>MCP Server (resource)
+  ↑ OAuth 2.1 Bearer token with scopes
+Presidium MCP Gateway
+  ↑ Agent grants + policy engine decision
+Civitas AgentProcess (client)
+  ↑ Credential context injected at startup by Presidium
+</code></pre>
+<p><strong>The LLM access control stack:</strong></p>
+<pre><code>LLM Provider API (Anthropic, OpenAI, etc.)
+  ↑ API key or OAuth token from Presidium credential vault
+Presidium GovernedModelProvider
+  ↑ Rate limit check + budget check + grant check
+Civitas ModelProvider protocol
+  ↑ Agent calls provider.chat(...)
+</code></pre>
+<h3 id="credential-flow">Credential Flow<a class="headerlink" href="#credential-flow" title="Permanent link">&para;</a></h3>
+<p>The canonical flow for any resource access:</p>
+<pre><code>1. Presidium issues agent credentials at startup
+   (client ID/secret or short-lived JWT for the agent identity)
+
+2. Agent needs to access a tool or LLM:
+   Agent → Presidium credential vault (authenticated via agent credentials)
+   Presidium validates grants, applies policy → returns scoped token
+
+3. Agent presents scoped token to MCP server or LLM API
+
+4. If user-delegated:
+   User authenticates to org IdP → user token
+   Agent exchanges user token via OBO/XAA → (agent_id, user_id) scoped token
+   Resulting token permissions = intersection(agent grants, user delegated scope)
+</code></pre>
+<p>This maps to the OAuth 2.1 authorization server / resource server split: <strong>Presidium is the authorization server; Civitas agents are clients; MCP servers and LLM APIs are resource servers.</strong></p>
+<h3 id="hitl-authorization-pattern">HITL Authorization Pattern<a class="headerlink" href="#hitl-authorization-pattern" title="Permanent link">&para;</a></h3>
+<pre><code>1. Agent calls await self.request_approval(action=..., payload=...)
+   (Civitas provides the durable suspension mechanism)
+
+2. Presidium approval service receives the request:
+   a. Signs the structured action payload (LITL protection — prevents UI manipulation)
+   b. Routes notification to approver via configured channel (Slack, Teams, email)
+   c. Notification contains a signed one-time token binding: action, decision, approver identity, expiry
+
+3. Approver authenticates to org IdP (Entra SSO, Okta, etc.) via the notification link
+
+4. Approver's authenticated identity is verified against approval policy
+   (e.g., only users with role &quot;senior-reviewer&quot; can approve production writes)
+
+5. Presidium records the decision with: action payload hash, approver identity, timestamp, channel
+   and sends a resume signal to the suspended Civitas agent
+
+6. Agent resumes with approval decision in its message context
+</code></pre>
+<hr />
+<h2 id="the-eight-integration-points">The Eight Integration Points<a class="headerlink" href="#the-eight-integration-points" title="Permanent link">&para;</a></h2>
+<p>Where Civitas ends and Presidium begins — these are the only surfaces that cross the boundary:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Hook</th>
+<th>Civitas Provides</th>
+<th>Presidium Consumes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>RegistryListener</code></td>
+<td>Async callback on every agent register/deregister, carrying name + capability tags</td>
+<td>Populates <code>AgentRecord</code> in persistent Agent Registry</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>ModelProvider</code> protocol</td>
+<td>Interface: <code>chat(messages, agent_name, **kwargs) → ModelResponse</code></td>
+<td><code>GovernedModelProvider</code> wraps any Civitas provider with rate limits, cost tracking, grant checks</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>ToolProvider</code> protocol</td>
+<td>Interface for tool calls via MCP client</td>
+<td><code>GovernedToolProvider</code> wraps with tool ACLs, poisoning detection, credential redaction</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>AuditSink</code></td>
+<td>Pipeline: agent emits structured audit events</td>
+<td>Presidium audit sink aggregates, enriches with governance context, exports to external platforms</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>ExportBackend</code></td>
+<td>Interface for telemetry export</td>
+<td>Presidium implements: <code>FiddlerExporter</code>, <code>ArizeExporter</code>, <code>LangfuseExporter</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>EvalLoop</code> hooks</td>
+<td>Correction signal infrastructure for agent self-improvement</td>
+<td>Presidium attaches governance metrics (compliance rate, denial count, trust delta) alongside self-correction signals</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Credential context injection</td>
+<td>Agent receives a <code>credentials</code> context at startup (opaque dict)</td>
+<td>Presidium populates it: agent client credentials, initial token, vault endpoint, agent's grants</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Durable suspension</td>
+<td><code>AgentProcess</code> can suspend execution awaiting an external signal</td>
+<td>Presidium HITL service sends the resume signal after human approval</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="external-platform-boundary">External Platform Boundary<a class="headerlink" href="#external-platform-boundary" title="Permanent link">&para;</a></h2>
+<p>Presidium generates governance signals. External platforms consume them.</p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Presidium Generates</th>
+<th>External Platform Consumes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OTEL spans (governance-enriched, with agent identity + policy decision)</td>
+<td>✅</td>
+<td>Fiddler, Datadog, Jaeger</td>
+</tr>
+<tr>
+<td>Governance metrics (compliance rate, trust drift, denial counts, budget utilization)</td>
+<td>✅</td>
+<td>Fiddler, Arize, Langfuse, Prometheus</td>
+</tr>
+<tr>
+<td>Policy decision logs</td>
+<td>✅</td>
+<td>SIEM, audit systems (Splunk, Sentinel)</td>
+</tr>
+<tr>
+<td>Trust score history</td>
+<td>✅</td>
+<td>Prometheus, Grafana</td>
+</tr>
+<tr>
+<td>Approval audit trail (approver identity, decision, timestamp)</td>
+<td>✅</td>
+<td>GRC platforms, compliance audit</td>
+</tr>
+</tbody>
+</table>
+<p>Presidium does <strong>not</strong>:
+- Build dashboards (external platform's job)
+- Score content quality or detect hallucinations (guardrails are not governance)
+- Issue compliance certificates (human audit process)
+- Implement an IdP (integrates with IdPs; does not replace them)</p>
+<hr />
+<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>Accept this RFC as the governing scope document for Presidium. All package proposals must demonstrate alignment. Features that cross the boundary must be proposed as separate RFCs with explicit justification.</p>
+<p><strong>Changes made in the 2026-05-05 revision:</strong>
+- Renamed <code>capabilities</code> → <code>grants</code> in <code>AgentRecord</code> throughout Presidium (avoids collision with Civitas capability routing tags)
+- Renamed <code>presidium-eval</code> → <code>presidium-audit</code> (clearer: governance audit is distinct from agent self-correction eval, which is Civitas's EvalLoop)
+- Removed "LLM Gateway" from Civitas — model routing without governance is a thin utility, not a gateway; the full governed gateway belongs in Presidium
+- Added comprehensive AAA architecture section
+- Formalized eight integration points (previously informal)
+- Added Identity &amp; Credentials as an explicit Presidium concern (credential vault, token exchange, IdP integration surface)</p>
+<h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Should Presidium include a minimal TUI for local development? (Not a web UI — a <code>presidium status</code> terminal view of which agents are running, their trust scores, recent policy decisions.)</li>
+<li>At what point does Presidium need its own CLI vs. extending <code>civitas</code> CLI? Proposal: <code>presidium</code> CLI for governance commands (<code>presidium policy validate</code>, <code>presidium registry list</code>, <code>presidium audit export</code>); the <code>civitas</code> CLI remains for runtime operations.</li>
+<li>Should a future top-level <code>presidium</code> import re-export Civitas APIs or keep them as separate imports? Leaning toward separate — customers should know they're using both layers. (Note: the standalone <code>presidium-sdk</code> package named in this question when it was written no longer matches the real, shipped structure — see the 2026-08-22 revision note.)</li>
+</ul>
+<p><strong>Resolved (was: "Cedar vs. OPA as primary policy engine"):</strong> CEL is primary, shipped in M2/M3.
+Cedar's formal-verification and ecosystem strengths are real, but CEL's zero-ops, embeddable,
+pure-library nature matched Presidium's "library mode by default" principle better for a first
+implementation with no external service dependency. OPA is supported today as an adapter for teams
+already running it. Cedar remains a candidate for a future <code>presidium-contrib</code> adapter
+(<code>docs/vision/roadmap.md</code> "Deferred adapters") if enterprise demand for its verification tooling
+materializes — not a primary-engine swap, an additional adapter alongside CEL/OPA.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

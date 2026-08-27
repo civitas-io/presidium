@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6B7280"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#EF4444"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#10B981"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3B82F6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="560" fill="#F9FAFB" rx="8"/>
+
+  <!-- Title -->
+  <text x="460" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">DeepEval Integration — Data Flow</text>
+
+  <!-- ═══ MAIN FLOW ═══ -->
+
+  <!-- EvalEvent (source) -->
+  <rect x="24" y="70" width="150" height="150" rx="8" fill="#1D4ED8"/>
+  <text x="99" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">EvalEvent</text>
+  <text x="99" y="110" text-anchor="middle" font-size="9" fill="#BFDBFE">civitas core</text>
+  <line x1="40" y1="120" x2="158" y2="120" stroke="#3B82F6" stroke-width="0.5"/>
+  <text x="40" y="137" font-size="9" fill="#DBEAFE" font-family="monospace">agent_name: str</text>
+  <text x="40" y="152" font-size="9" fill="#DBEAFE" font-family="monospace">event_type: str</text>
+  <text x="40" y="167" font-size="9" fill="#DBEAFE" font-family="monospace">payload: dict</text>
+  <text x="40" y="182" font-size="9" fill="#DBEAFE" font-family="monospace">trace_id: str</text>
+  <text x="40" y="197" font-size="9" fill="#DBEAFE" font-family="monospace">timestamp: float</text>
+
+  <!-- Arrow: _event_to_test_case() -->
+  <line x1="174" y1="145" x2="224" y2="145" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="199" y="135" text-anchor="middle" font-size="8" fill="#6B7280" font-style="italic" transform="rotate(-90, 199, 135)">_event_to_test_case()</text>
+
+  <!-- LLMTestCase -->
+  <rect x="228" y="70" width="150" height="150" rx="8" fill="#059669"/>
+  <text x="303" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">LLMTestCase</text>
+  <text x="303" y="110" text-anchor="middle" font-size="9" fill="#D1FAE5">deepeval</text>
+  <line x1="244" y1="120" x2="362" y2="120" stroke="#10B981" stroke-width="0.5"/>
+  <text x="244" y="137" font-size="9" fill="#D1FAE5" font-family="monospace">input</text>
+  <text x="244" y="152" font-size="9" fill="#D1FAE5" font-family="monospace">actual_output</text>
+  <text x="244" y="167" font-size="9" fill="#D1FAE5" font-family="monospace">expected_output</text>
+  <text x="244" y="182" font-size="9" fill="#D1FAE5" font-family="monospace">tools_called</text>
+  <text x="244" y="197" font-size="9" fill="#D1FAE5" font-family="monospace">context</text>
+
+  <!-- Arrow: a_measure() -->
+  <line x1="378" y1="145" x2="428" y2="145" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="403" y="134" text-anchor="middle" font-size="9" fill="#6B7280" font-style="italic">a_measure()</text>
+
+  <!-- Metrics stack -->
+  <rect x="432" y="68" width="186" height="156" rx="8" fill="#F0FDF4" stroke="#10B981" stroke-width="1.5"/>
+  <text x="525" y="88" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">DeepEval Metrics</text>
+
+  <rect x="444" y="98" width="162" height="24" rx="4" fill="#10B981"/>
+  <text x="525" y="114" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">TaskCompletionMetric</text>
+
+  <rect x="444" y="126" width="162" height="24" rx="4" fill="#10B981"/>
+  <text x="525" y="142" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">ToolCorrectnessMetric</text>
+
+  <rect x="444" y="154" width="162" height="24" rx="4" fill="#10B981"/>
+  <text x="525" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">FaithfulnessMetric</text>
+
+  <rect x="444" y="182" width="162" height="24" rx="4" fill="#047857"/>
+  <text x="525" y="198" text-anchor="middle" font-size="10" font-weight="600" fill="#FFFFFF">[Custom metrics]</text>
+
+  <!-- Arrow: score + reason -->
+  <line x1="618" y1="145" x2="662" y2="145" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="640" y="134" text-anchor="middle" font-size="9" fill="#6B7280" font-style="italic">score + reason</text>
+
+  <!-- Decision diamond -->
+  <polygon points="720,105 780,145 720,185 660,145" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="720" y="141" text-anchor="middle" font-size="10" font-weight="600" fill="#1D4ED8">score</text>
+  <text x="720" y="155" text-anchor="middle" font-size="10" font-weight="600" fill="#1D4ED8">check</text>
+
+  <!-- Branch: >= 0.8 (up-right) -->
+  <line x1="780" y1="125" x2="830" y2="90" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="808" y="100" text-anchor="middle" font-size="9" font-weight="600" fill="#10B981">&gt;= 0.8</text>
+  <rect x="834" y="72" width="72" height="36" rx="6" fill="#D1FAE5" stroke="#10B981" stroke-width="1"/>
+  <text x="870" y="94" text-anchor="middle" font-size="10" font-weight="600" fill="#065F46">None</text>
+
+  <!-- Branch: 0.5-0.8 (right) -->
+  <line x1="780" y1="145" x2="830" y2="145" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+  <text x="808" y="138" text-anchor="middle" font-size="9" font-weight="600" fill="#3B82F6">0.5–0.8</text>
+  <rect x="834" y="126" width="72" height="38" rx="6" fill="#3B82F6"/>
+  <text x="870" y="143" text-anchor="middle" font-size="9" font-weight="600" fill="#FFFFFF">redirect</text>
+  <text x="870" y="157" text-anchor="middle" font-size="8" fill="#BFDBFE">CorrSignal</text>
+
+  <!-- Branch: < 0.5 (down-right) -->
+  <line x1="780" y1="165" x2="830" y2="200" stroke="#EF4444" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="808" y="194" text-anchor="middle" font-size="9" font-weight="600" fill="#EF4444">&lt; 0.5</text>
+  <rect x="834" y="182" width="72" height="38" rx="6" fill="#EF4444"/>
+  <text x="870" y="199" text-anchor="middle" font-size="9" font-weight="600" fill="#FFFFFF">halt</text>
+  <text x="870" y="213" text-anchor="middle" font-size="8" fill="#FEE2E2">CorrSignal</text>
+
+  <!-- ═══ PACKAGE OWNERSHIP TABLE ═══ -->
+  <rect x="24" y="270" width="882" height="44" rx="0" fill="#374151"/>
+  <text x="174" y="296" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">civitas core</text>
+  <text x="478" y="296" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">civitas-contrib[deepeval]</text>
+  <text x="790" y="296" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">presidium-eval</text>
+
+  <!-- Dividers -->
+  <line x1="326" y1="270" x2="326" y2="314" stroke="#6B7280" stroke-width="1"/>
+  <line x1="632" y1="270" x2="632" y2="314" stroke="#6B7280" stroke-width="1"/>
+
+  <!-- Content rows -->
+  <rect x="24" y="314" width="302" height="90" rx="0" fill="#EFF6FF" stroke="#D1D5DB" stroke-width="0.5"/>
+  <rect x="326" y="314" width="306" height="90" rx="0" fill="#F0FDF4" stroke="#D1D5DB" stroke-width="0.5"/>
+  <rect x="632" y="314" width="274" height="90" rx="0" fill="#F5F3FF" stroke="#D1D5DB" stroke-width="0.5"/>
+
+  <text x="40" y="336" font-size="10" fill="#1D4ED8" font-weight="600">Owned primitives:</text>
+  <text x="40" y="354" font-size="10" fill="#374151">EvalEvent</text>
+  <text x="40" y="370" font-size="10" fill="#374151">EvalAgent + on_eval_event()</text>
+  <text x="40" y="386" font-size="10" fill="#374151">EvalExporter protocol</text>
+  <text x="40" y="398" font-size="10" fill="#374151">CorrectionSignal</text>
+
+  <text x="340" y="336" font-size="10" fill="#065F46" font-weight="600">Owned primitives:</text>
+  <text x="340" y="354" font-size="10" fill="#374151">DeepEvalExporter (impl)</text>
+  <text x="340" y="370" font-size="10" fill="#374151">EvalEvent → LLMTestCase mapping</text>
+  <text x="340" y="386" font-size="10" fill="#374151">Score → CorrectionSignal mapping</text>
+  <text x="340" y="398" font-size="10" fill="#374151">Custom BaseMetric subclasses</text>
+
+  <text x="646" y="336" font-size="10" fill="#5B21B6" font-weight="600">Owned primitives:</text>
+  <text x="646" y="354" font-size="10" fill="#374151">GovernanceEvalLoop</text>
+  <text x="646" y="370" font-size="10" fill="#374151">GovernanceMetrics</text>
+  <text x="646" y="386" font-size="10" fill="#374151">Trust score feedback</text>
+  <text x="646" y="398" font-size="10" fill="#374151">Governance-specific metrics</text>
+
+  <!-- ═══ KEY DESIGN DECISIONS ═══ -->
+  <rect x="24" y="424" width="882" height="122" rx="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="40" y="446" font-size="11" font-weight="700" fill="#374151">Key Design Decisions</text>
+
+  <circle cx="40" cy="468" r="4" fill="#3B82F6"/>
+  <text x="52" y="472" font-size="10" fill="#374151"><tspan font-weight="600">Protocol, not class.</tspan> DeepEvalExporter implements EvalExporter — civitas core never imports deepeval.</text>
+
+  <circle cx="40" cy="492" r="4" fill="#10B981"/>
+  <text x="52" y="496" font-size="10" fill="#374151"><tspan font-weight="600">Async-first.</tspan> All metrics run via a_measure() — non-blocking, compatible with Civitas event loop.</text>
+
+  <circle cx="40" cy="516" r="4" fill="#7C3AED"/>
+  <text x="52" y="520" font-size="10" fill="#374151"><tspan font-weight="600">Same metrics, two contexts.</tspan> Identical metric instances run in-flight (EvalAgent) and offline (pytest). No drift.</text>
+</svg>

@@ -1,0 +1,3417 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/design/performance-research/">
+      
+      
+        <link rel="prev" href="../spiffe-vendor-research-2026-08/">
+      
+      
+        <link rel="next" href="../trust-scoring-design/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Performance Research - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#design-m8-performance-research-real-benchmarks-real-numbers-a-recommendation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Performance Research
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#goal-unchanged-from-the-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal, unchanged from the roadmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-isolated-cel-microbenchmark-corrected-not-just-reproduced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. The isolated CEL microbenchmark — corrected, not just reproduced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-real-http-endpoint-benchmarks-the-number-that-didnt-exist-before-this-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Real HTTP-endpoint benchmarks — the number that didn't exist before this pass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Real HTTP-endpoint benchmarks — the number that didn&#39;t exist before this pass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2a-local-loopback-macbook-pro-apple-silicon-aarch64-isolates-httpcel-overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2a. Local loopback (MacBook Pro, Apple Silicon, aarch64) -- isolates HTTP+CEL overhead
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-real-network-hop-macbook-darkenergy-a-separate-real-linux-host-direct-tailscale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Real network hop (MacBook -&gt; darkenergy, a separate real Linux host, direct Tailscale
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-option-a-horizontal-scaling-confirmed-works-cheapest-recommended-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Option A — horizontal scaling: confirmed, works, cheapest, recommended now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-option-b-free-threaded-cpython-does-not-help-today-for-two-independent-real-reasons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Option B — free-threaded CPython: does not help today, for two independent real reasons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Option B — free-threaded CPython: does not help today, for two independent real reasons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4a-a-real-dependency-ecosystem-gap-found-before-any-runtime-testing-was-even-possible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. A real dependency-ecosystem gap, found before any runtime testing was even possible
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4b-even-once-installed-the-gil-doesnt-actually-stay-off-and-forcing-it-off-doesnt-help-anyway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Even once installed, the GIL doesn't actually stay off -- and forcing it off doesn't help anyway
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-option-c-a-rust-backed-cel-evaluator-not-prototyped-but-real-concrete-directional-evidence-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Option C — a Rust-backed CEL evaluator: not prototyped, but real, concrete directional evidence exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-option-d-a-fuller-rust-rewrite-not-evaluated-per-the-milestones-own-sequencing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Option D — a fuller Rust rewrite: not evaluated, per the milestone's own sequencing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-real-fair-same-hardware-comparison-presidium-vs-opa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The real, fair, same-hardware comparison — Presidium vs. OPA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-mcp-governances-regex-based-scanning-the-second-gil-bound-cost-center-benchmarked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. MCP governance's regex-based scanning — the second GIL-bound cost center, benchmarked
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. MCP governance&#39;s regex-based scanning — the second GIL-bound cost center, benchmarked">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8a-piidetectorredact_dict-scale-with-tool-output-size-not-rule-count-and-the-cost-is-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8a. PIIDetector/redact_dict scale with tool-OUTPUT size, not rule count -- and the cost is real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8b-the-real-composed-end-to-end-pipeline-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8b. The real, composed, end-to-end pipeline cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8c-a-real-honest-security-relevant-check-does-any-pattern-catastrophically-backtrack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8c. A real, honest, security-relevant check: does any pattern catastrophically backtrack?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8d-recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8d. Recommendation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-methodology-what-to-publish-and-what-to-compare-against-in-the-market" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison methodology: what to publish, and what to compare against in the market
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommendation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reproducing-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducing this
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#goal-unchanged-from-the-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal, unchanged from the roadmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-isolated-cel-microbenchmark-corrected-not-just-reproduced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. The isolated CEL microbenchmark — corrected, not just reproduced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-real-http-endpoint-benchmarks-the-number-that-didnt-exist-before-this-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Real HTTP-endpoint benchmarks — the number that didn't exist before this pass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Real HTTP-endpoint benchmarks — the number that didn&#39;t exist before this pass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2a-local-loopback-macbook-pro-apple-silicon-aarch64-isolates-httpcel-overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2a. Local loopback (MacBook Pro, Apple Silicon, aarch64) -- isolates HTTP+CEL overhead
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-real-network-hop-macbook-darkenergy-a-separate-real-linux-host-direct-tailscale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Real network hop (MacBook -&gt; darkenergy, a separate real Linux host, direct Tailscale
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-option-a-horizontal-scaling-confirmed-works-cheapest-recommended-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Option A — horizontal scaling: confirmed, works, cheapest, recommended now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-option-b-free-threaded-cpython-does-not-help-today-for-two-independent-real-reasons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Option B — free-threaded CPython: does not help today, for two independent real reasons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Option B — free-threaded CPython: does not help today, for two independent real reasons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4a-a-real-dependency-ecosystem-gap-found-before-any-runtime-testing-was-even-possible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. A real dependency-ecosystem gap, found before any runtime testing was even possible
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4b-even-once-installed-the-gil-doesnt-actually-stay-off-and-forcing-it-off-doesnt-help-anyway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Even once installed, the GIL doesn't actually stay off -- and forcing it off doesn't help anyway
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-option-c-a-rust-backed-cel-evaluator-not-prototyped-but-real-concrete-directional-evidence-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Option C — a Rust-backed CEL evaluator: not prototyped, but real, concrete directional evidence exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-option-d-a-fuller-rust-rewrite-not-evaluated-per-the-milestones-own-sequencing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Option D — a fuller Rust rewrite: not evaluated, per the milestone's own sequencing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-real-fair-same-hardware-comparison-presidium-vs-opa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The real, fair, same-hardware comparison — Presidium vs. OPA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-mcp-governances-regex-based-scanning-the-second-gil-bound-cost-center-benchmarked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. MCP governance's regex-based scanning — the second GIL-bound cost center, benchmarked
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. MCP governance&#39;s regex-based scanning — the second GIL-bound cost center, benchmarked">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8a-piidetectorredact_dict-scale-with-tool-output-size-not-rule-count-and-the-cost-is-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8a. PIIDetector/redact_dict scale with tool-OUTPUT size, not rule count -- and the cost is real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8b-the-real-composed-end-to-end-pipeline-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8b. The real, composed, end-to-end pipeline cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8c-a-real-honest-security-relevant-check-does-any-pattern-catastrophically-backtrack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8c. A real, honest, security-relevant check: does any pattern catastrophically backtrack?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8d-recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8d. Recommendation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-methodology-what-to-publish-and-what-to-compare-against-in-the-market" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison methodology: what to publish, and what to compare against in the market
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommendation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reproducing-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducing this
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="design-m8-performance-research-real-benchmarks-real-numbers-a-recommendation">Design: M8 Performance Research — real benchmarks, real numbers, a recommendation<a class="headerlink" href="#design-m8-performance-research-real-benchmarks-real-numbers-a-recommendation" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Complete, 2026-08-25. Real benchmarks against a real M7 server, on real (separate,
+network-connected) hardware, plus a real, same-conditions comparison against OPA. Not a rewrite
+commitment -- matching <code>docs/vision/roadmap.md</code>'s own framing for this milestone.
+<strong>Depends on:</strong> <code>docs/vision/roadmap.md</code>'s M8 section (goal, options A-D, original baseline);
+<code>docs/design/policy-engine.md</code>; the council session that shaped this doc's own comparison
+methodology (see "Comparison methodology" below).
+<strong>Harness:</strong> <code>benchmarks/</code> in this repo -- real, kept (not deleted), reproducible scripts, not a
+one-off throwaway. See <code>benchmarks/README.md</code>.</p>
+<h2 id="goal-unchanged-from-the-roadmap">Goal, unchanged from the roadmap<a class="headerlink" href="#goal-unchanged-from-the-roadmap" title="Permanent link">&para;</a></h2>
+<p>Answer, with real measured evidence, whether any part of Presidium's request-path hot loop needs
+to move off pure Python -- and if so, which part, how, and when -- before it becomes a real
+production bottleneck rather than after. Four options were on the table (A: horizontal scaling,
+B: free-threaded CPython, C: a Rust-backed CEL evaluator, D: a fuller Rust rewrite of the M7
+layer). This doc reports what was actually measured for each.</p>
+<hr />
+<h2 id="1-the-isolated-cel-microbenchmark-corrected-not-just-reproduced">1. The isolated CEL microbenchmark — corrected, not just reproduced<a class="headerlink" href="#1-the-isolated-cel-microbenchmark-corrected-not-just-reproduced" title="Permanent link">&para;</a></h2>
+<p><strong>A real, honest correction to the previously-cited baseline.</strong> <code>docs/vision/roadmap.md</code>'s M8
+section cited "~88µs per evaluation, ~11,400 evaluations/sec... with 20 loaded rules." No
+reusable script backed that number -- it was measured ad hoc while scoping the milestone. This
+pass built one (<code>benchmarks/cel_microbench.py</code>) and found the real number, at 20 rules, evaluated
+under the same "first-match-wins scans every loaded rule" worst case the original text itself
+describes, is materially higher:</p>
+<table>
+<thead>
+<tr>
+<th>Rules</th>
+<th>Mean (µs)</th>
+<th>p50 (µs)</th>
+<th>p95 (µs)</th>
+<th>p99 (µs)</th>
+<th>Evals/sec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>353</td>
+<td>340</td>
+<td>382</td>
+<td>784</td>
+<td>2,829</td>
+</tr>
+<tr>
+<td>20</td>
+<td>1,314</td>
+<td>1,305</td>
+<td>1,359</td>
+<td>1,425</td>
+<td>761</td>
+</tr>
+<tr>
+<td>50</td>
+<td>3,377</td>
+<td>3,339</td>
+<td>3,542</td>
+<td>3,729</td>
+<td>296</td>
+</tr>
+<tr>
+<td>100</td>
+<td>6,714</td>
+<td>6,670</td>
+<td>6,975</td>
+<td>7,100</td>
+<td>149</td>
+</tr>
+</tbody>
+</table>
+<p>Scaling is clean and linear: ~67µs per rule evaluated, consistent across all four sizes,
+confirmed directly against <code>cel-python</code>'s own raw <code>program.evaluate()</code> call in isolation (~67µs/
+call, matching). <strong>The most likely explanation for the discrepancy</strong>: the original 88µs figure
+was probably measured against a request that matched an early, high-priority rule (so only one
+or two of the 20 loaded rules were actually evaluated), not the worst-case "no match, scan
+everything" scenario its own qualitative framing ("a request that matches no rule... evaluates
+every loaded rule") describes. This is not a regression -- it's the first time this number has
+been measured against a script that's checked in, named, and re-runnable, rather than reasoned
+about after the fact. <strong>This revision makes the case for investigating Options A-C stronger, not
+weaker</strong> -- the real per-request cost at realistic rule-set sizes (20-100 rules, matching real
+deployments with more than a handful of policies) is materially higher than previously stated.</p>
+<hr />
+<h2 id="2-real-http-endpoint-benchmarks-the-number-that-didnt-exist-before-this-pass">2. Real HTTP-endpoint benchmarks — the number that didn't exist before this pass<a class="headerlink" href="#2-real-http-endpoint-benchmarks-the-number-that-didnt-exist-before-this-pass" title="Permanent link">&para;</a></h2>
+<p>The isolated number above has never included the network/HTTP/registry-lookup/Civitas-dispatch
+layers a real <code>/v1/check_grant</code> request actually pays for. This is the real gap <code>docs/design/
+policy-engine.md</code>'s own M8 section identified and this pass closes: a real, standalone M7 server
+(<code>benchmarks/serve_m7.py</code> -- real <code>HTTPGateway</code> + <code>PresidiumGatewayAgent</code> + <code>HealthCheckAgent</code>,
+real <code>civitas.Runtime</code>/<code>Supervisor</code>, not a pytest fixture), hit with Apache Bench (<code>ab</code>) -- a
+real, separate process/connection per request, not asyncio tasks sharing one connection inside
+the same process as the code under test.</p>
+<p><strong>Two real environments, deliberately kept separate, not blended:</strong></p>
+<h3 id="2a-local-loopback-macbook-pro-apple-silicon-aarch64-isolates-httpcel-overhead">2a. Local loopback (MacBook Pro, Apple Silicon, aarch64) -- isolates HTTP+CEL overhead<a class="headerlink" href="#2a-local-loopback-macbook-pro-apple-silicon-aarch64-isolates-httpcel-overhead" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rules</th>
+<th>Throughput ceiling (req/sec, concurrency 10-100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>~1,890-2,010</td>
+</tr>
+<tr>
+<td>20</td>
+<td>~630-640</td>
+</tr>
+<tr>
+<td>100</td>
+<td>~140-147</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2b-real-network-hop-macbook-darkenergy-a-separate-real-linux-host-direct-tailscale">2b. Real network hop (MacBook -&gt; <code>darkenergy</code>, a separate real Linux host, direct Tailscale<a class="headerlink" href="#2b-real-network-hop-macbook-darkenergy-a-separate-real-linux-host-direct-tailscale" title="Permanent link">&para;</a></h3>
+<p>connection, ~4-6ms RTT, NOT loopback) -- the more realistic number for an actual deployment</p>
+<table>
+<thead>
+<tr>
+<th>Rules</th>
+<th>Throughput ceiling (req/sec, concurrency 10-100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>~970-1,000</td>
+</tr>
+<tr>
+<td>20</td>
+<td>~345-365</td>
+</tr>
+<tr>
+<td>100</td>
+<td>~81-84</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The concurrency model, stated explicitly</strong> (matching this org's own established disclosure
+discipline from <code>python-civitas</code>'s M-LAST scoping doc): <code>ab</code> driving a fixed pool of real,
+independent TCP connections/OS-level worker threads against a single presidium-contrib server
+process, itself a single Python process running one asyncio event loop.</p>
+<p><strong>The real, load-bearing confirmation of the GIL hypothesis</strong>: at every rule count, in both
+environments, throughput is <strong>flat regardless of concurrency</strong> once concurrency exceeds ~10 --
+1, 10, 25, 50, and 100 concurrent connections all produce essentially the same ceiling. This is
+real, direct, HTTP-level evidence for the exact mechanism <code>docs/vision/roadmap.md</code>'s M8 section
+hypothesized: a single Python process's throughput ceiling does not rise with more concurrent
+callers, because the GIL serializes all CEL evaluation onto one core regardless of how many
+connections are open.</p>
+<p><strong>Honest limitation</strong>: <code>darkenergy</code> is a real, shared, busy homelab host (24 cores, running
+several unrelated production services -- photo ML, file sync, other agent workloads -- during
+this benchmark), not a dedicated, idle bench box. The 2b numbers include real noisy-neighbor
+contention and should be read as "a real, imperfect deployment condition," not "a clean, isolated
+ceiling." This is disclosed here deliberately, not smoothed over.</p>
+<hr />
+<h2 id="3-option-a-horizontal-scaling-confirmed-works-cheapest-recommended-now">3. Option A — horizontal scaling: confirmed, works, cheapest, recommended now<a class="headerlink" href="#3-option-a-horizontal-scaling-confirmed-works-cheapest-recommended-now" title="Permanent link">&para;</a></h2>
+<p>Two independent <code>serve_m7.py</code> processes (20 rules each), on the same <code>darkenergy</code> host, hit
+<strong>concurrently</strong> by two separate <code>ab</code> invocations:</p>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>Throughput (req/sec)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server 1 (port 28080)</td>
+<td>325.78</td>
+</tr>
+<tr>
+<td>Server 2 (port 28081)</td>
+<td>324.55</td>
+</tr>
+<tr>
+<td><strong>Combined</strong></td>
+<td><strong>~650.3</strong></td>
+</tr>
+</tbody>
+</table>
+<p>This is essentially double the single-process ceiling measured in §2b (~345-365 req/sec) --
+<strong>horizontal scaling works, close to linearly, with zero code changes</strong>, exactly as
+<code>docs/vision/roadmap.md</code>'s Option A predicted. This is the cheapest, lowest-risk lever available
+today, and the evidence here supports recommending it as the real, default scaling story for M7
+deployments, ahead of any of the other three options.</p>
+<hr />
+<h2 id="4-option-b-free-threaded-cpython-does-not-help-today-for-two-independent-real-reasons">4. Option B — free-threaded CPython: does not help today, for two independent real reasons<a class="headerlink" href="#4-option-b-free-threaded-cpython-does-not-help-today-for-two-independent-real-reasons" title="Permanent link">&para;</a></h2>
+<p>This is the most involved, and most surprising, finding of this pass.</p>
+<h3 id="4a-a-real-dependency-ecosystem-gap-found-before-any-runtime-testing-was-even-possible">4a. A real dependency-ecosystem gap, found before any runtime testing was even possible<a class="headerlink" href="#4a-a-real-dependency-ecosystem-gap-found-before-any-runtime-testing-was-even-possible" title="Permanent link">&para;</a></h3>
+<p>Installing <code>presidium</code>/<code>presidium-contrib[server]</code> under free-threaded CPython required real,
+non-trivial extra work: <code>cel-python</code>'s <code>google-re2</code> dependency has no prebuilt wheel for
+free-threaded builds and fails to build from source without <code>abseil</code>, <code>re2</code>, and <code>pybind11</code>
+installed as system/build dependencies -- none of which are needed under normal CPython. On
+Linux (<code>darkenergy</code>), <code>cffi</code> (a <code>cryptography</code> dependency) additionally refuses to build under
+free-threaded <strong>3.13</strong> outright ("Upgrade to free-threaded 3.14 or newer"), forcing a move to
+3.14. <strong>This is a real, concrete, present-day cost of adopting free-threaded CPython for this
+specific dependency chain</strong> -- not a Presidium-specific problem, but a real signal that the
+surrounding C-extension ecosystem is not yet fully ready.</p>
+<h3 id="4b-even-once-installed-the-gil-doesnt-actually-stay-off-and-forcing-it-off-doesnt-help-anyway">4b. Even once installed, the GIL doesn't actually stay off -- and forcing it off doesn't help anyway<a class="headerlink" href="#4b-even-once-installed-the-gil-doesnt-actually-stay-off-and-forcing-it-off-doesnt-help-anyway" title="Permanent link">&para;</a></h3>
+<p>Once built, importing <code>re2._re2</code> triggers a real, documented CPython 3.14 safety mechanism: the
+module hasn't declared itself free-threading-safe, so <strong>the GIL is automatically re-enabled at
+runtime</strong>, with an explicit warning. Overriding this (<code>PYTHON_GIL=0</code>, at real, acknowledged risk
+of undefined behavior if <code>re2</code>'s C code isn't actually thread-safe) does let the GIL stay off --
+confirmed directly (<code>sys._is_gil_enabled()</code> returns <code>False</code> throughout, including after import).</p>
+<p><strong>But it makes no measurable difference.</strong> With the GIL forced off, the same local-loopback,
+20-rule benchmark produced a <strong>~610-622 req/sec ceiling</strong> -- statistically indistinguishable from
+the normal, GIL-enabled local number (~630-640 req/sec) in §2a.</p>
+<p><strong>Why, and this is the real finding</strong>: <code>civitas.gateway.HTTPGateway</code> serves requests on a single
+asyncio event loop, on a single OS thread. Free-threading only removes contention <em>between
+multiple OS threads simultaneously wanting the GIL</em> -- a single-threaded async server was never
+contending with itself for the GIL in the first place, so there is nothing for free-threading to
+relieve. <strong>Option B cannot help Presidium's request-path hot loop until the serving architecture
+itself uses multiple OS threads to handle concurrent requests</strong> -- at which point the benefit
+would look architecturally similar to Option A (horizontal scaling), just inside one process
+instead of across several.</p>
+<p><strong>Recommendation: do not pursue Option B further right now.</strong> Two independent, real blockers
+exist today -- an immature C-extension ecosystem for this exact dependency chain, and a serving
+architecture that wouldn't benefit even if the ecosystem gap were closed. Revisit only if (a) a
+future <code>civitas.gateway.HTTPGateway</code> gains a real multi-threaded worker model, and (b)
+<code>google-re2</code>/<code>cffi</code> declare free-threading support upstream.</p>
+<hr />
+<h2 id="5-option-c-a-rust-backed-cel-evaluator-not-prototyped-but-real-concrete-directional-evidence-exists">5. Option C — a Rust-backed CEL evaluator: not prototyped, but real, concrete directional evidence exists<a class="headerlink" href="#5-option-c-a-rust-backed-cel-evaluator-not-prototyped-but-real-concrete-directional-evidence-exists" title="Permanent link">&para;</a></h2>
+<p>Not built this pass (per the milestone's own "no component gets rewritten... the deliverable is
+a design doc with real numbers" framing) -- but two real, concrete facts ground the option
+better than it was grounded before:</p>
+<ul>
+<li><strong>A real, actively maintained Rust CEL crate already exists</strong>: <code>cel-interpreter</code> on crates.io
+  (547k+ downloads, last updated within the past year) -- a real starting point for a PyO3
+  binding behind the same <code>PolicyEngine</code> Protocol, not a from-scratch language implementation.</li>
+<li><strong>§6's real OPA comparison (below) is the best available directional evidence for the plausible
+  magnitude of a compiled-evaluator speedup</strong> -- OPA (Go, compiled) sustained 15-140x Presidium's
+  own throughput at equivalent rule counts on the same hardware. A Rust-backed CEL evaluator
+  would not be identical to OPA/Rego (different policy language, different engine), but the
+  category of improvement (compiled, non-interpreted evaluation replacing a pure-Python
+  tree-walking interpreter) is the same one driving OPA's advantage here.</li>
+</ul>
+<p><strong>Honest caveat</strong>: PyO3 call-boundary overhead (marshaling Python objects into and out of Rust)
+would eat into some of this theoretical gain -- the real number can only come from an actual
+prototype, which this pass deliberately did not build. <strong>Recommended as the next real
+investigation step</strong> if Option A's horizontal scaling alone proves insufficient or too costly
+for a real production deployment's throughput target.</p>
+<h2 id="6-option-d-a-fuller-rust-rewrite-not-evaluated-per-the-milestones-own-sequencing">6. Option D — a fuller Rust rewrite: not evaluated, per the milestone's own sequencing<a class="headerlink" href="#6-option-d-a-fuller-rust-rewrite-not-evaluated-per-the-milestones-own-sequencing" title="Permanent link">&para;</a></h2>
+<p>Not benchmarked, matching <code>docs/vision/roadmap.md</code>'s own framing: "most invasive; only worth it
+if A-C don't clear the bar." Option A already does, for today's real, known load; nothing in
+this pass's findings changes that sequencing.</p>
+<hr />
+<h2 id="7-the-real-fair-same-hardware-comparison-presidium-vs-opa">7. The real, fair, same-hardware comparison — Presidium vs. OPA<a class="headerlink" href="#7-the-real-fair-same-hardware-comparison-presidium-vs-opa" title="Permanent link">&para;</a></h2>
+<p>Per this doc's own comparison-methodology section below, the one competitor whose internals are
+actually independently replicable is OPA (free, open source, self-hostable) -- so this pass ran
+a real, same-conditions, same-hardware (local Mac loopback, identical <code>ab</code> matrix) comparison, not
+a citation of OPA's own marketing numbers. <code>benchmarks/gen_opa_policy.py</code> generates a Rego policy
+with the <strong>identical logical shape</strong> as Presidium's own benchmark rule set (N-1 never-matching
+distractor rules + one terminal allow), so both systems evaluate the same workload, not just
+"a policy" each.</p>
+<table>
+<thead>
+<tr>
+<th>Rules</th>
+<th>Presidium (req/sec)</th>
+<th>OPA (req/sec)</th>
+<th>OPA / Presidium</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>~2,000</td>
+<td>~29,000-32,000</td>
+<td>~15x</td>
+</tr>
+<tr>
+<td>20</td>
+<td>~635</td>
+<td>~25,000-29,000</td>
+<td>~42x</td>
+</tr>
+<tr>
+<td>100</td>
+<td>~146</td>
+<td>~19,800-21,700</td>
+<td>~140x</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Two real, honest things worth saying about this table, not hidden:</strong></p>
+<ol>
+<li><strong>The gap widens as rule count grows</strong> -- OPA's compiled, Go-native evaluation barely slows
+   down as rules are added (from ~31,000 to ~20,700 req/sec, roughly -33%, across a 20x increase
+   in rule count), while Presidium's pure-Python tree-walking cost scales roughly linearly with
+   rule count (from ~2,000 to ~146 req/sec, roughly -93%, across the same range). This means the
+   real cost of Presidium's current architecture grows worse, not just proportionally, as a real
+   deployment's policy set grows.</li>
+<li><strong>This is not a perfectly isolated apples-to-apples comparison, and the difference is
+   attributable mostly to the CEL-eval cost itself, not incidental overhead</strong> -- confirmed by
+   comparing against §1's own isolated numbers: at 20 rules, the isolated CEL eval alone
+   (1,314µs) accounts for the large majority of the ~1,587µs full HTTP request time (§2a: ~630
+   req/sec ≈ 1,587µs/request) -- the additional registry-lookup/Civitas-dispatch/JSON overhead is
+   a comparatively small ~270µs slice. The dominant cost really is the interpreted-Python CEL
+   evaluator itself, exactly matching what Option C's rationale assumes, now with real numbers
+   behind it rather than an assumption.</li>
+</ol>
+<hr />
+<h2 id="8-mcp-governances-regex-based-scanning-the-second-gil-bound-cost-center-benchmarked">8. MCP governance's regex-based scanning — the second GIL-bound cost center, benchmarked<a class="headerlink" href="#8-mcp-governances-regex-based-scanning-the-second-gil-bound-cost-center-benchmarked" title="Permanent link">&para;</a></h2>
+<p><code>docs/vision/roadmap.md</code>'s M8 checklist named a real, separate follow-up this pass initially
+left open: <code>PIIDetector</code>, <code>PoisoningDetector</code>, and credential redaction (<code>redact_dict</code>) are
+CPU-bound string processing over potentially large tool outputs -- "a second real GIL-bound cost
+center worth benchmarking alongside policy evaluation, not assumed fine by proximity." Benchmarked
+here with a new, real, checked-in harness (<code>benchmarks/mcp_governance_microbench.py</code>,
+<code>benchmarks/mcp_pipeline_e2e_bench.py</code>, <code>benchmarks/redos_check.py</code>).</p>
+<h3 id="8a-piidetectorredact_dict-scale-with-tool-output-size-not-rule-count-and-the-cost-is-real">8a. <code>PIIDetector</code>/<code>redact_dict</code> scale with tool-OUTPUT size, not rule count -- and the cost is real<a class="headerlink" href="#8a-piidetectorredact_dict-scale-with-tool-output-size-not-rule-count-and-the-cost-is-real" title="Permanent link">&para;</a></h3>
+<p>Unlike CEL policy evaluation (scales with the number of loaded <em>rules</em>), these primitives scale
+with the size of the <em>data being scanned</em> -- a tool's actual result. Realistic payloads (prose
+text with ~2% sprinkled PII matches, not synthetic all-match or all-clean text):</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>1 KB</th>
+<th>10 KB</th>
+<th>100 KB</th>
+<th>1 MB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PIIDetector.scan_dict()</code></td>
+<td>69µs</td>
+<td>578µs</td>
+<td>5.4ms</td>
+<td><strong>61.6ms</strong></td>
+</tr>
+<tr>
+<td><code>PIIDetector.mask_dict()</code></td>
+<td>65µs</td>
+<td>532µs</td>
+<td>5.2ms</td>
+<td><strong>52.8ms</strong></td>
+</tr>
+<tr>
+<td><code>redact_dict()</code></td>
+<td>48µs</td>
+<td>367µs</td>
+<td>3.6ms</td>
+<td><strong>35.8ms</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Scaling is clean and linear (~55-60µs/KB for PII scan/mask, ~35µs/KB for redaction). <strong>The real,
+previously-unmeasured finding</strong>: a single tool call returning a 1MB result (a real, unremarkable
+size for an API response, a file read, or a scraped web page) costs <strong>60-115ms of pure-Python
+regex processing</strong> if both PII scanning and masking run (the pipeline does both by default when
+PII is found) -- this is a genuinely larger cost than CEL policy evaluation at any realistic rule
+count measured in §1, and, being GIL-bound Python regex work exactly like CEL evaluation, subject
+to the identical horizontal-scaling-not-vertical-throughput constraint.</p>
+<p><code>PoisoningDetector.check()</code>, by contrast, is confirmed cheap and <strong>independent of tool-output
+size</strong> (it hashes the tool's name/description/schema, never its result): <strong>~3.4µs, ~286,000
+calls/sec</strong>, regardless of how large a real result would be.</p>
+<h3 id="8b-the-real-composed-end-to-end-pipeline-cost">8b. The real, composed, end-to-end pipeline cost<a class="headerlink" href="#8b-the-real-composed-end-to-end-pipeline-cost" title="Permanent link">&para;</a></h3>
+<p><code>GovernedMcpToolPipeline.call_tool()</code>'s full real sequence (poisoning check -&gt; redact arguments
+-&gt; PRE_TOOL CEL -&gt; backend call -&gt; PII scan -&gt; POST_TOOL CEL -&gt; PII mask if detected), against a
+minimal, fixed CEL rule set (so this isolates the effect of tool-<em>result</em> size specifically, not
+rule count, already covered in §1):</p>
+<table>
+<thead>
+<tr>
+<th>Result size</th>
+<th>Mean</th>
+<th>p50</th>
+<th>p95</th>
+<th>p99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 B</td>
+<td>166µs</td>
+<td>165µs</td>
+<td>175µs</td>
+<td>182µs</td>
+</tr>
+<tr>
+<td>1 KB</td>
+<td>297µs</td>
+<td>297µs</td>
+<td>308µs</td>
+<td>315µs</td>
+</tr>
+<tr>
+<td>10 KB</td>
+<td>1.29ms</td>
+<td>1.29ms</td>
+<td>1.31ms</td>
+<td>1.37ms</td>
+</tr>
+<tr>
+<td>100 KB</td>
+<td><strong>11.4ms</strong></td>
+<td>11.4ms</td>
+<td>11.7ms</td>
+<td>11.7ms</td>
+</tr>
+</tbody>
+</table>
+<p>Internally consistent with §8a: at 100KB, the real PII sprinkled into the payload triggers both
+<code>scan_dict()</code> (~5.4ms) and <code>mask_dict()</code> (~5.2ms) -- the composed pipeline cost (~11.4ms) is
+almost exactly their sum plus a small, fixed per-call overhead, confirming the primitives
+compose additively, not with any hidden extra cost.</p>
+<h3 id="8c-a-real-honest-security-relevant-check-does-any-pattern-catastrophically-backtrack">8c. A real, honest, security-relevant check: does any pattern catastrophically backtrack?<a class="headerlink" href="#8c-a-real-honest-security-relevant-check-does-any-pattern-catastrophically-backtrack" title="Permanent link">&para;</a></h3>
+<p>Python's <code>re</code> module is a backtracking engine, not a guaranteed-linear one (unlike RE2, which
+<code>cel-python</code> itself depends on for a different reason -- see the M8 free-threading findings
+above). <code>PIIDetector</code>'s own <code>credit_card</code> pattern (<code>\b(?:\d[ -]*?){13,19}\b</code>) has the general
+shape (a bounded repetition wrapping a variable-length inner quantifier) that's a real, known
+category of ReDoS risk -- worth checking directly, not assumed safe by inspection alone.</p>
+<p>Two adversarial input constructions were tested, run in a subprocess with a hard 3-second
+wall-clock timeout (so a genuinely catastrophic case couldn't hang the benchmark itself) -- a
+naive digit-space-digit sequence, and a more genuinely ambiguous one (digits separated by runs
+of 2+ dashes, so the engine has real combinatorial choice about how to partition separators
+across iterations before concluding failure). <strong>Neither triggered catastrophic behavior</strong> --
+every attempt, up to 100 digits/dash-runs, completed in under 0.01ms, no growth trend visible.</p>
+<p><strong>The real, defensible explanation, not just a lucky result</strong>: the <code>{13,19}</code> <em>bound</em> on the outer
+repetition is what saves this pattern -- classic catastrophic ReDoS requires an <em>unbounded</em>
+quantifier (<code>+</code>/<code>*</code>) wrapping the ambiguous group so the number of possible partitions grows
+without limit as input grows; a bounded <code>{13,19}</code> caps the worst-case number of partitions to a
+small, fixed factor regardless of how long the input gets. The other PII patterns and all seven
+<code>redaction.py</code> credential patterns were also smoke-tested against generic near-miss adversarial
+text with the same negative (safe) result.</p>
+<p><strong>Honest limitation, stated plainly, not overclaimed</strong>: this is a real, useful empirical smoke
+test with two specific adversarial constructions, not an exhaustive proof of safety -- a
+dedicated static ReDoS-analysis tool (e.g. <code>regexploit</code>) would give stronger assurance if this
+needs certainty for a security audit. Recorded here as a real, honest negative result with a
+real theoretical grounding, not a guarantee.</p>
+<h3 id="8d-recommendation">8d. Recommendation<a class="headerlink" href="#8d-recommendation" title="Permanent link">&para;</a></h3>
+<p><strong>PII scanning/masking cost is real and should be a documented, tunable concern for deployments
+handling large tool outputs</strong>, not silently assumed negligible by proximity to the (smaller) CEL
+cost. Concrete, low-effort mitigations worth adding as a real follow-up, not urgent today: (1) a
+configurable maximum-scan-size on <code>PIIDetector</code>/<code>redact_dict</code> (skip or truncate scanning beyond a
+size threshold, with a loud, audited signal when triggered -- matching this codebase's own
+fail-loud-not-silent convention), (2) documenting the real per-KB cost in <code>docs/design/
+mcp-gateway.md</code> so operators can reason about worst-case latency for their own expected tool-
+output sizes. <strong>No ReDoS fix is needed</strong> -- the empirical and theoretical evidence both support
+the existing patterns being safe from catastrophic backtracking, though a dedicated static-
+analysis pass remains a reasonable, cheap addition to CI if this deployment surface grows.</p>
+<hr />
+<h2 id="comparison-methodology-what-to-publish-and-what-to-compare-against-in-the-market">Comparison methodology: what to publish, and what to compare against in the market<a class="headerlink" href="#comparison-methodology-what-to-publish-and-what-to-compare-against-in-the-market" title="Permanent link">&para;</a></h2>
+<p>This section answers the three real, tied-together questions this research pass started from:
+who are Presidium's real competitors as a product, what should be measured on its own real HTTP
+endpoints, and what should any published benchmark be compared against. Reached via a structured,
+adversarial five-perspective council session (the <code>llm-council</code> methodology), not a single
+unchallenged take -- summarized here; see the session transcript for the full five-advisor
+analysis and peer review.</p>
+<p><strong>Real competitors identified</strong> (grounded in <code>docs/research/competitive-landscape.md</code> plus fresh
+research this pass): Microsoft's Agent Governance Toolkit (a 7-package, multi-language, Rust-core
+policy engine claiming <strong>&lt;0.1ms p99</strong> decision latency), Fiddler (SaaS observability + guardrails,
+<strong>&lt;100ms</strong> trust-model latency -- a different order of magnitude <em>and</em> a different kind of check,
+ML-based scoring rather than rule evaluation), general-purpose policy engines (<strong>OPA</strong> -- own
+docs frame "a microservice authorization decision... budget in the order of 1 millisecond" as
+their own performance bar; <strong>AWS Cedar</strong>), and a newly-identified, narrowly-scoped competitor not
+previously in this repo's own competitive-landscape doc: <strong>Kastra</strong> ("the authorization layer for
+AI systems" -- intercepts every AI action, returns allow/deny/redact/escalate, and publishes its
+own dedicated benchmarks page, explicitly tracking the p99/p50 tail-latency ratio under
+increasing concurrency).</p>
+<p><strong>The real risk the council surfaced and this doc avoids</strong>: comparing an isolated, no-network
+microbenchmark (§1) against a competitor's full-decision or full-HTTP-endpoint marketing claim
+is an apples-to-oranges trap. AGT's "&lt;0.1ms p99" and Fiddler's "&lt;100ms" almost certainly measure
+different layers (in-process call vs. full ML guardrail scoring) than a raw CEL eval -- blending
+them into one table without saying so would be a credibility failure, not a fair comparison. <strong>§2
+and §7's real, measured numbers exist specifically to avoid ever needing to make that mistake.</strong></p>
+<p><strong>What this doc actually does, following the council's recommendation:</strong></p>
+<ol>
+<li><strong>Presidium's own real numbers, first and mandatory</strong> (§1, §2) -- exists now, didn't before.</li>
+<li><strong>One real, fair, same-conditions comparison</strong> (§7) -- OPA, the one competitor whose internals
+   are actually independently replicable, run identically, on the same hardware.</li>
+<li><strong>Everything else (AGT, Fiddler, Kastra) is cited above as labeled, third-party context only</strong>
+   -- never blended into §2/§7's own measured tables.</li>
+</ol>
+<p><strong>The correct framing for "is Presidium fast enough,"</strong> per the council's own First Principles
+perspective: not "is it faster than AGT," but whether governance overhead stays negligible
+relative to what it's gating -- an LLM call is milliseconds-to-seconds; even Presidium's own,
+now-corrected, higher CEL-eval numbers (§1) are one to two orders of magnitude below that. <strong>Where
+this stops being true is exactly the real, load-bearing finding §2's flat-throughput-under-
+concurrency data shows</strong>: a shared, multi-tenant M7 deployment serving many concurrent callers is
+the scenario where the GIL ceiling, not the per-request cost, becomes the real constraint --
+matching <code>docs/vision/roadmap.md</code>'s own original framing exactly, now with real numbers proving
+it rather than asserting it.</p>
+<hr />
+<h2 id="recommendation">Recommendation<a class="headerlink" href="#recommendation" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Ship Option A (horizontal scaling) as the real, documented, default scaling story for M7
+   deployments today.</strong> Zero code changes, confirmed to work close to linearly on real hardware.
+   Add a short operator-facing note to <code>docs/design/presidium-server.md</code> recommending multiple
+   <code>presidium-contrib</code> server processes behind a load balancer for any deployment expecting
+   sustained concurrent load beyond a few hundred requests/sec.</li>
+<li><strong>Do not pursue Option B (free-threaded CPython) further right now</strong> -- two independent, real
+   blockers (an immature C-extension ecosystem for this exact dependency chain, and a
+   single-threaded serving architecture that wouldn't benefit even if the ecosystem gap closed).
+   Revisit only if both close.</li>
+<li><strong>Option C (a Rust-backed CEL evaluator via PyO3) is the real next lever</strong>, now backed by
+   concrete evidence (an existing, maintained crate; a real 15-140x directional comparison) --
+   worth a contained prototype spike if a real deployment's throughput needs exceed what Option A
+   can cost-effectively cover, not before.</li>
+<li><strong>Option D remains correctly out of scope</strong>, per the milestone's own original sequencing.</li>
+<li><strong>Publish this doc's §1/§2/§7 numbers, with the comparison-methodology section above, as
+   Presidium's own real, honest benchmark story</strong> -- differentiated by being the only one in this
+   space (per the research done) that discloses methodology, hardware, and concurrency model
+   explicitly rather than a single unqualified headline number.</li>
+</ol>
+<h2 id="reproducing-this">Reproducing this<a class="headerlink" href="#reproducing-this" title="Permanent link">&para;</a></h2>
+<p>See <code>benchmarks/README.md</code>. All scripts are real, checked-in, and reusable -- not deleted after
+this pass, per this org's own spike-code convention (<code>python-civitas</code>'s M-LAST scoping doc
+states the same discipline for a reason: a benchmark that can't be re-run isn't a benchmark
+that can be trusted later).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

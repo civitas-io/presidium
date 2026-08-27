@@ -1,0 +1,3517 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/design/eval-framework/">
+      
+      
+        <link rel="prev" href="../mcp-gateway/">
+      
+      
+        <link rel="next" href="../deepeval-integration/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Eval Framework - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#design-eval-framework" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Eval Framework
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-tier-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two-Tier Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#three-layers-of-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three Layers of Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-flight-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-Flight Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governance-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Backends
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-score-feedback-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Score Feedback Loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Harness
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Harness">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#design_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepeval-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepEval Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepEval Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-deepeval-over-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why DeepEval Over Alternatives
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#civitas-core-changes-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Civitas Core Changes Required
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#two-tier-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two-Tier Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#three-layers-of-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three Layers of Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-flight-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In-Flight Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governance-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governance Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Backends
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-score-feedback-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Score Feedback Loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Harness
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Harness">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#design_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepeval-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepEval Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepEval Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-deepeval-over-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why DeepEval Over Alternatives
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#civitas-core-changes-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Civitas Core Changes Required
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="design-eval-framework">Design: Eval Framework<a class="headerlink" href="#design-eval-framework" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><code>presidium-eval</code> — Governance-aware evaluation, test harness, and external platform integration.</p>
+</blockquote>
+<p><strong>Status:</strong> Draft (revised)
+<strong>Package:</strong> <code>presidium-eval</code>
+<strong>Milestone:</strong> M4
+<strong>Depends on:</strong> <code>civitas</code> (EvalLoop, EvalAgent, EvalExporter), <code>presidium-registry</code> (trust scores)</p>
+<hr />
+<h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
+<p>Agents in production need two kinds of evaluation:</p>
+<ol>
+<li><strong>Output quality</strong> — Did the agent produce a correct, useful result? (Task completion, tool selection accuracy, faithfulness to context.)</li>
+<li><strong>Governance compliance</strong> — Did the agent stay within policy? Is its trust score trending correctly? Did it use only authorized tools?</li>
+</ol>
+<p>Existing eval tools (Fiddler, Arize, Langfuse) address output quality as post-hoc dashboards. They don't evaluate governance compliance, they don't enforce thresholds at runtime, and they don't provide an offline regression harness that uses the same metrics as production.</p>
+<p>Civitas provides the runtime primitives (<code>EvalAgent</code>, <code>EvalExporter</code>, <code>CorrectionSignal</code>) but defines no metrics, no test harness, and no governance integration. There is a gap between "we can observe" and "we can systematically evaluate and regress."</p>
+<p>Three concrete gaps:</p>
+<p><strong>Gap 1 — No in-flight quality scoring.</strong> An agent that drifts from its task or selects wrong tools generates no signal until a human reviews the output. The EvalAgent hook exists but ships with no metric implementations.</p>
+<p><strong>Gap 2 — No offline regression harness.</strong> When you change an agent's prompt, model, or tool set, there is no way to run a suite of recorded tasks and assert that quality didn't regress. This is the equivalent of shipping code without running the test suite.</p>
+<p><strong>Gap 3 — No governance-quality feedback loop.</strong> Governance metrics (policy compliance, grant utilization, budget consumption) and quality metrics (task completion, tool correctness) are evaluated by separate systems with no shared vocabulary. Trust scores cannot incorporate quality signals, and quality evaluations cannot incorporate governance context.</p>
+<hr />
+<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Define a two-tier evaluation architecture: in-flight (runtime) and offline (CI/CD)</li>
+<li>Introduce a test harness for offline agent regression testing with golden datasets</li>
+<li>Integrate DeepEval as the recommended (not required) eval backend via <code>civitas-contrib[deepeval]</code></li>
+<li>Define governance-specific evaluation metrics that extend Civitas's EvalLoop</li>
+<li>Close the feedback loop: eval scores → trust score adjustments → autonomy changes</li>
+<li>Export governance metrics to external platforms (Fiddler, Arize, Langfuse, Prometheus)</li>
+</ol>
+<h2 id="non-goals">Non-Goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Replace Fiddler/Arize — Presidium generates governance metrics, they dashboard them</li>
+<li>Content safety (hallucination detection, toxicity) — that's guardrails, not structural governance</li>
+<li>Real-time policy enforcement — that's <code>presidium-policy</code></li>
+<li>Mandating DeepEval — it's the recommended backend, but the architecture is backend-agnostic via <code>EvalExporter</code></li>
+</ul>
+<hr />
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<p><img alt="Evaluation Architecture — Two-Tier Design" src="../../assets/eval-architecture.svg" /></p>
+<h3 id="two-tier-design">Two-Tier Design<a class="headerlink" href="#two-tier-design" title="Permanent link">&para;</a></h3>
+<p>Evaluation runs at two points in the agent lifecycle:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>When</th>
+<th>Where</th>
+<th>Latency budget</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>In-flight</strong></td>
+<td>Every agent action, in real time</td>
+<td>Inside the Civitas supervision tree (<code>EvalAgent</code>)</td>
+<td>&lt; 500ms for deterministic; async for LLM-as-Judge</td>
+<td>Catch violations as they happen; emit CorrectionSignals; feed trust scores</td>
+</tr>
+<tr>
+<td><strong>Offline</strong></td>
+<td>CI/CD, pre-merge, scheduled</td>
+<td>pytest suite (<code>EvalTestRunner</code>)</td>
+<td>Unbounded</td>
+<td>Regression testing; golden dataset validation; threshold assertion</td>
+</tr>
+</tbody>
+</table>
+<p>The same metric instances run in both tiers. This is a non-negotiable design constraint — if in-flight and offline use different metrics, thresholds will drift and regressions will be invisible.</p>
+<h3 id="three-layers-of-evaluation">Three Layers of Evaluation<a class="headerlink" href="#three-layers-of-evaluation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Owns</th>
+<th>Metrics</th>
+<th>Package</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Agent quality</strong></td>
+<td>Did the agent produce a good result?</td>
+<td>TaskCompletion, ToolCorrectness, Faithfulness, custom</td>
+<td><code>civitas-contrib[deepeval]</code> or any <code>EvalExporter</code></td>
+</tr>
+<tr>
+<td><strong>Governance compliance</strong></td>
+<td>Did the agent follow policy?</td>
+<td>PolicyCompliance, GrantUtilization, BudgetAdherence, DriftScore</td>
+<td><code>presidium-eval</code></td>
+</tr>
+<tr>
+<td><strong>Trust feedback</strong></td>
+<td>Should the agent's autonomy change?</td>
+<td>Composite of quality + governance scores</td>
+<td><code>presidium-eval</code> → <code>presidium-registry</code></td>
+</tr>
+</tbody>
+</table>
+<p>Quality and governance are distinct evaluation streams (as established in the <a href="../../architecture/overview/">Architecture Overview</a>):</p>
+<ul>
+<li><strong>EvalLoop (Civitas):</strong> Did the agent produce a good output? Internal quality signal.</li>
+<li><strong>presidium-eval (Presidium):</strong> Did the agent comply with policy? External accountability signal.</li>
+</ul>
+<p>The trust feedback layer combines both. A high-quality agent that violates policy should not earn trust. A policy-compliant agent that produces bad outputs should not retain trust.</p>
+<hr />
+<h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
+<h3 id="in-flight-evaluation">In-Flight Evaluation<a class="headerlink" href="#in-flight-evaluation" title="Permanent link">&para;</a></h3>
+<p>The <code>EvalAgent</code> is a supervised process that sits alongside application agents in the supervision tree. It receives <code>EvalEvent</code> messages emitted by agents via <code>self.emit_eval()</code>, runs metrics via its <code>EvalExporter</code> chain, and returns <code>CorrectionSignal</code> when thresholds are breached.</p>
+<pre><code class="language-python"># Civitas core — already shipped
+class EvalAgent(AgentProcess):
+    async def on_eval_event(self, event: EvalEvent) -&gt; CorrectionSignal | None:
+        &quot;&quot;&quot;Override point. Return a CorrectionSignal to intervene.&quot;&quot;&quot;
+        return None
+</code></pre>
+<p>Presidium extends this with governance context:</p>
+<pre><code class="language-python"># presidium-eval — new
+class GovernanceEvalAgent(EvalAgent):
+    &quot;&quot;&quot;Extends EvalAgent with governance metric collection and trust feedback.&quot;&quot;&quot;
+
+    def __init__(
+        self,
+        name: str,
+        registry: AgentRegistry,
+        policy_engine: PolicyEngine,
+        metrics: list[GovernanceMetric],
+        exporters: list[EvalExporter] | None = None,
+        **kwargs: Any,
+    ) -&gt; None:
+        super().__init__(name, exporters=exporters, **kwargs)
+        self._registry = registry
+        self._policy_engine = policy_engine
+        self._metrics = metrics
+
+    async def on_eval_event(self, event: EvalEvent) -&gt; CorrectionSignal | None:
+        # 1. Run governance metrics
+        governance_scores = await self._evaluate_governance(event)
+
+        # 2. Collect quality scores from exporters (DeepEval, etc.)
+        quality_scores = self._collect_exporter_scores()
+
+        # 3. Compute composite score
+        composite = self._compute_composite(governance_scores, quality_scores)
+
+        # 4. Update trust score
+        await self._update_trust(event.agent_name, composite)
+
+        # 5. Return CorrectionSignal if warranted
+        return self._score_to_signal(composite, governance_scores, quality_scores)
+
+    def _score_to_signal(
+        self, composite: float, governance: dict, quality: dict
+    ) -&gt; CorrectionSignal | None:
+        if composite &gt;= 0.8:
+            return None
+        if composite &lt; 0.4:
+            failed = [k for k, v in {**governance, **quality}.items() if v &lt; 0.5]
+            return CorrectionSignal(
+                severity=&quot;halt&quot;,
+                reason=f&quot;Critical eval failure: {', '.join(failed)}&quot;,
+                payload={&quot;governance&quot;: governance, &quot;quality&quot;: quality},
+            )
+        failed = [k for k, v in {**governance, **quality}.items() if v &lt; 0.7]
+        return CorrectionSignal(
+            severity=&quot;redirect&quot;,
+            reason=f&quot;Below threshold: {', '.join(failed)}&quot;,
+            payload={&quot;governance&quot;: governance, &quot;quality&quot;: quality},
+        )
+</code></pre>
+<h4 id="correctionsignal-severity-mapping">CorrectionSignal Severity Mapping<a class="headerlink" href="#correctionsignal-severity-mapping" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Composite score</th>
+<th>Severity</th>
+<th>Effect on agent</th>
+<th>Trust delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>≥ 0.8</td>
+<td>None</td>
+<td>No correction</td>
+<td>+0.02 per window</td>
+</tr>
+<tr>
+<td>0.4 – 0.8</td>
+<td><code>redirect</code></td>
+<td>Agent receives correction, should change approach</td>
+<td>-0.05</td>
+</tr>
+<tr>
+<td>&lt; 0.4</td>
+<td><code>halt</code></td>
+<td>Agent's message loop is stopped; human review required</td>
+<td>-0.2</td>
+</tr>
+</tbody>
+</table>
+<p>These thresholds are configurable per agent via the Metric Registry (see below).</p>
+<h3 id="governance-metrics">Governance Metrics<a class="headerlink" href="#governance-metrics" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">@dataclass
+class GovernanceMetrics:
+    &quot;&quot;&quot;Metrics computed per agent per evaluation window.&quot;&quot;&quot;
+    policy_compliance_rate: float       # % of actions that passed policy check
+    denial_count: int                   # Number of DENY decisions this window
+    approval_pending_count: int         # Actions waiting for REQUIRE_APPROVAL
+    trust_score_delta: float            # Change in trust score this window
+    tool_usage_authorized: float        # % of tool calls to granted tools
+    llm_budget_utilization: float       # % of LLM token/cost budget consumed
+    restart_count: int                  # Number of supervisor restarts
+    mean_action_latency_ms: float       # Average policy evaluation latency
+    drift_score: float                  # Deviation from declared intent (0.0 = on track)
+    grant_violation_count: int          # Attempts to access ungrated resources
+</code></pre>
+<p>Each field maps to a <code>GovernanceMetric</code> protocol implementation:</p>
+<pre><code class="language-python">class GovernanceMetric(Protocol):
+    &quot;&quot;&quot;Single governance metric computed from policy engine state.&quot;&quot;&quot;
+    name: str
+    threshold: float
+
+    async def evaluate(
+        self,
+        agent_name: str,
+        policy_engine: PolicyEngine,
+        registry: AgentRegistry,
+        window: TimeWindow,
+    ) -&gt; float: ...
+</code></pre>
+<h3 id="metric-registry">Metric Registry<a class="headerlink" href="#metric-registry" title="Permanent link">&para;</a></h3>
+<p>The Metric Registry is the canonical definition of which metrics run for which agent types, with what thresholds. It is the single source of truth for both in-flight and offline evaluation.</p>
+<pre><code class="language-python">@dataclass
+class MetricConfig:
+    &quot;&quot;&quot;Configuration for a single metric applied to an agent pattern.&quot;&quot;&quot;
+    metric_name: str
+    threshold: float
+    severity_on_breach: Literal[&quot;nudge&quot;, &quot;redirect&quot;, &quot;halt&quot;]
+    in_flight: bool = True      # Run in EvalAgent?
+    offline: bool = True        # Run in test harness?
+
+@dataclass
+class MetricRegistryEntry:
+    &quot;&quot;&quot;Metrics configuration for a set of agents.&quot;&quot;&quot;
+    agent_pattern: str          # Glob pattern, e.g. &quot;coder-*&quot;
+    metrics: list[MetricConfig]
+
+class MetricRegistry:
+    &quot;&quot;&quot;Loads metric configurations and resolves which metrics apply to an agent.&quot;&quot;&quot;
+
+    def __init__(self, entries: list[MetricRegistryEntry]) -&gt; None: ...
+    def get_metrics(self, agent_name: str, context: str = &quot;in_flight&quot;) -&gt; list[MetricConfig]: ...
+</code></pre>
+<p>YAML configuration:</p>
+<pre><code class="language-yaml"># eval.yaml — loaded by MetricRegistry
+eval:
+  metrics:
+    - agents: &quot;*&quot;
+      metrics:
+        - name: policy_compliance
+          threshold: 0.95
+          severity: redirect
+        - name: budget_utilization
+          threshold: 0.9
+          severity: halt
+
+    - agents: &quot;coder-*&quot;
+      metrics:
+        - name: task_completion
+          threshold: 0.7
+          severity: redirect
+        - name: tool_correctness
+          threshold: 0.8
+          severity: redirect
+        - name: scope_drift
+          threshold: 0.9
+          severity: halt
+          in_flight: true
+          offline: true
+</code></pre>
+<h3 id="export-backends">Export Backends<a class="headerlink" href="#export-backends" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class GovernanceExporter(Protocol):
+    &quot;&quot;&quot;Exports governance metrics to external platforms.&quot;&quot;&quot;
+
+    async def export(
+        self,
+        agent_name: str,
+        metrics: GovernanceMetrics,
+        window: TimeWindow,
+    ) -&gt; None: ...
+</code></pre>
+<p>Planned implementations:</p>
+<table>
+<thead>
+<tr>
+<th>Exporter</th>
+<th>Package</th>
+<th>Destination</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FiddlerExporter</code></td>
+<td><code>presidium-eval</code></td>
+<td>Fiddler AI platform</td>
+</tr>
+<tr>
+<td><code>ArizeExporter</code></td>
+<td><code>presidium-eval</code></td>
+<td>Arize Phoenix</td>
+</tr>
+<tr>
+<td><code>LangfuseExporter</code></td>
+<td><code>presidium-eval</code></td>
+<td>Langfuse</td>
+</tr>
+<tr>
+<td><code>PrometheusExporter</code></td>
+<td><code>presidium-eval</code></td>
+<td>Prometheus (time-series)</td>
+</tr>
+<tr>
+<td><code>ConsoleExporter</code></td>
+<td><code>presidium-eval</code></td>
+<td>stdout (development)</td>
+</tr>
+</tbody>
+</table>
+<p>These are distinct from Civitas's <code>EvalExporter</code> (which exports <code>EvalEvent</code>). <code>GovernanceExporter</code> exports aggregated <code>GovernanceMetrics</code> — a higher-level summary.</p>
+<h3 id="trust-score-feedback-loop">Trust Score Feedback Loop<a class="headerlink" href="#trust-score-feedback-loop" title="Permanent link">&para;</a></h3>
+<pre><code>Agent acts
+  → Policy evaluates (presidium-policy)
+  → OTEL span emitted (civitas)
+  → EvalAgent receives EvalEvent (civitas)
+    → GovernanceEvalAgent.on_eval_event() (presidium-eval)
+      → Governance metrics computed
+      → Quality metrics computed (via DeepEvalExporter or others)
+      → Composite score
+      → Trust score adjustment (presidium-registry)
+      → CorrectionSignal sent to agent (civitas)
+  → GovernanceExporter.export() (presidium-eval)
+    → Fiddler / Arize / Langfuse / Prometheus
+  → Alert if threshold breached
+</code></pre>
+<p>The feedback loop is closed: eval results change trust scores, trust scores change autonomy levels (via trust-gated policy thresholds in <code>presidium-policy</code>), autonomy levels change what actions the agent can take without approval.</p>
+<hr />
+<h2 id="test-harness">Test Harness<a class="headerlink" href="#test-harness" title="Permanent link">&para;</a></h2>
+<p><img alt="Test Harness Architecture" src="../../assets/test-harness-architecture.svg" /></p>
+<h3 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h3>
+<p>There is no way to regression-test agent behavior. When you change an agent's prompt, model, or tool set, you cannot run a suite of recorded tasks and assert that quality didn't regress. This is the agent equivalent of shipping code without running <code>pytest</code>.</p>
+<h3 id="design_1">Design<a class="headerlink" href="#design_1" title="Permanent link">&para;</a></h3>
+<p>The test harness lives in <strong>civitas core</strong> as a <code>civitas[test]</code> extra. It is not governance-specific — any Civitas agent can use it. Presidium adds governance metrics on top.</p>
+<h4 id="evaldataset">EvalDataset<a class="headerlink" href="#evaldataset" title="Permanent link">&para;</a></h4>
+<pre><code class="language-python">@dataclass
+class EvalTestCase:
+    &quot;&quot;&quot;A single recorded agent interaction for offline evaluation.&quot;&quot;&quot;
+    input: dict[str, Any]                        # Task/message sent to agent
+    expected_output: dict[str, Any] | None       # Known-correct output (optional)
+    expected_tools: list[str] | None             # Tools that should be used
+    context: list[str] | None                    # Retrieval context provided
+    metadata: dict[str, Any] | None              # Arbitrary annotations
+    tags: list[str] | None                       # For filtering: [&quot;regression&quot;, &quot;adversarial&quot;]
+
+@dataclass
+class EvalDataset:
+    &quot;&quot;&quot;A collection of test cases for offline agent evaluation.&quot;&quot;&quot;
+    name: str
+    version: str
+    test_cases: list[EvalTestCase]
+
+    @classmethod
+    def from_json(cls, path: Path) -&gt; EvalDataset: ...
+
+    @classmethod
+    def from_jsonl(cls, path: Path) -&gt; EvalDataset: ...
+
+    def save(self, path: Path) -&gt; None: ...
+</code></pre>
+<h4 id="evaltestrunner">EvalTestRunner<a class="headerlink" href="#evaltestrunner" title="Permanent link">&para;</a></h4>
+<pre><code class="language-python">class EvalTestRunner:
+    &quot;&quot;&quot;Runs an agent pipeline against an EvalDataset and collects metric scores.&quot;&quot;&quot;
+
+    def __init__(
+        self,
+        agent_factory: Callable[[], AgentProcess],
+        metric_registry: MetricRegistry,
+        exporters: list[EvalExporter] | None = None,
+    ) -&gt; None: ...
+
+    async def run(self, dataset: EvalDataset) -&gt; EvalReport: ...
+
+@dataclass
+class EvalReport:
+    &quot;&quot;&quot;Results of running an EvalDataset through an agent pipeline.&quot;&quot;&quot;
+    dataset_name: str
+    dataset_version: str
+    results: list[EvalTestResult]
+    aggregate_scores: dict[str, float]   # metric_name → mean score
+    passed: bool                          # All metrics above threshold?
+    duration_seconds: float
+
+@dataclass
+class EvalTestResult:
+    &quot;&quot;&quot;Result of a single test case.&quot;&quot;&quot;
+    test_case: EvalTestCase
+    actual_output: dict[str, Any]
+    tools_called: list[str]
+    scores: dict[str, float]              # metric_name → score
+    passed: bool
+    reasons: dict[str, str]               # metric_name → reason
+</code></pre>
+<h4 id="pytest-integration">pytest Integration<a class="headerlink" href="#pytest-integration" title="Permanent link">&para;</a></h4>
+<pre><code class="language-python"># tests/evals/test_my_agent.py
+import pytest
+from civitas.testing import EvalDataset, EvalTestRunner
+
+dataset = EvalDataset.from_json(&quot;datasets/my_agent_v1.json&quot;)
+
+@pytest.fixture
+def runner():
+    return EvalTestRunner(
+        agent_factory=lambda: MyAgent(&quot;test_agent&quot;),
+        metric_registry=MetricRegistry.from_yaml(&quot;eval.yaml&quot;),
+    )
+
+@pytest.mark.parametrize(&quot;test_case&quot;, dataset.test_cases, ids=lambda tc: tc.metadata.get(&quot;id&quot;, &quot;&quot;))
+async def test_agent_eval(runner, test_case):
+    result = await runner.run_single(test_case)
+    assert result.passed, f&quot;Failed metrics: {[k for k, v in result.scores.items() if v &lt; runner.threshold(k)]}&quot;
+</code></pre>
+<p>Run:</p>
+<pre><code class="language-bash"># Standard pytest
+uv run pytest tests/evals/ -v
+
+# With DeepEval dashboard (if civitas-contrib[deepeval] installed)
+deepeval test run tests/evals/
+</code></pre>
+<h4 id="dataset-sources">Dataset Sources<a class="headerlink" href="#dataset-sources" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Description</th>
+<th>Automation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Curated goldens</strong></td>
+<td>Manually written test cases with known-correct outputs</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td><strong>Recorded traces</strong></td>
+<td>Captured from production via flight recorder</td>
+<td>Automatic (opt-in)</td>
+</tr>
+<tr>
+<td><strong>Adversarial suite</strong></td>
+<td>Designed to trigger drift, policy violations, edge cases</td>
+<td>Manual</td>
+</tr>
+</tbody>
+</table>
+<p>The flight recorder is a Civitas <code>AuditSink</code> implementation that writes <code>EvalTestCase</code> records for every agent interaction. It captures input, output, tools called, and metadata. Teams opt in per agent via topology config:</p>
+<pre><code class="language-yaml">audit:
+  sinks:
+    - type: eval_recorder
+      config:
+        output_dir: datasets/recorded/
+        format: jsonl
+        agents: [&quot;coder-*&quot;, &quot;reviewer-*&quot;]   # record only these agents
+</code></pre>
+<hr />
+<h2 id="deepeval-integration">DeepEval Integration<a class="headerlink" href="#deepeval-integration" title="Permanent link">&para;</a></h2>
+<p><img alt="DeepEval Integration — Data Flow" src="../../assets/deepeval-integration.svg" /></p>
+<p>DeepEval is the <strong>recommended</strong> eval backend. It is not required — the architecture is backend-agnostic via <code>EvalExporter</code>. But DeepEval is uniquely suited because it provides both in-flight metrics (via <code>a_measure()</code>) and an offline test harness (via <code>assert_test()</code> + pytest).</p>
+<p>For the full integration design, see the companion doc: <a href="../deepeval-integration/">DeepEval Integration</a>.</p>
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Package</td>
+<td><code>civitas-contrib[deepeval]</code></td>
+</tr>
+<tr>
+<td>Integration point</td>
+<td><code>EvalExporter</code> protocol (civitas core)</td>
+</tr>
+<tr>
+<td>Key class</td>
+<td><code>DeepEvalExporter</code> — bridges <code>EvalEvent</code> → <code>LLMTestCase</code> → metrics</td>
+</tr>
+<tr>
+<td>Built-in metrics used</td>
+<td><code>TaskCompletionMetric</code>, <code>ToolCorrectnessMetric</code>, <code>FaithfulnessMetric</code>, <code>PlanAdherenceMetric</code></td>
+</tr>
+<tr>
+<td>Custom metrics</td>
+<td><code>GovernanceComplianceMetric</code>, <code>ScopeDriftMetric</code> (extend <code>BaseMetric</code>)</td>
+</tr>
+<tr>
+<td>Async support</td>
+<td>All metrics run via <code>a_measure()</code> — non-blocking</td>
+</tr>
+<tr>
+<td>Offline harness</td>
+<td><code>deepeval test run</code> wraps pytest; uses same metrics as in-flight</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-deepeval-over-alternatives">Why DeepEval Over Alternatives<a class="headerlink" href="#why-deepeval-over-alternatives" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Why not primary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fiddler</td>
+<td>Observability platform — dashboards, not metrics engine. Complementary, not replacement</td>
+</tr>
+<tr>
+<td>Arize Phoenix</td>
+<td>Same — observability, not eval harness</td>
+</tr>
+<tr>
+<td>Langfuse</td>
+<td>Same — tracing + analytics, no pytest integration</td>
+</tr>
+<tr>
+<td>Ragas</td>
+<td>RAG-focused. Useful for retrieval agents, not general-purpose agent eval</td>
+</tr>
+<tr>
+<td>Custom metrics only</td>
+<td>Misses the ecosystem: 50+ built-in metrics, dataset management, regression tracking</td>
+</tr>
+</tbody>
+</table>
+<p>DeepEval is the only option that provides a metrics engine, custom metric extensibility, and a pytest-integrated test harness in a single package.</p>
+<hr />
+<h2 id="civitas-core-changes-required">Civitas Core Changes Required<a class="headerlink" href="#civitas-core-changes-required" title="Permanent link">&para;</a></h2>
+<p>The test harness (<code>EvalTestRunner</code>, <code>EvalDataset</code>, <code>EvalTestCase</code>) lives in civitas core as a <code>civitas[test]</code> extra. This requires adding modules to <code>python-civitas</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Purpose</th>
+<th>New?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>civitas/testing/__init__.py</code></td>
+<td>Public surface for test harness</td>
+<td>New</td>
+</tr>
+<tr>
+<td><code>civitas/testing/dataset.py</code></td>
+<td><code>EvalDataset</code>, <code>EvalTestCase</code></td>
+<td>New</td>
+</tr>
+<tr>
+<td><code>civitas/testing/runner.py</code></td>
+<td><code>EvalTestRunner</code>, <code>EvalReport</code>, <code>EvalTestResult</code></td>
+<td>New</td>
+</tr>
+<tr>
+<td><code>civitas/testing/recorder.py</code></td>
+<td>Flight recorder <code>AuditSink</code> implementation</td>
+<td>New</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>civitas[test]</code> extra adds <code>deepeval</code> as an optional dependency (for <code>deepeval test run</code> integration). The test harness itself works without DeepEval — it uses <code>EvalExporter</code> protocol, which any backend can implement.</p>
+<p>No changes to existing civitas modules. The existing <code>EvalAgent</code>, <code>EvalExporter</code>, <code>EvalEvent</code>, and <code>CorrectionSignal</code> are sufficient.</p>
+<hr />
+<h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Evaluation window:</strong> What's the default window for governance metrics? 30s is too noisy. 5m is too slow for halt signals. Proposal: configurable, default 60s.</li>
+<li><strong>Auto vs. manual trust adjustment:</strong> Should eval automatically adjust trust scores, or just report? Proposal: automatic by default, with an <code>auto_trust_feedback: bool</code> config knob.</li>
+<li><strong>Infrequent agents:</strong> How do we evaluate agents that run once a day? Window-based metrics don't apply. Proposal: per-invocation mode (evaluate after each task, not per window).</li>
+<li><strong>Flight recorder privacy:</strong> Recorded traces may contain sensitive data. Should the recorder support field-level redaction? Proposal: yes, configurable via <code>redact_fields: ["payload.pii", "payload.credentials"]</code>.</li>
+<li><strong>Metric Registry location:</strong> Should <code>eval.yaml</code> be a standalone file, a section in <code>topology.yaml</code>, or part of the agent's constitution? Proposal: standalone file, referenced from topology.yaml via <code>eval: ./eval.yaml</code>.</li>
+<li><strong>DeepEval Confident AI:</strong> Should the integration support DeepEval's optional cloud component for dataset management and dashboards? Proposal: support but don't require — local-first by default.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

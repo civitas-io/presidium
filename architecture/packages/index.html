@@ -1,0 +1,3203 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The governed agent platform built on Civitas">
+      
+      
+      
+        <link rel="canonical" href="https://civitas-io.github.io/presidium/architecture/packages/">
+      
+      
+        <link rel="prev" href="../overview/">
+      
+      
+        <link rel="next" href="../stack/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Package Map - Presidium</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#package-map" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Presidium" class="md-header__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presidium
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Package Map
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../guides/getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../vision/manifesto/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/agent-registry/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../research/competitive-landscape/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Research
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rfcs/001-presidium-scope/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  RFCs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../log/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Wiki Log
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Presidium" class="md-nav__button md-logo" aria-label="Presidium" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presidium
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civitas-io/presidium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    civitas-io/presidium
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/manifesto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#presidium-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        presidium (core)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="presidium (core)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#policy-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credential-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-scorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Scorer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitl-approval-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HITL / Approval Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-enricher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Enricher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llm-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM Gateway
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Governance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#presidium-contrib" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        presidium-contrib
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="presidium-contrib">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adapters-existing-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adapters (existing products)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-implementations-novel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Implementations (novel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agent-registry-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/policy-engine-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Engine Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/credential-provider-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Credential Provider Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/approval-service-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approval Service Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/audit-enricher-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audit Enricher Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/topology-integration-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Integration Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/implementation-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/llm-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/mcp-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/eval-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eval Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/deepeval-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DeepEval Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server-requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/presidium-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presidium Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendor research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Vendor research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/agentgateway-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AgentGateway (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/a2a-delegation-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A2A Delegation (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/spiffe-vendor-research-2026-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SPIFFE (2026-08)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/performance-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-scoring-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/trust-attestation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Attestation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/hero-demo-candidates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hero Demo Candidates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Research
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/competitive-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Competitive Landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/market-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Market Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/monetization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monetization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/fiddler-relationship/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fiddler Relationship
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-registry-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/trust-scoring-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trust Scoring Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/aaa-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AAA Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFCs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RFCs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/001-presidium-scope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-001: Presidium Scope and Boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/002-multi-dimensional-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-002: Multi-Dimensional Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rfcs/003-agent-value-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RFC-003: Agent Value Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#presidium-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        presidium (core)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="presidium (core)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#policy-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credential-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-scorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust Scorer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hitl-approval-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HITL / Approval Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-enricher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit Enricher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llm-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM Gateway
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Governance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#presidium-contrib" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        presidium-contrib
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="presidium-contrib">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adapters-existing-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adapters (existing products)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-implementations-novel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Implementations (novel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="package-map">Package Map<a class="headerlink" href="#package-map" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>What each package does, its boundaries, and dependencies.
+Last updated: 2026-07-07</p>
+</blockquote>
+<p><img alt="Interface-First Architecture" src="../../assets/interface-first-architecture.svg" /></p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Presidium ships as two packages. <code>presidium</code> is the interface library: pure Protocol definitions, no heavy dependencies, installable anywhere. <code>presidium-contrib</code> is the adapters and reference implementations: OPA, OpenBao, AgentGateway, LiteLLM, Slack, several stubbed gateway-backend adapters (Kong, Portkey, Cloudflare AI Gateway, Helicone, TrueFoundry), and reference implementations for components whose prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone, swappable library.</p>
+<p>This follows the same pattern as Civitas (<code>civitas</code> + <code>civitas-contrib</code>): the core package defines the contracts, contrib provides the implementations.</p>
+<pre><code>presidium/                          # Interface library (pip install presidium)
+  model.py                          # AgentRecord, Grant, PolicyRule, EvaluationStage, etc.
+  errors.py                         # PresidiumError hierarchy
+  approval.py                       # ApprovalService protocol + CallbackApprovalProvider
+  audit.py                          # AuditEnricher protocol (wraps Civitas AuditSink)
+  bus.py                            # GovernedMessageBus (PRE_MESSAGE enforcement)
+  credentials.py                    # CredentialProvider protocol + Env/File defaults
+  runtime.py                        # GovernedRuntime (from_config, reload_policies)
+  policy/
+    _base.py                        # PolicyEngine protocol
+    cel.py                          # CelPolicyEngine default (compile-once, fail-closed)
+  providers/
+    model.py                        # GovernedModelProvider (PRE_LLM / POST_LLM)
+    tool.py                         # GovernedToolProvider (PRE_TOOL / POST_TOOL)
+    gateway.py                      # LLMGatewayBackend + ToolsGatewayBackend protocols (2026-07-07:
+                                     # pluggable operations layer GovernedModelProvider/
+                                     # GovernedToolProvider delegate to — see llm-gateway.md,
+                                     # mcp-gateway.md)
+  registry/
+    _base.py                        # AgentRegistry protocol
+    memory.py                       # InMemoryRegistry (dict-backed, snapshot semantics)
+    sqlite.py                       # SqliteRegistry (WAL mode, asyncio.Lock)
+  scoring/                          # Domain-agnostic scoring library
+    events.py                       # Event, EventContext
+    functions.py                    # score(), windowed_score(), decay(), replay()
+    config.py                       # ScoringConfig, DecayConfig, WindowConfig
+    spec.py                         # ScoringSpec (immutable, spec_hash)
+  trust/                            # Trust scoring (consumer of scoring library)
+    core.py                         # TrustScorer protocol, LinearTrustScore, tier_for_value
+    protocols.py                    # ContextualTrustScorer, IntrospectableScorer, QueryableScorer
+    windowed.py                     # WindowedTrustScorer (cold-start, spec pinning, OTel)
+    cold_start.py                   # ColdStartStrategy + Optimistic/Neutral/Pessimistic
+    telemetry.py                    # Optional OTel instrumentation (no-op fallback)
+
+presidium-contrib/                   # Adapters + reference impls
+  opa/engine.py                     # OPA PolicyEngine adapter (REST API)
+  openbao/provider.py               # OpenBao CredentialProvider (hvac, MPL 2.0)
+  agentgateway/client.py            # AgentGateway adapter — LLMGatewayBackend (shipped) +
+                                     # ToolsGatewayBackend (list_tools/call_tool: gap, see issue)
+  litellm/client.py                 # LiteLLM Proxy adapter — LLMGatewayBackend. Leading 2nd-adapter
+                                     # candidate (2026-07-07 market research), NOT frozen.
+  kong/client.py                    # Kong AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  portkey/client.py                 # Portkey adapter — LLMGatewayBackend. Stubbed.
+  cloudflare_ai_gateway/client.py   # Cloudflare AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  helicone/client.py                # Helicone AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  truefoundry/client.py             # TrueFoundry AI Gateway adapter — LLMGatewayBackend. Stubbed.
+  slack/approval.py                 # Slack HITL adapter (Block Kit buttons)
+  webhook/approval.py               # Webhook approval adapter (POST + callback)
+  registry/postgres.py              # PostgresAgentRegistry (asyncpg)
+  mcp_gateway/                      # MCP governance reference impl
+    poisoning.py                    # Tool poisoning detection (hash-based snapshots)
+    redaction.py                    # Credential redaction (regex patterns)
+    pii.py                          # PII detection + masking (configurable patterns)
+  trust/scorer.py                   # LearningTrustScorer (adjustable weights, journal)
+  service/                          # Service mode GenServer wrappers
+    policy.py                       # PolicyEvaluatorServer (distributed evaluation)
+    registry.py                     # RegistryServer (distributed lookups)
+</code></pre>
+<p><img alt="Dependency Graph" src="../../assets/dependency-graph.svg" /></p>
+<hr />
+<h2 id="component-map">Component Map<a class="headerlink" href="#component-map" title="Permanent link">&para;</a></h2>
+<p><img alt="Build vs. Wrap" src="../../assets/product-mapping.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Interface (presidium)</th>
+<th>Library Mode Default</th>
+<th>Service Mode</th>
+<th>Existing Products (Adapters)</th>
+<th>Novel (Reference Impl)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy Engine</td>
+<td><code>PolicyEngine</code></td>
+<td><code>CelPolicyEngine</code> (in-process CEL)</td>
+<td><code>PolicyService</code> GenServer</td>
+<td>OPA, Cedar</td>
+<td></td>
+</tr>
+<tr>
+<td>Agent Registry</td>
+<td><code>AgentRegistry</code></td>
+<td><code>InMemoryRegistry</code> / <code>SqliteRegistry</code></td>
+<td><code>RegistryService</code> (Postgres)</td>
+<td></td>
+<td>Postgres registry with grants + trust</td>
+</tr>
+<tr>
+<td>Credential Provider</td>
+<td><code>CredentialProvider</code></td>
+<td><code>EnvCredentialProvider</code> / <code>FileCredentialProvider</code></td>
+<td></td>
+<td>OpenBao (Vault-compatible), AWS Secrets Manager</td>
+<td></td>
+</tr>
+<tr>
+<td>Trust Scorer</td>
+<td><code>TrustScorer</code></td>
+<td><code>LinearTrustScore</code> / <code>WindowedTrustScorer</code></td>
+<td><code>LearningTrustScorer</code></td>
+<td></td>
+<td>Trust scoring with windowed aggregation, cold-start, spec pinning</td>
+</tr>
+<tr>
+<td>HITL / Approval</td>
+<td><code>ApprovalService</code></td>
+<td><code>CallbackApprovalProvider</code></td>
+<td></td>
+<td>Slack, Temporal, PagerDuty</td>
+<td></td>
+</tr>
+<tr>
+<td>Audit Enricher</td>
+<td><code>AuditEnricher</code></td>
+<td><code>InProcessAuditEnricher</code></td>
+<td></td>
+<td>Datadog, Splunk, ELK (via Civitas AuditSink)</td>
+<td></td>
+</tr>
+<tr>
+<td>LLM Gateway</td>
+<td><code>GovernedModelProvider</code> + <code>LLMGatewayBackend</code></td>
+<td>In-process grant checks + rate limits</td>
+<td></td>
+<td>AgentGateway (reference, built); LiteLLM (leading 2<sup>nd</sup> candidate, not frozen); Kong, Portkey, Cloudflare, Helicone, TrueFoundry (stubbed)</td>
+<td></td>
+</tr>
+<tr>
+<td>MCP Governance</td>
+<td><code>GovernedToolProvider</code> + <code>ToolsGatewayBackend</code></td>
+<td>In-process ACL checks</td>
+<td></td>
+<td>AgentGateway (sole backend today — MCP+A2A methods pending, see issue)</td>
+<td>MCP governance (no standalone library to wrap)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="presidium-core">presidium (core)<a class="headerlink" href="#presidium-core" title="Permanent link">&para;</a></h2>
+<p><strong>Protocol definitions and lightweight defaults.</strong></p>
+<p>The core package has no heavy dependencies. Every component is a Protocol — structural typing, not inheritance. Defaults are in-process implementations suitable for development and small deployments.</p>
+<h3 id="policy-engine">Policy Engine<a class="headerlink" href="#policy-engine" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class PolicyDecision(Enum):
+    ALLOW = &quot;allow&quot;
+    DENY = &quot;deny&quot;
+    REQUIRE_APPROVAL = &quot;require_approval&quot;
+
+class EvaluationStage(Enum):
+    PRE_TOOL = &quot;pre_tool&quot;
+    PRE_LLM = &quot;pre_llm&quot;
+    PRE_MESSAGE = &quot;pre_message&quot;
+    REGISTRATION = &quot;registration&quot;
+    POST_TOOL = &quot;post_tool&quot;
+    POST_LLM = &quot;post_llm&quot;
+
+@dataclass
+class PolicyResult:
+    decision: PolicyDecision
+    policy_name: str
+    reason: str | None = None
+    approvers: list[str] | None = None
+    enforcement: EnforcementMode = EnforcementMode.HARD
+
+@dataclass
+class EvaluationContext:
+    agent: AgentRecord       # identity, grants, trust, status, owner
+    request: ActionRequest   # resource + action + parameters
+    time: datetime
+
+class PolicyEngine(Protocol):
+    def load_policies(self, rules: list[PolicyRule]) -&gt; None: ...
+    async def evaluate(
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -&gt; PolicyResult: ...
+
+class CelPolicyEngine:
+    &quot;&quot;&quot;Default: compiles CEL expressions at load time, evaluates in-process (1-3ms).
+    Fail-closed: evaluation errors return DENY. No sidecar required.&quot;&quot;&quot;
+
+    def load_policies(self, rules: list[PolicyRule]) -&gt; None: ...
+    async def evaluate(
+        self, stage: EvaluationStage, context: EvaluationContext
+    ) -&gt; PolicyResult: ...
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/policy-engine/">policy-engine design doc</a> for full data model, enforcement modes, CEL expression format, and design decisions.</p>
+</blockquote>
+<p>CEL (Common Expression Language) is the default because it's embeddable, has a Python implementation (<code>cel-python</code>), and is the direction Kubernetes is moving for admission policies. No sidecar, no network call, no Rego to learn.</p>
+<h3 id="agent-registry">Agent Registry<a class="headerlink" href="#agent-registry" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">@dataclass
+class Grant:
+    resources: list[str]              # [&quot;tool:database&quot;, &quot;llm:claude-sonnet&quot;]
+    actions: list[str]                # [&quot;read&quot;, &quot;write&quot;, &quot;invoke&quot;]
+    scope: dict[str, str] = field(default_factory=dict)
+    condition: str | None = None      # CEL expression evaluated at policy time
+    expires_at: datetime | None = None
+
+@dataclass
+class AgentRecord:
+    # Identity
+    agent_id: str                     # SPIFFE-compatible URI: presidium://{trust_domain}/{path}
+    name: str
+    public_key: str                   # Ed25519 public key (base64)
+    # Governance
+    grants: list[Grant] = field(default_factory=list)
+    trust_value: float = 0.5
+    trust_tier: TrustTier = TrustTier.STANDARD
+    status: AgentStatus = AgentStatus.REGISTERED
+    # Accountability
+    owner: str | None = None
+    parent_agent_id: str | None = None
+    revision: int = 0
+
+class AgentRegistry(Protocol):
+    async def register(self, record: AgentRecord) -&gt; AgentRecord: ...
+    async def lookup(self, name: str) -&gt; AgentRecord | None: ...
+    async def lookup_by_id(self, agent_id: str) -&gt; AgentRecord | None: ...
+    async def add_grant(self, name: str, grant: Grant) -&gt; AgentRecord: ...
+    async def has_grant(self, name: str, resource: str, action: str) -&gt; bool: ...
+    async def record_trust_event(self, name: str, event: TrustEvent) -&gt; AgentRecord: ...
+    async def update_status(self, name: str, status: AgentStatus) -&gt; AgentRecord: ...
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/agent-registry/">agent-registry design doc</a> for full data model, SPIFFE identity format, dynamic spawning rules, and design decisions.</p>
+</blockquote>
+<p>No standalone library packages agent grants and trust scores together for reuse — existing registries (e.g. Google Gemini) and trust models (e.g. Microsoft AGT) are coupled to their host platforms. This is the gap the reference implementation fills.</p>
+<h3 id="credential-provider">Credential Provider<a class="headerlink" href="#credential-provider" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class CredentialProvider(Protocol):
+    async def get(
+        self,
+        agent_id: str,
+        credential_name: str,
+        grants: list[Grant],
+    ) -&gt; str | None: ...
+    async def close(self) -&gt; None: ...
+
+class EnvCredentialProvider:
+    &quot;&quot;&quot;Default: reads from os.environ. Checks grants before resolving.
+    Credential resource format: credential:{name}&quot;&quot;&quot;
+    async def get(self, agent_id: str, credential_name: str, grants: list[Grant]) -&gt; str | None: ...
+
+class FileCredentialProvider:
+    &quot;&quot;&quot;Default: reads from a key=value file (dev only). Same grant checking.&quot;&quot;&quot;
+    def __init__(self, path: Path) -&gt; None: ...
+    async def get(self, agent_id: str, credential_name: str, grants: list[Grant]) -&gt; str | None: ...
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/credential-provider/">credential-provider design doc</a> for grant integration, topology YAML wiring, audit event format, and design decisions.</p>
+</blockquote>
+<h3 id="trust-scorer">Trust Scorer<a class="headerlink" href="#trust-scorer" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class TrustEvent(Enum):
+    SUCCESS = &quot;success&quot;
+    FAILURE = &quot;failure&quot;
+    POLICY_VIOLATION = &quot;policy_violation&quot;
+    HUMAN_OVERRIDE = &quot;human_override&quot;
+
+class TrustScorer(Protocol):
+    @property
+    def value(self) -&gt; float: ...       # 0.0 - 1.0
+    @property
+    def tier(self) -&gt; TrustTier: ...
+    @property
+    def last_updated(self) -&gt; datetime: ...
+    def record_event(self, event: TrustEvent) -&gt; None: ...
+
+class LinearTrustScore:
+    &quot;&quot;&quot;Default: linear decay, 3 tiers (TRUSTED &gt;= 0.7, STANDARD 0.3-0.7, RESTRICTED &lt; 0.3).
+    SUCCESS +0.02, FAILURE -0.05, POLICY_VIOLATION -0.10, decay -0.01/hr.&quot;&quot;&quot;
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/agent-registry/">agent-registry design doc</a> for trust tier thresholds, decay model, and the AGT-style learning scorer in presidium-contrib.</p>
+</blockquote>
+<p>Mature agent trust models exist (e.g. Microsoft AGT's 0–1000 scorer) but none ship as a reusable library. The reference implementation in <code>presidium-contrib</code> adds learning from historical patterns.</p>
+<h3 id="hitl-approval-service">HITL / Approval Service<a class="headerlink" href="#hitl-approval-service" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">@dataclass
+class ApprovalRequest:
+    request_id: str                       # UUID
+    agent_id: str                         # presidium:// URI
+    resource: str                         # e.g. &quot;tool:database&quot;
+    action: str                           # e.g. &quot;write&quot;
+    reason: str                           # from PolicyResult.reason
+    approvers: list[str]                  # from PolicyRule.approvers
+    context: dict[str, Any]
+    policy_name: str
+    status: ApprovalStatus = ApprovalStatus.PENDING
+    timeout_seconds: float = 1800.0
+
+@dataclass
+class ApprovalDecision:
+    request_id: str
+    approved: bool
+    decided_by: str
+    reason: str | None = None
+
+class ApprovalService(Protocol):
+    async def request_approval(self, request: ApprovalRequest) -&gt; ApprovalDecision: ...
+    async def list_pending(self) -&gt; list[ApprovalRequest]: ...
+    async def decide(self, request_id: str, decision: ApprovalDecision) -&gt; None: ...
+
+class CallbackApprovalProvider:
+    &quot;&quot;&quot;Default: programmatic callback or auto-approve/deny flags. No infrastructure required.&quot;&quot;&quot;
+    auto_approve: bool
+    auto_deny: bool
+    callback: Callable | None
+    async def request_approval(self, request: ApprovalRequest) -&gt; ApprovalDecision: ...
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/approval-service/">approval-service design doc</a> for PEP integration, Slack/Temporal contrib adapters, and the connection to M4 autonomy progression.</p>
+</blockquote>
+<h3 id="audit-enricher">Audit Enricher<a class="headerlink" href="#audit-enricher" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python"># AuditEvent is Civitas's TypedDict — Presidium does not define its own
+from civitas.audit.types import AuditEvent, AuditSink
+
+class AuditEnricher(Protocol):
+    &quot;&quot;&quot;Structural subtype of AuditSink. Drop-in replacement that adds governance context.&quot;&quot;&quot;
+    async def emit(self, event: AuditEvent) -&gt; None: ...
+    async def flush(self) -&gt; None: ...
+    async def close(self) -&gt; None: ...
+
+class InProcessAuditEnricher:
+    &quot;&quot;&quot;Default: looks up agent in registry, adds details['governance'] dict, forwards to sink.
+    Fail-open: enrichment errors forward the original event rather than dropping it.&quot;&quot;&quot;
+    def __init__(self, downstream: AuditSink, registry: AgentRegistry, cache_ttl: float = 5.0) -&gt; None: ...
+    async def emit(self, event: AuditEvent) -&gt; None: ...
+</code></pre>
+<p>Enrichment adds a <code>governance</code> key to <code>event["details"]</code>:</p>
+<pre><code class="language-python"># Before enrichment (Civitas event)
+{&quot;sender&quot;: &quot;researcher&quot;, &quot;recipient&quot;: &quot;database_tool&quot;, &quot;type&quot;: &quot;tool_call&quot;}
+
+# After enrichment (Presidium adds governance key)
+{&quot;sender&quot;: &quot;researcher&quot;, &quot;recipient&quot;: &quot;database_tool&quot;, &quot;type&quot;: &quot;tool_call&quot;,
+ &quot;governance&quot;: {&quot;agent_id&quot;: &quot;presidium://acme.com/prod/researcher&quot;,
+                &quot;trust_value&quot;: 0.72, &quot;trust_tier&quot;: &quot;trusted&quot;, &quot;owner&quot;: &quot;alice@acme.com&quot;}}
+</code></pre>
+<blockquote>
+<p>See <a href="../../design/audit-enricher/">audit-enricher design doc</a> for the full event type catalog, topology YAML wiring, and design decisions.</p>
+</blockquote>
+<p>Presidium doesn't own the audit destination. It enriches events with governance context and forwards to Civitas's <code>AuditSink</code>, which already has adapters for Datadog, Splunk, and ELK.</p>
+<h3 id="llm-gateway">LLM Gateway<a class="headerlink" href="#llm-gateway" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class GovernedModelProvider:
+    &quot;&quot;&quot;A concrete class (not a Protocol) doing pure PRE_LLM/POST_LLM authorization -- it does
+    NOT implement civitas.ModelProvider itself (no chat()). presidium.providers.civitas_adapters.
+    GovernedModelProviderAdapter is the real, drop-in civitas.ModelProvider that composes this
+    check with a real backend.&quot;&quot;&quot;
+    async def check(self, agent_name: str, model: str) -&gt; Any: ...  # raises PolicyDeniedError on DENY, else PolicyResult
+    async def post_check(self, agent_name: str, model: str, result_data: dict[str, Any]) -&gt; Any: ...
+
+class LLMGatewayBackend(Protocol):
+    &quot;&quot;&quot;Pluggable operations layer GovernedModelProvider delegates to after authorization passes.
+    AgentGateway is the reference/built adapter; see llm-gateway.md for the full candidate table
+    (LiteLLM is the current leading 2nd-adapter pick, not frozen).&quot;&quot;&quot;
+    async def chat(
+        self, messages: list[dict[str, str]], *, model: str | None = None,
+        agent_name: str | None = None, **kwargs: Any,
+    ) -&gt; dict[str, Any]: ...
+    async def list_models(self) -&gt; list[dict[str, Any]]: ...
+    async def health(self) -&gt; bool: ...
+</code></pre>
+<h3 id="mcp-governance">MCP Governance<a class="headerlink" href="#mcp-governance" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class GovernedToolProvider:
+    &quot;&quot;&quot;A concrete class (not a Protocol) doing pure PRE_TOOL/POST_TOOL authorization for
+    possibly many tools -- it does NOT implement civitas.ToolProvider itself.
+    presidium.providers.civitas_adapters.GovernedToolAdapter is the real, drop-in
+    civitas.ToolProvider that wraps exactly one real backend tool with this check.&quot;&quot;&quot;
+    async def check(self, agent_name: str, tool: str, action: str = &quot;invoke&quot;,
+                     parameters: dict[str, Any] | None = None) -&gt; Any: ...  # raises PolicyDeniedError on DENY, else PolicyResult
+    async def check_grant(self, agent_name: str, resource: str, action: str) -&gt; Any: ...
+
+class ToolsGatewayBackend(Protocol):
+    &quot;&quot;&quot;Pluggable operations layer GovernedToolProvider delegates to. call_tool() is deliberately
+    uniform for a classic MCP tool and an A2A-delegated agent (outbound only — see mcp-gateway.md
+    Non-Goals for deferred inbound A2A exposure). AgentGateway is the sole implementation today.&quot;&quot;&quot;
+    async def list_tools(self, *, agent_name: str | None = None) -&gt; list[dict[str, Any]]: ...
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any], *, agent_name: str | None = None,
+    ) -&gt; dict[str, Any]: ...
+    async def health(self) -&gt; bool: ...
+</code></pre>
+<p>Existing MCP gateways (incl. Microsoft AGT's MCP Security Gateway) aren't available as standalone libraries to wrap. The reference implementation in <code>presidium-contrib</code> adds tool poisoning detection and credential redaction.</p>
+<hr />
+<h2 id="presidium-contrib">presidium-contrib<a class="headerlink" href="#presidium-contrib" title="Permanent link">&para;</a></h2>
+<p><strong>Adapters for existing products and reference implementations for novel components.</strong></p>
+<h3 id="adapters-existing-products">Adapters (existing products)<a class="headerlink" href="#adapters-existing-products" title="Permanent link">&para;</a></h3>
+<p>These wrap products that already exist. The adapter implements the Presidium protocol; the underlying product does the work.</p>
+<p><strong><code>adapters/opa.py</code></strong> — OPA <code>PolicyEngine</code> adapter. Calls the OPA REST API. Use when you already run OPA and want to reuse your Rego policies.</p>
+<p><strong><code>adapters/cedar.py</code></strong> — Cedar <code>PolicyEngine</code> adapter. Use when you need Cedar's authorization model (entity-based, fine-grained).</p>
+<p><strong><code>adapters/openbao.py</code></strong> — OpenBao <code>CredentialProvider</code>. Reads secrets from OpenBao/Vault KV v2 engine via <code>hvac</code>. Handles token renewal. API-compatible with HashiCorp Vault — existing Vault deployments work unchanged. OpenBao is the MPL 2.0 community fork under Linux Foundation / OpenSSF Sandbox.</p>
+<p><strong><code>agentgateway/client.py</code></strong> — AgentGateway <code>LLMGatewayBackend</code> (shipped) + <code>ToolsGatewayBackend</code>
+(MCP/A2A <code>list_tools</code>/<code>call_tool</code> methods pending — tracked as an issue). Routes LLM, MCP, and A2A
+calls through AgentGateway (Linux Foundation). Native CEL policy engine, OpenTelemetry
+observability.</p>
+<p><strong><code>litellm/client.py</code></strong> — LiteLLM Proxy <code>LLMGatewayBackend</code>. Current leading candidate for the
+second fully-built backend (2026-07-07 market research: highest OSS adoption signal, MIT license,
+Python-native, self-hostable) — <strong>not frozen</strong>, may change on customer/market signal. LiteLLM does
+not do MCP/A2A, so it does not implement <code>ToolsGatewayBackend</code>.</p>
+<p><strong><code>kong/client.py</code>, <code>portkey/client.py</code>, <code>cloudflare_ai_gateway/client.py</code>, <code>helicone/client.py</code>,
+<code>truefoundry/client.py</code></strong> — <code>LLMGatewayBackend</code> stubs (interface-conformant, <code>NotImplementedError</code>
+bodies). Reserve the extras name and prove the Protocol isn't AgentGateway-shaped-in-disguise
+without committing build effort to all of them.</p>
+<p><strong><code>adapters/slack_approval.py</code></strong> — Slack <code>ApprovalService</code>. Posts approval requests to a Slack channel with approve/deny buttons. Waits for response via Slack Events API.</p>
+<p><strong><code>adapters/temporal_approval.py</code></strong> — Temporal <code>ApprovalService</code>. Creates a Temporal human task workflow. Integrates with existing Temporal deployments.</p>
+<h3 id="reference-implementations-novel">Reference Implementations (novel)<a class="headerlink" href="#reference-implementations-novel" title="Permanent link">&para;</a></h3>
+<p>These implement components where prior art (e.g. Microsoft AGT, Google Gemini) isn't available as a standalone library to wrap. They're production-ready but not wrappers.</p>
+<p><strong><code>reference/postgres_registry.py</code></strong> — <code>AgentRegistry</code> backed by Postgres. Stores agent records, grant sets, and trust score history. Supports the <code>RegistryService</code> GenServer for service mode.</p>
+<p><strong><code>reference/mcp_governance.py</code></strong> — <code>GovernedToolProvider</code> with full MCP governance: ACL enforcement, tool poisoning detection (hash-based), credential redaction from parameters, and per-call audit logging.</p>
+<p><strong><code>reference/trust_scorer.py</code></strong> — <code>LearningTrustScorer</code>. Starts with rule-based scoring, then learns from the decision journal (action, context, outcome, human decision) to improve signal weighting over time.</p>
+<hr />
+<h2 id="dependency-graph">Dependency Graph<a class="headerlink" href="#dependency-graph" title="Permanent link">&para;</a></h2>
+<p><img alt="Dependency Graph" src="../../assets/dependency-graph.svg" /></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache 2.0 License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/civitas-io/presidium" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.instant", "navigation.indexes", "content.code.copy", "content.code.annotate", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
