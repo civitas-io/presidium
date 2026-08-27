@@ -6,7 +6,7 @@
 **Package:** `presidium` (protocol + CelPolicyEngine) / `presidium-contrib` (OPA, Cedar adapters)
 **Milestone:** M2
 **Requirements:** [policy-engine-requirements.md](policy-engine-requirements.md)
-**Research:** [agent-registry-research.md](../research/agent-registry-research.md), [policy-engines-ai-governance](/Users/jeryn/workspace/projects/policy-engines-ai-governance/index.md)
+**Research:** [agent-registry-research.md](../research/agent-registry-research.md), an internal policy-engine-landscape research pass (not published; local research notes only)
 
 ## Problem Statement
 

@@ -9,6 +9,11 @@ authors = [
     { name = "Jeryn Mathew", email = "jerynmathew@gmail.com" },
 ]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.5",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

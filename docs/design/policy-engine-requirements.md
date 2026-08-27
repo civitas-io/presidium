@@ -1,6 +1,6 @@
 # Policy Engine: Requirements
 
-> What the PolicyEngine must do, informed by [industry research](../research/agent-registry-research.md) and [policy engine research](/Users/jeryn/workspace/projects/policy-engines-ai-governance/index.md).
+> What the PolicyEngine must do, informed by [industry research](../research/agent-registry-research.md) and an internal policy-engine-landscape research pass (not published; local research notes only).
 > Status: Draft
 > Milestone: M2 (Core Interfaces + CEL Policy)
 

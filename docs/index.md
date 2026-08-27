@@ -3,7 +3,7 @@
 > Content catalog for the Presidium knowledge base.
 > AI assistants: read this file first to find relevant pages before drilling in.
 > Content structure last updated: 2026-07-07 — for current milestone/test-count status, see
-> [`docs/vision/roadmap.md`](vision/roadmap.md)'s milestone table and [`HANDOFF.md`](../HANDOFF.md),
+> [`docs/vision/roadmap.md`](vision/roadmap.md)'s milestone table and [`HANDOFF.md`](https://github.com/civitas-io/presidium/blob/main/HANDOFF.md),
 > not the prose below (a hand-maintained snapshot on this page drifted for 7+ weeks before being
 > caught — see `docs/log.md`).
 
@@ -11,7 +11,7 @@
 
 Runtime + governance as one architecture — not bolted on, not a sidecar, native.
 
-**Status:** see [`docs/vision/roadmap.md`](vision/roadmap.md) for the current, maintained milestone table (M1-M3 complete, M4 not started, M5 started 2026-08-24, M7 complete for its P0 scope) and [`HANDOFF.md`](../HANDOFF.md) for current test counts and release status.
+**Status:** see [`docs/vision/roadmap.md`](vision/roadmap.md) for the current, maintained milestone table (M1-M3 complete, M4 not started, M5 started 2026-08-24, M7 complete for its P0 scope) and [`HANDOFF.md`](https://github.com/civitas-io/presidium/blob/main/HANDOFF.md) for current test counts and release status.
 
 ---
 
@@ -31,10 +31,10 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 | Page | Summary |
 |---|---|
-| [System Overview](architecture/overview.md) | Full system architecture diagram (Mermaid). Seven key design decisions: governance as supervisor constraints, registry as source of truth, gateways as Civitas plugins, eval as feedback loop, interface-first architecture, CEL as default policy language, library-first service-optional. Data flow and startup sequence. |
+| [System Overview](architecture/overview.md) | Full system architecture diagram (SVG). Seven key design decisions: governance as supervisor constraints, registry as source of truth, gateways as Civitas plugins, eval as feedback loop, interface-first architecture, CEL as default policy language, library-first service-optional. Data flow and startup sequence. |
 | [Package Map](architecture/packages.md) | Two-package structure: `presidium` (protocols + CEL defaults + scoring library) and `presidium-contrib` (adapters for OPA/OpenBao/AgentGateway/LiteLLM/Slack + stubbed gateway backends (Kong/Portkey/Cloudflare/Helicone/TrueFoundry) + reference impls for novel components). Component map, Protocol definitions, dependency graph. |
 | [Full Stack](architecture/stack.md) | Three-layer model: Run (Civitas) → Govern (Presidium) → Observe (Fiddler/Arize). Library mode vs service mode deployment. Three deployment scenarios with YAML topology examples (laptop → staging → production). |
-| [Architecture Diagrams](assets/) | SVG assets: interface-first-architecture, deployment-modes, autonomy-progression, product-mapping, policy-evaluation-flow, full-stack-layers, eval-architecture, deepeval-integration, test-harness-architecture |
+| Architecture Diagrams | SVG assets embedded in the pages above: interface-first-architecture, deployment-modes, autonomy-progression, product-mapping, policy-evaluation-flow, full-stack-layers, eval-architecture, deepeval-integration, test-harness-architecture |
 
 ## Design
 
@@ -99,12 +99,12 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 | File | Purpose |
 |---|---|
-| [AGENTS.md](../AGENTS.md) | Machine-readable project reference for AI assistants. Conventions, anti-patterns, PR checklist. |
-| [README.md](../README.md) | Public-facing project overview. |
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | How to contribute (currently: feedback on design docs). |
-| [SECURITY.md](../SECURITY.md) | Vulnerability reporting policy. |
-| [CHANGELOG.md](../CHANGELOG.md) | Release history. |
-| [pyproject.toml](../pyproject.toml) | Workspace configuration (uv, Ruff, mypy, pytest). |
+| [AGENTS.md](https://github.com/civitas-io/presidium/blob/main/AGENTS.md) | Machine-readable project reference for AI assistants. Conventions, anti-patterns, PR checklist. |
+| [README.md](https://github.com/civitas-io/presidium/blob/main/README.md) | Public-facing project overview. |
+| [CONTRIBUTING.md](https://github.com/civitas-io/presidium/blob/main/CONTRIBUTING.md) | How to contribute (currently: feedback on design docs). |
+| [SECURITY.md](https://github.com/civitas-io/presidium/blob/main/SECURITY.md) | Vulnerability reporting policy. |
+| [CHANGELOG.md](https://github.com/civitas-io/presidium/blob/main/CHANGELOG.md) | Release history. |
+| [pyproject.toml](https://github.com/civitas-io/presidium/blob/main/pyproject.toml) | Workspace configuration (uv, Ruff, mypy, pytest). |
 
 ## Maintenance
 

@@ -3,6 +3,7 @@ site_description: The governed agent platform built on Civitas
 site_url: https://civitas-io.github.io/presidium
 repo_url: https://github.com/civitas-io/presidium
 repo_name: civitas-io/presidium
+copyright: Apache 2.0 License
 
 theme:
   name: material
@@ -10,46 +11,111 @@ theme:
     - scheme: default
       primary: indigo
       accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
+    - navigation.top
+    - navigation.instant
+    - navigation.indexes
     - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.inlinehilite
+  - admonition
+  - pymdownx.details
+  - tables
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/civitas-io/presidium
 
 nav:
   - Home: index.md
-  - Vision:
-      - Manifesto: vision/manifesto.md
-      - Positioning: vision/positioning.md
-      - Roadmap: vision/roadmap.md
-  - Architecture:
-      - Overview: architecture/overview.md
-      - Package Map: architecture/packages.md
-      - Full Stack: architecture/stack.md
-  - Design:
-      - Agent Registry: design/agent-registry.md
-      - Policy Engine: design/policy-engine.md
-      - LLM Gateway: design/llm-gateway.md
-      - MCP Gateway: design/mcp-gateway.md
-      - Eval Framework: design/eval-framework.md
-      - HTTP Gateway: design/http-gateway.md
-  - Research:
-      - Competitive Landscape: research/competitive-landscape.md
-      - Market Analysis: research/market-analysis.md
-      - Monetization: research/monetization.md
-      - Fiddler Relationship: research/fiddler-relationship.md
-  - RFCs:
-      - "001: Presidium Scope": rfcs/001-presidium-scope.md
-  - Wiki Log: log.md
+  - Getting Started: guides/getting-started.md
 
-markdown_extensions:
-  - pymdownx.highlight
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed
-  - admonition
-  - tables
-  - toc:
-      permalink: true
+  - Vision:
+    - Manifesto: vision/manifesto.md
+    - Market Positioning: vision/positioning.md
+    - PRD: vision/prd.md
+    - Roadmap: vision/roadmap.md
+
+  - Architecture:
+    - System Overview: architecture/overview.md
+    - Package Map: architecture/packages.md
+    - Full Stack: architecture/stack.md
+
+  - Design:
+    - Agent Registry: design/agent-registry.md
+    - Agent Registry Requirements: design/agent-registry-requirements.md
+    - Policy Engine: design/policy-engine.md
+    - Policy Engine Requirements: design/policy-engine-requirements.md
+    - Credential Provider: design/credential-provider.md
+    - Credential Provider Requirements: design/credential-provider-requirements.md
+    - Approval Service: design/approval-service.md
+    - Approval Service Requirements: design/approval-service-requirements.md
+    - Audit Enricher: design/audit-enricher.md
+    - Audit Enricher Requirements: design/audit-enricher-requirements.md
+    - Topology Integration: design/topology-integration.md
+    - Topology Integration Requirements: design/topology-integration-requirements.md
+    - Implementation Plan: design/implementation-plan.md
+    - LLM Gateway: design/llm-gateway.md
+    - MCP Gateway: design/mcp-gateway.md
+    - Eval Framework: design/eval-framework.md
+    - DeepEval Integration: design/deepeval-integration.md
+    - Trust Scoring Requirements: design/trust-scoring-requirements.md
+    - HTTP Gateway (superseded): design/http-gateway.md
+    - Presidium Server Requirements: design/presidium-server-requirements.md
+    - Presidium Server: design/presidium-server.md
+    - Vendor research:
+      - AgentGateway (2026-08): design/agentgateway-vendor-research-2026-08.md
+      - A2A Delegation (2026-08): design/a2a-delegation-vendor-research-2026-08.md
+      - SPIFFE (2026-08): design/spiffe-vendor-research-2026-08.md
+    - Performance Research: design/performance-research.md
+    - Trust Scoring Design: design/trust-scoring-design.md
+    - Trust Attestation: design/trust-attestation.md
+    - Hero Demo Candidates: design/hero-demo-candidates.md
+
+  - Research:
+    - Competitive Landscape: research/competitive-landscape.md
+    - Market Analysis: research/market-analysis.md
+    - Monetization Strategy: research/monetization.md
+    - Fiddler Relationship: research/fiddler-relationship.md
+    - Agent Registry Research: research/agent-registry-research.md
+    - Trust Scoring Research: research/trust-scoring-research.md
+    - AAA Patterns: research/aaa-patterns.md
+
+  - RFCs:
+    - "RFC-001: Presidium Scope and Boundaries": rfcs/001-presidium-scope.md
+    - "RFC-002: Multi-Dimensional Evaluation": rfcs/002-multi-dimensional-evaluation.md
+    - "RFC-003: Agent Value Chain": rfcs/003-agent-value-chain.md
+
+  - Wiki Log: log.md
