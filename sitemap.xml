@@ -2,194 +2,194 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://civitas-io.github.io/presidium/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/log/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/architecture/overview/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/architecture/packages/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/architecture/stack/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/a2a-delegation-vendor-research-2026-08/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/agent-registry-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/agent-registry/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/agentgateway-vendor-research-2026-08/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/approval-service-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/approval-service/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/audit-enricher-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/audit-enricher/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/credential-provider-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/credential-provider/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/deepeval-integration/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/eval-framework/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/hero-demo-candidates/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/http-gateway/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/implementation-plan/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/llm-gateway/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/mcp-gateway/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/performance-research/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/policy-engine-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/policy-engine/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/presidium-server-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/presidium-server/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/spiffe-vendor-research-2026-08/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/topology-integration-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/topology-integration/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/trust-attestation/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/trust-scoring-design/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/trust-scoring-requirements/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/guides/getting-started/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/aaa-patterns/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/agent-registry-research/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/competitive-landscape/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/fiddler-relationship/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/market-analysis/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/monetization/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/research/trust-scoring-research/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/rfcs/001-presidium-scope/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/rfcs/002-multi-dimensional-evaluation/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/rfcs/003-agent-value-chain/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/vision/manifesto/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/vision/positioning/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/vision/prd/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/vision/roadmap/</loc>
-         <lastmod>2026-08-27</lastmod>
+         <lastmod>2026-08-28</lastmod>
     </url>
 </urlset>

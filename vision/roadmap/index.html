@@ -2976,8 +2976,12 @@ real, separate work, not automatically unblocked by this alone.</p>
     <code>docs/architecture/*</code>, <code>docs/guides/getting-started.md</code>, and <code>README.md</code> — explicitly
     excluding <code>docs/design/research/vision/rfcs</code>, where forcing Draft code sketches to import-check
     against current source would produce false positives and train people to ignore the check.</li>
-<li><code>mkdocs build --strict</code> in the docs deploy workflow, after fixing whatever real broken
-    links/anchors it finds first.</li>
+<li>✅ <code>mkdocs build --strict</code> in the docs deploy workflow — <strong>done, 2026-08-27</strong>, as part of
+    building this repo's first real mkdocs site (<code>mkdocs.yml</code>, <code>docs/index.md</code>,
+    <code>.github/workflows/docs.yml</code>). Found a pre-existing <code>mkdocs.yml</code> was missing from the working
+    tree entirely (in git history, absent on disk — unrelated to this audit, fixed alongside it)
+    and two docs/design/policy-engine*.md files hardcoding a local-machine-only filesystem path.
+    Strict build is clean: zero warnings.</li>
 <li>An explicit archive/delete-vs-label decision for any design docs clearly superseded by a
     shipped milestone, rather than defaulting to "label everything in place" forever.</li>
 <li>AGENTS.md needs no thin-router rework — it's already 389 lines with its own documented
