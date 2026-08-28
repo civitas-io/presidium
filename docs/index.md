@@ -38,7 +38,12 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 
 ## Design
 
-*Per-component design docs — problem, goals, API sketches, alternatives.*
+*Per-component design docs — problem, goals, API sketches, alternatives. Most below are
+"Draft" but describe features that have since shipped (real historical record of what was
+designed and built, kept as-is per this wiki's own append-don't-delete convention) — that's
+different from a doc whose entire premise was replaced by a later one. Docs in that second
+category move to `docs/design/archive/` with a `Superseded` status note explaining what
+replaced them and why, rather than staying mixed in with current design docs indefinitely.*
 
 | Page | Package | Milestone | Status |
 |---|---|---|---|
@@ -60,7 +65,7 @@ Runtime + governance as one architecture — not bolted on, not a sidecar, nativ
 | [Eval Framework](design/eval-framework.md) | `presidium` + `civitas[test]` | M4 | Draft (revised) |
 | [DeepEval Integration](design/deepeval-integration.md) | `civitas-contrib[deepeval]` | M4 | Draft |
 | [Trust Scoring Requirements](design/trust-scoring-requirements.md) | `presidium` + `presidium-contrib` | M3-M6 | Draft |
-| [HTTP Gateway](design/http-gateway.md) | TBD | M4+ | Superseded by Presidium Server, 2026-08-22 |
+| [HTTP Gateway (archived)](design/archive/http-gateway.md) | TBD | M4+ | Superseded by Presidium Server, 2026-08-22 — moved to `docs/design/archive/` |
 | [Presidium Server Requirements](design/presidium-server-requirements.md) | `presidium` (1 new method) + `presidium-contrib.server` | M7 | Shipped -- FR-1 through FR-5.2 done (2026-08-22–24); only FR-5.3 (credential resolution) remains, deliberately unsketched |
 | [Presidium Server](design/presidium-server.md) | `presidium-contrib.server` (needs `civitas[http]`) | M7 | Shipped -- check_grant, rate limiting, registry CRUD, approval list/decide all real and released; only credential resolution remains |
 

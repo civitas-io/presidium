@@ -1800,3 +1800,35 @@ Build is now clean: zero warnings, zero infos.
 **Pages updated:** `mkdocs.yml`, `.github/workflows/docs.yml` (new), `pyproject.toml`,
 `docs/index.md`, `docs/design/policy-engine.md`, `docs/design/policy-engine-requirements.md`,
 `docs/vision/roadmap.md`, `docs/log.md` (this entry).
+
+## [2026-08-28] docs | Archived the one genuinely superseded design doc, not everything Draft
+
+Fourth item from the council's own priority order on the 2026-08-27 doc-reliability audit
+(`docs/vision/roadmap.md`'s P1 backlog): "an explicit archive/delete-vs-label decision for any
+design docs clearly superseded by a shipped milestone, rather than defaulting to 'label
+everything in place' forever."
+
+**Checked all 29 files under `docs/design/` for real evidence of being superseded** (grepped for
+"superseded"/"deprecated"/"obsolete"/"replaced by", read every `Status:` line), not just their
+"Draft" label -- most Draft-status design docs (agent-registry, policy-engine,
+credential-provider, approval-service, audit-enricher, topology-integration, etc.) describe
+features that have since shipped in M2/M3; they're accurate historical records of what was
+designed and built, not superseded, and stay exactly where they are, unarchived. Only one file
+was genuinely, wholly superseded: `docs/design/http-gateway.md`, whose own header already said
+"Superseded 2026-08-22 by presidium-server-requirements.md + presidium-server.md (M7)" -- an
+older draft entirely replaced by a newer one, the exact category this item exists to move, not
+a shipped-feature record.
+
+**Moved** `docs/design/http-gateway.md` → `docs/design/archive/http-gateway.md` (new directory).
+Fixed its own internal relative links (now one level deeper) and updated every real cross-
+reference: `docs/design/presidium-server.md`'s pointer to it, `docs/index.md`'s design-docs
+table row, and `mkdocs.yml`'s nav (moved into a new "Archive (superseded designs)" subsection
+under Design). Left `docs/log.md`'s own historical mentions of the old path untouched -- plain
+backtick-quoted text, not hyperlinks, so no strict-mode breakage, and they're accurate records
+of what was true when written. Added a short explanatory note to `docs/index.md`'s Design
+section header establishing the convention for future superseded docs, so this doesn't need
+re-deciding from scratch next time. `mkdocs build --strict` clean: zero warnings.
+
+**Pages updated:** `docs/design/archive/http-gateway.md` (moved, from `docs/design/http-gateway.md`),
+`docs/design/presidium-server.md`, `docs/index.md`, `mkdocs.yml`, `docs/vision/roadmap.md`,
+`docs/log.md` (this entry).

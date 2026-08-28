@@ -307,7 +307,7 @@ end-to-end HTTP), 100% coverage on all three new/changed files, `ruff`/`ruff for
   it is.
 
 **Real, pre-existing endpoint sketches worth reusing, not re-deriving**, from the now-superseded
-[`http-gateway.md`](http-gateway.md) (a real, older draft that correctly identified "extend
+[`http-gateway.md`](archive/http-gateway.md) (a real, older draft that correctly identified "extend
  Civitas's HTTP Gateway" back when it was written, but sat unconnected to any milestone):
 
 ```

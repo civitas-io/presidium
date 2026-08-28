@@ -300,8 +300,14 @@ real, separate work, not automatically unblocked by this alone.
     tree entirely (in git history, absent on disk — unrelated to this audit, fixed alongside it)
     and two docs/design/policy-engine*.md files hardcoding a local-machine-only filesystem path.
     Strict build is clean: zero warnings.
-  - An explicit archive/delete-vs-label decision for any design docs clearly superseded by a
-    shipped milestone, rather than defaulting to "label everything in place" forever.
+  - ✅ Archive/delete-vs-label decision for superseded design docs — **done, 2026-08-28**.
+    Checked all 29 `docs/design/*.md` files for real evidence of being superseded, not just
+    "Draft" status (most Draft docs describe shipped M2/M3 features — accurate historical
+    record, not superseded, left in place). Only one file qualified:
+    `docs/design/http-gateway.md`, moved to `docs/design/archive/http-gateway.md`, with every
+    real cross-reference (`presidium-server.md`, `docs/index.md`, `mkdocs.yml`) updated and a
+    convention note added to `docs/index.md` for future superseded docs. See `docs/log.md`'s
+    `[2026-08-28]` entry.
   - AGENTS.md needs no thin-router rework — it's already 389 lines with its own documented
     self-correction history (2026-08-24). Deliberately not manufacturing work there.
 - [ ] M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely
