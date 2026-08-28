@@ -1764,3 +1764,39 @@ abandoned -- tracked as open work, not silently dropped.
 `docs/architecture/overview.md`, `docs/architecture/packages.md`, `docs/architecture/stack.md`,
 `docs/vision/roadmap.md` (new P1 backlog item), `HANDOFF.md`,
 `packages/presidium-contrib/src/presidium_contrib/cli/__init__.py`, `docs/log.md` (this entry).
+
+## [2026-08-27] fix | Public mkdocs site rebuilt -- was silently missing from the working tree
+
+Explicitly requested separately from the docs-reliability audit above: a real, public-facing
+mkdocs site with the existing SVG diagrams, matching `python-civitas`'s.
+
+**Real anomaly found before building anything**: `mkdocs.yml` already existed in this repo's git
+history (`Initial commit` + `Adopt LLM Wiki pattern for persistent knowledge management`), but was
+missing from the actual working directory -- confirmed via `ls`/`find`, no deletion commit exists
+anywhere in history. Not caused by this session; investigated rather than silently overwritten.
+Rebuilt comprehensively rather than restoring the stale version: the old nav covered only a
+fraction of the real design/research/rfc docs that exist today, carried a dead Mermaid-fence
+config (this repo's diagrams are real SVG assets, not Mermaid -- `docs/index.md` itself had this
+claim wrong, also fixed), and had no dark-mode toggle.
+
+New `mkdocs.yml` nav covers every real doc under `docs/vision`, `docs/architecture`,
+`docs/design` (29 files, including three "Vendor research" subpages), `docs/research`,
+`docs/rfcs`, plus the wiki log -- verified against the actual file listing, not assumed from
+`docs/index.md`'s own catalog table. Added `.github/workflows/docs.yml` (`mkdocs build --strict`
+then `gh-deploy`, mirroring `python-civitas`) and a `docs` extra in `pyproject.toml`.
+
+**Ran `mkdocs build --strict` locally first, fixed every real warning before wiring in CI**:
+`docs/index.md`'s "Project Files" table linked to root-level files (`HANDOFF.md`, `AGENTS.md`,
+`README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `pyproject.toml`) with relative
+paths that only work because mkdocs's `docs_dir` is `docs/` -- dead links on any real deployed
+site, now GitHub blob URLs. Also found and fixed two `docs/design/policy-engine*.md` files linking
+to `/Users/jeryn/workspace/projects/policy-engines-ai-governance/index.md` -- a hardcoded local
+filesystem path to an unpublished, non-git research folder that only ever worked on one machine
+and leaked local directory structure into a public doc; replaced with an honest prose mention (no
+public URL exists to link to).
+
+Build is now clean: zero warnings, zero infos.
+
+**Pages updated:** `mkdocs.yml`, `.github/workflows/docs.yml` (new), `pyproject.toml`,
+`docs/index.md`, `docs/design/policy-engine.md`, `docs/design/policy-engine-requirements.md`,
+`docs/vision/roadmap.md`, `docs/log.md` (this entry).

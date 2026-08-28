@@ -18,8 +18,14 @@ existed -- the real repo is `civitas-io/python-civitas`) drifted into `docs/inde
 `AGENTS.md` (twice), `CONTRIBUTING.md`, and a source docstring, plus a `docs/index.md` status
 header that had contradicted its own linked `docs/vision/roadmap.md` for ~7 weeks. Full detail
 and remaining follow-up items (a status taxonomy for `docs/design/`/`research/`/`vision/`/`rfcs/`,
-a mechanical currency check, a scoped code-fence import checker, `mkdocs --strict`) are tracked in
-`docs/vision/roadmap.md`'s P1 section and `docs/log.md`'s `[2026-08-27]` entry.
+a mechanical currency check, a scoped code-fence import checker) are tracked in `docs/vision/
+roadmap.md`'s P1 section and `docs/log.md`'s `[2026-08-27]` entries.
+
+**Public mkdocs site, 2026-08-27** (also docs-only): rebuilt `mkdocs.yml` (a version already
+existed in git history but was missing from the working tree -- a real, pre-existing anomaly,
+not caused by this work), added `docs/index.md`'s "Project Files" GitHub-blob-URL fixes, and
+`.github/workflows/docs.yml` with `mkdocs build --strict`. Site build is clean. See
+`docs/log.md`'s `[2026-08-27] fix | Public mkdocs site rebuilt` entry.
 
 ## Status as of 2026-08-25: **presidium v0.6.0 and presidium-contrib v0.7.0 are real, live on PyPI**
 
