@@ -73,10 +73,6 @@
          <lastmod>2026-08-28</lastmod>
     </url>
     <url>
-         <loc>https://civitas-io.github.io/presidium/design/http-gateway/</loc>
-         <lastmod>2026-08-28</lastmod>
-    </url>
-    <url>
          <loc>https://civitas-io.github.io/presidium/design/implementation-plan/</loc>
          <lastmod>2026-08-28</lastmod>
     </url>
@@ -130,6 +126,10 @@
     </url>
     <url>
          <loc>https://civitas-io.github.io/presidium/design/trust-scoring-requirements/</loc>
+         <lastmod>2026-08-28</lastmod>
+    </url>
+    <url>
+         <loc>https://civitas-io.github.io/presidium/design/archive/http-gateway/</loc>
          <lastmod>2026-08-28</lastmod>
     </url>
     <url>

@@ -1442,34 +1442,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../design/http-gateway/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HTTP Gateway (superseded)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../design/presidium-server-requirements/" class="md-nav__link">
         
   
@@ -1549,10 +1521,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_21" >
         
           
-          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_21" id="__nav_5_21_label" tabindex="0">
             
   
   
@@ -1570,8 +1542,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1780,6 +1752,100 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_26" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_26" id="__nav_5_26_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive (superseded designs)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_26">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive (superseded designs)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design/archive/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded 2026-08-22)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2812,6 +2878,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#2026-08-28-docs-archived-the-one-genuinely-superseded-design-doc-not-everything-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2026-08-28] docs | Archived the one genuinely superseded design doc, not everything Draft
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3368,6 +3445,17 @@
     <span class="md-ellipsis">
       
         [2026-08-27] fix | Public mkdocs site rebuilt -- was silently missing from the working tree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-08-28-docs-archived-the-one-genuinely-superseded-design-doc-not-everything-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2026-08-28] docs | Archived the one genuinely superseded design doc, not everything Draft
       
     </span>
   </a>
@@ -4889,6 +4977,33 @@ public URL exists to link to).</p>
 <p><strong>Pages updated:</strong> <code>mkdocs.yml</code>, <code>.github/workflows/docs.yml</code> (new), <code>pyproject.toml</code>,
 <code>docs/index.md</code>, <code>docs/design/policy-engine.md</code>, <code>docs/design/policy-engine-requirements.md</code>,
 <code>docs/vision/roadmap.md</code>, <code>docs/log.md</code> (this entry).</p>
+<h2 id="2026-08-28-docs-archived-the-one-genuinely-superseded-design-doc-not-everything-draft">[2026-08-28] docs | Archived the one genuinely superseded design doc, not everything Draft<a class="headerlink" href="#2026-08-28-docs-archived-the-one-genuinely-superseded-design-doc-not-everything-draft" title="Permanent link">&para;</a></h2>
+<p>Fourth item from the council's own priority order on the 2026-08-27 doc-reliability audit
+(<code>docs/vision/roadmap.md</code>'s P1 backlog): "an explicit archive/delete-vs-label decision for any
+design docs clearly superseded by a shipped milestone, rather than defaulting to 'label
+everything in place' forever."</p>
+<p><strong>Checked all 29 files under <code>docs/design/</code> for real evidence of being superseded</strong> (grepped for
+"superseded"/"deprecated"/"obsolete"/"replaced by", read every <code>Status:</code> line), not just their
+"Draft" label -- most Draft-status design docs (agent-registry, policy-engine,
+credential-provider, approval-service, audit-enricher, topology-integration, etc.) describe
+features that have since shipped in M2/M3; they're accurate historical records of what was
+designed and built, not superseded, and stay exactly where they are, unarchived. Only one file
+was genuinely, wholly superseded: <code>docs/design/http-gateway.md</code>, whose own header already said
+"Superseded 2026-08-22 by presidium-server-requirements.md + presidium-server.md (M7)" -- an
+older draft entirely replaced by a newer one, the exact category this item exists to move, not
+a shipped-feature record.</p>
+<p><strong>Moved</strong> <code>docs/design/http-gateway.md</code> → <code>docs/design/archive/http-gateway.md</code> (new directory).
+Fixed its own internal relative links (now one level deeper) and updated every real cross-
+reference: <code>docs/design/presidium-server.md</code>'s pointer to it, <code>docs/index.md</code>'s design-docs
+table row, and <code>mkdocs.yml</code>'s nav (moved into a new "Archive (superseded designs)" subsection
+under Design). Left <code>docs/log.md</code>'s own historical mentions of the old path untouched -- plain
+backtick-quoted text, not hyperlinks, so no strict-mode breakage, and they're accurate records
+of what was true when written. Added a short explanatory note to <code>docs/index.md</code>'s Design
+section header establishing the convention for future superseded docs, so this doesn't need
+re-deciding from scratch next time. <code>mkdocs build --strict</code> clean: zero warnings.</p>
+<p><strong>Pages updated:</strong> <code>docs/design/archive/http-gateway.md</code> (moved, from <code>docs/design/http-gateway.md</code>),
+<code>docs/design/presidium-server.md</code>, <code>docs/index.md</code>, <code>mkdocs.yml</code>, <code>docs/vision/roadmap.md</code>,
+<code>docs/log.md</code> (this entry).</p>
 
 
 

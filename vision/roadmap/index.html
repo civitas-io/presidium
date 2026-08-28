@@ -1665,34 +1665,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/http-gateway/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HTTP Gateway (superseded)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../design/presidium-server-requirements/" class="md-nav__link">
         
   
@@ -1772,10 +1744,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_21" >
         
           
-          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_21" id="__nav_5_21_label" tabindex="0">
             
   
   
@@ -1793,8 +1765,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2003,6 +1975,100 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_26" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_26" id="__nav_5_26_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive (superseded designs)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_26">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive (superseded designs)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/archive/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded 2026-08-22)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2982,8 +3048,14 @@ real, separate work, not automatically unblocked by this alone.</p>
     tree entirely (in git history, absent on disk — unrelated to this audit, fixed alongside it)
     and two docs/design/policy-engine*.md files hardcoding a local-machine-only filesystem path.
     Strict build is clean: zero warnings.</li>
-<li>An explicit archive/delete-vs-label decision for any design docs clearly superseded by a
-    shipped milestone, rather than defaulting to "label everything in place" forever.</li>
+<li>✅ Archive/delete-vs-label decision for superseded design docs — <strong>done, 2026-08-28</strong>.
+    Checked all 29 <code>docs/design/*.md</code> files for real evidence of being superseded, not just
+    "Draft" status (most Draft docs describe shipped M2/M3 features — accurate historical
+    record, not superseded, left in place). Only one file qualified:
+    <code>docs/design/http-gateway.md</code>, moved to <code>docs/design/archive/http-gateway.md</code>, with every
+    real cross-reference (<code>presidium-server.md</code>, <code>docs/index.md</code>, <code>mkdocs.yml</code>) updated and a
+    convention note added to <code>docs/index.md</code> for future superseded docs. See <code>docs/log.md</code>'s
+    <code>[2026-08-28]</code> entry.</li>
 <li>AGENTS.md needs no thin-router rework — it's already 389 lines with its own documented
     self-correction history (2026-08-24). Deliberately not manufacturing work there.</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> M4: Autonomy Progression (see below) — real, well-specified, but Presidium is genuinely

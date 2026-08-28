@@ -1577,34 +1577,6 @@
   
   
     <li class="md-nav__item">
-      <a href="design/http-gateway/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    HTTP Gateway (superseded)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="design/presidium-server-requirements/" class="md-nav__link">
         
   
@@ -1684,10 +1656,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_22" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_21" >
         
           
-          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_21" id="__nav_5_21_label" tabindex="0">
             
   
   
@@ -1705,8 +1677,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1915,6 +1887,100 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_26" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_26" id="__nav_5_26_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive (superseded designs)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_26">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive (superseded designs)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="design/archive/http-gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP Gateway (superseded 2026-08-22)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2580,7 +2646,12 @@ caught — see <code>docs/log.md</code>).</p>
 </tbody>
 </table>
 <h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
-<p><em>Per-component design docs — problem, goals, API sketches, alternatives.</em></p>
+<p><em>Per-component design docs — problem, goals, API sketches, alternatives. Most below are
+"Draft" but describe features that have since shipped (real historical record of what was
+designed and built, kept as-is per this wiki's own append-don't-delete convention) — that's
+different from a doc whose entire premise was replaced by a later one. Docs in that second
+category move to <code>docs/design/archive/</code> with a <code>Superseded</code> status note explaining what
+replaced them and why, rather than staying mixed in with current design docs indefinitely.</em></p>
 <table>
 <thead>
 <tr>
@@ -2700,10 +2771,10 @@ caught — see <code>docs/log.md</code>).</p>
 <td>Draft</td>
 </tr>
 <tr>
-<td><a href="design/http-gateway/">HTTP Gateway</a></td>
+<td><a href="design/archive/http-gateway/">HTTP Gateway (archived)</a></td>
 <td>TBD</td>
 <td>M4+</td>
-<td>Superseded by Presidium Server, 2026-08-22</td>
+<td>Superseded by Presidium Server, 2026-08-22 — moved to <code>docs/design/archive/</code></td>
 </tr>
 <tr>
 <td><a href="design/presidium-server-requirements/">Presidium Server Requirements</a></td>
